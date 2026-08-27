@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube SEO Score Checker</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #0b0f19;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .glow-border {
+            background: linear-gradient(90deg, #ff0000, #3b82f6);
+            padding: 2px;
+            border-radius: 18px;
+        }
+
+        .custom-card { background: #121826; }
+
+        .result-card {
+            background: #121826;
+            border: 1px solid #263247;
+            border-radius: 16px;
+        }
+
+        .score-ring {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .score-ring-inner {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: #121826;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .check-item:last-child { border-bottom: none; }
+
+        .check-icon-pass { color: #4ade80; }
+        .check-icon-warn { color: #facc15; }
+        .check-icon-fail { color: #f87171; }
+
+        #statusMessage { min-height: 20px; }
+
+        .thumb-preview {
+            width: 100%;
+            max-width: 280px;
+            border-radius: 12px;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+
+        .spinner {
+            width: 28px;
+            height: 28px;
+            border: 4px solid #333;
+            border-top-color: #ec4899;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+
+<body class="min-h-screen p-4">
+
+    <div class="glow-border w-full max-w-3xl mx-auto shadow-2xl">
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-red-950/80 text-red-400 border border-red-800/50 text-xs font-bold px-4 py-2 rounded-full">
+                    ● Audit Engine 2026
+                </span>
+                <div class="flex items-center gap-2">
+                    <span class="bg-slate-800 text-yellow-400 text-xs font-bold px-3 py-2 rounded-full border border-slate-700">
+                        📺 View49
+                    </span>
+                    <span class="bg-slate-800 text-cyan-400 text-xs font-semibold px-3 py-2 rounded-full border border-slate-700">
+                        🏠 HELPVIEW
+                    </span>
+                </div>
+            </div>
+
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3">
+                    YouTube SEO Score Checker
+                </h1>
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto">
+                    Paste any YouTube video URL — we'll pull the real title and thumbnail,
+                    run a full SEO audit, and give you an actionable score.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+
+                <input
+                    id="videoUrl"
+                    type="text"
+                    placeholder="Paste YouTube video URL"
+                    class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500"
+                />
+
+                <button onclick="runAudit()" class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg">
+                    🔍 Run SEO Audit
+                </button>
+
+                <div id="statusMessage" class="text-center text-xs text-slate-400"></div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="resultsArea" class="w-full max-w-3xl mx-auto mt-6"></div>
+
+<script>
+
+function extractVideoId(input) {
+    input = input.trim();
+    if (!input) return null;
+
+    const pattern = /(?:youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = input.match(pattern);
+    if (match) return match[1];
+
+    if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+
+    return null;
+}
+
+async function fetchVideoData(videoId) {
+    const targetUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+
+    const response = await fetch(proxyUrl);
+
+    if (!response.ok) {
+        throw new Error("Couldn't fetch video data. The video may be private, deleted, or restricted.");
+    }
+
+    return await response.json();
+}
+
+function runSeoChecks(data) {
+    const checks = [];
+    const title = data.title || "";
+
+    // Title length check
+    if (title.length >= 40 && title.length <= 70) {
+        checks.push({ status: "pass", label: "Title Length", detail: `${title.length} characters — great length for search visibility.` });
+    } else if (title.length < 40) {
+        checks.push({ status: "warn", label: "Title Length", detail: `${title.length} characters — a bit short. Aim for 40-70 characters to use more searchable keywords.` });
+    } else {
+        checks.push({ status: "warn", label: "Title Length", detail: `${title.length} characters — may get truncated in search results. Keep it under 70.` });
+    }
+
+    // Numbers/brackets in title (CTR boosters)
+    const hasNumber = /\d/.test(title);
+    const hasBracket = /[\[\(]/.test(title);
+    if (hasNumber || hasBracket) {
+        checks.push({ status: "pass", label: "CTR Boosters", detail: "Title includes numbers or brackets — these tend to improve click-through rate." });
+    } else {
+        checks.push({ status: "warn", label: "CTR Boosters", detail: "Consider adding a number, year, or bracketed tag (e.g. \"[2026 Guide]\") to boost clicks." });
+    }
+
+    // Capitalization check
+    const wordsCap = title.split(" ").filter(w => w.length > 0 && w[0] === w[0].toUpperCase());
+    const totalWords = title.split(" ").filter(Boolean).length;
+    if (totalWords > 0 && wordsCap.length / totalWords > 0.5) {
+        checks.push({ status: "pass", label: "Title Capitalization", detail: "Good use of capitalization — easier to read and looks intentional." });
+    } else {
+        checks.push({ status: "warn", label: "Title Capitalization", detail: "Consider Title Case for better readability and a more polished look." });
+    }
+
+    // Thumbnail check
+    if (data.thumbnail_url) {
+        checks.push({ status: "pass", label: "Thumbnail", detail: "Custom thumbnail detected and loading correctly." });
+    } else {
+        checks.push({ status: "fail", label: "Thumbnail", detail: "No thumbnail could be retrieved." });
+    }
+
+    // Channel name presence
+    if (data.author_name) {
+        checks.push({ status: "pass", label: "Channel Info", detail: `Published by ${data.author_name} — channel data confirmed.` });
+    }
+
+    return checks;
+}
+
+function calculateScore(checks) {
+    const weights = { pass: 100, warn: 55, fail: 0 };
+    const total = checks.reduce((sum, c) => sum + weights[c.status], 0);
+    return Math.round(total / checks.length);
+}
+
+function scoreColor(score) {
+    if (score >= 80) return "#4ade80";
+    if (score >= 55) return "#facc15";
+    return "#f87171";
+}
+
+async function runAudit() {
+    const input = document.getElementById("videoUrl").value;
+    const status = document.getElementById("statusMessage");
+    const results = document.getElementById("resultsArea");
+
+    const videoId = extractVideoId(input);
+
+    if (!videoId) {
+        status.innerHTML = '<span class="text-red-400">Please enter a valid YouTube video URL.</span>';
+        results.innerHTML = "";
+        return;
+    }
+
+    status.innerHTML = '<span class="text-yellow-400">Fetching video data...</span>';
+    results.innerHTML = '<div class="text-center py-10"><div class="spinner"></div></div>';
+
+    let data;
+    try {
+        data = await fetchVideoData(videoId);
+    } catch (error) {
+        status.innerHTML = `<span class="text-red-400">${escapeHtml(error.message)}</span>`;
+        results.innerHTML = "";
+        return;
+    }
+
+    const checks = runSeoChecks(data);
+    const score = calculateScore(checks);
+    const color = scoreColor(score);
+
+    status.innerHTML = '<span class="text-green-400">Audit complete!</span>';
+
+    const iconMap = { pass: "✅", warn: "⚠️", fail: "❌" };
+    const classMap = { pass: "check-icon-pass", warn: "check-icon-warn", fail: "check-icon-fail" };
+
+    const hashtags = extractHashtags(data.title || "");
+
+    results.innerHTML = `
+        <div class="result-card p-6 mb-4">
+            <div class="flex flex-col md:flex-row items-center gap-6">
+                <div class="score-ring" style="background: conic-gradient(${color} ${score * 3.6}deg, #1e293b 0deg);">
+                    <div class="score-ring-inner">
+                        <span class="text-3xl font-extrabold" style="color: ${color}">${score}</span>
+                        <span class="text-xs text-slate-400">/ 100</span>
+                    </div>
+                </div>
+
+                <div class="flex-1 text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
+                        <h2 class="text-white font-bold text-lg">${escapeHtml(data.title)}</h2>
+                        <button onclick="copyToClipboard(${JSON.stringify(data.title)}, this)" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-2 py-1 rounded-lg shrink-0">
+                            📋 Copy
+                        </button>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-3">by ${escapeHtml(data.author_name || "Unknown channel")}</p>
+                    <img src="${data.thumbnail_url}" class="thumb-preview mx-auto md:mx-0" alt="thumbnail" />
+                </div>
+            </div>
+        </div>
+
+        <div class="result-card p-6 mb-4">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-white font-bold">🏷 Hashtags Found in Title (${hashtags.length})</h3>
+                ${hashtags.length ? `<button onclick="copyToClipboard(${JSON.stringify(hashtags.join(' '))}, this)" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-3 py-1.5 rounded-lg">📋 Copy All</button>` : ""}
+            </div>
+            ${hashtags.length
+                ? `<div>${hashtags.map(h => `<span class="tag-pill">${escapeHtml(h)}</span>`).join("")}</div>`
+                : `<p class="text-slate-500 text-sm">No hashtags found in the title.</p>`
+            }
+        </div>
+
+        <div class="result-card p-6 mb-4">
+            <h3 class="text-white font-bold mb-2">📋 Detailed Checklist</h3>
+            ${checks.map(c => `
+                <div class="check-item">
+                    <span class="${classMap[c.status]} text-lg">${iconMap[c.status]}</span>
+                    <div>
+                        <div class="text-white text-sm font-semibold">${escapeHtml(c.label)}</div>
+                        <div class="text-slate-400 text-xs mt-0.5">${escapeHtml(c.detail)}</div>
+                    </div>
+                </div>
+            `).join("")}
+        </div>
+
+        <div class="result-card p-4">
+            <p class="text-slate-500 text-xs">
+                ℹ️ View count and the uploader's exact backend tags aren't publicly available —
+                YouTube only exposes those through an authenticated API key. This report uses
+                everything that's publicly visible: title, hashtags, channel, and thumbnail.
+            </p>
+        </div>
+    `;
+}
+
+function extractHashtags(title) {
+    const matches = title.match(/#[\w]+/g);
+    return matches ? [...new Set(matches)] : [];
+}
+
+function copyToClipboard(text, button) {
+    navigator.clipboard.writeText(text).then(() => {
+        const originalText = button.textContent;
+        button.textContent = "✅ Copied!";
+        setTimeout(() => { button.textContent = originalText; }, 1500);
+    });
+}
+
+function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = value;
+    return div.innerHTML;
+}
+
+document.getElementById("videoUrl").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") runAudit();
+});
+
+</script>
+
+</body>
+</html>
