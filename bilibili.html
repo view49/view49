@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bilibili Multi Viewer</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #0b0f19;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .glow-border {
+            background: linear-gradient(90deg, #ec4899, #3b82f6);
+            padding: 2px;
+            border-radius: 18px;
+        }
+
+        .custom-card {
+            background: #121826;
+        }
+
+        .video-card {
+            background: #121826;
+            border: 1px solid #263247;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .loader {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            z-index: 2;
+        }
+
+        .spinner {
+            width: 35px;
+            height: 35px;
+            border: 4px solid #333;
+            border-top-color: #ec4899;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-box {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            background: #050505;
+            color: #f87171;
+        }
+
+        .slot-number {
+            color: #f472b6;
+            font-weight: 700;
+        }
+
+        #statusMessage {
+            min-height: 20px;
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4">
+
+    <!-- HEADER -->
+    <div class="glow-border w-full max-w-6xl mx-auto shadow-2xl">
+
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+
+            <!-- TOP -->
+            <div class="flex justify-between items-center mb-6">
+
+                <span class="bg-pink-950/80 text-pink-400
+                    border border-pink-800/50
+                    text-xs font-bold px-4 py-2 rounded-full">
+
+                    ● Bilibili Engine 2026
+                </span>
+
+                <span class="bg-slate-800 text-cyan-400
+                    text-xs font-semibold px-3 py-2
+                    rounded-full border border-slate-700">
+
+                    🏠 HELPVIEW
+                </span>
+
+            </div>
+
+
+            <!-- TITLE -->
+
+            <div class="text-center mb-8">
+
+                <h1 class="text-3xl md:text-5xl font-extrabold
+                    text-white mb-3">
+
+                    Bilibili Multi-Viewer
+                </h1>
+
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto">
+
+                    Paste a Bilibili long URL, BV ID or AV ID.
+                    The system automatically detects the video ID and
+                    creates your multi-viewer workspace.
+
+                </p>
+
+            </div>
+
+
+            <!-- INPUT -->
+
+            <div class="space-y-4">
+
+                <input
+                    id="biliUrl"
+                    type="text"
+                    placeholder="Paste Bilibili URL / BV ID / AV ID"
+                    class="w-full bg-[#0d1322]
+                    border border-slate-700
+                    rounded-xl px-4 py-4
+                    text-sm text-white
+                    placeholder-slate-500
+                    focus:outline-none
+                    focus:border-pink-500"
+                />
+
+
+                <!-- CONTROLS -->
+
+                <div class="flex flex-wrap gap-3">
+
+                    <!-- SLOT -->
+
+                    <div class="flex items-center gap-2">
+
+                        <label class="text-xs text-slate-400">
+                            Slots
+                        </label>
+
+                        <input
+                            id="slotCount"
+                            type="number"
+                            value="4"
+                            min="1"
+                            max="100"
+                            class="w-24 bg-[#0d1322]
+                            border border-slate-700
+                            rounded-xl px-3 py-3
+                            text-center font-bold text-white
+                            focus:outline-none
+                            focus:border-pink-500"
+                        />
+
+                    </div>
+
+
+                    <!-- LAYOUT -->
+
+                    <select
+                        id="layoutStyle"
+                        class="bg-[#0d1322]
+                        border border-slate-700
+                        rounded-xl px-4 py-3
+                        text-sm text-white">
+
+                        <option value="auto">
+                            Auto Layout
+                        </option>
+
+                        <option value="1">
+                            1 Column
+                        </option>
+
+                        <option value="2">
+                            2 Columns
+                        </option>
+
+                        <option value="3">
+                            3 Columns
+                        </option>
+
+                        <option value="4">
+                            4 Columns
+                        </option>
+
+                        <option value="5">
+                            5 Columns
+                        </option>
+
+                    </select>
+
+
+                    <!-- BUTTON -->
+
+                    <button
+                        onclick="launchWorkspace()"
+                        class="flex-1 min-w-[200px]
+                        bg-gradient-to-r
+                        from-pink-500 to-rose-500
+                        hover:from-pink-600 hover:to-rose-600
+                        text-white font-bold
+                        px-6 py-3 rounded-xl
+                        shadow-lg">
+
+                        ▶ Launch Workspace
+
+                    </button>
+
+
+                    <!-- CLEAR -->
+
+                    <button
+                        onclick="clearAll()"
+                        class="bg-slate-800
+                        hover:bg-slate-700
+                        border border-slate-700
+                        text-white px-5 py-3
+                        rounded-xl">
+
+                        ✕ Clear
+
+                    </button>
+
+                </div>
+
+
+                <!-- STATUS -->
+
+                <div
+                    id="statusMessage"
+                    class="text-center text-xs text-slate-400">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- WORKSPACE -->
+
+    <div
+        id="workspaceGrid"
+        class="w-full max-w-[1800px]
+        mx-auto mt-6
+        grid grid-cols-1 md:grid-cols-2
+        gap-4">
+    </div>
+
+
+<script>
+
+/* =========================================================
+   NORMALIZE INPUT
+========================================================= */
+
+function cleanInput(value) {
+
+    return value
+        .trim()
+        .replace(/\s+/g, "");
+
+}
+
+
+/* =========================================================
+   EXTRACT BILIBILI ID
+========================================================= */
+
+function extractBiliId(input) {
+
+    input = cleanInput(input);
+
+    /*
+        BV ID (can appear anywhere in a URL, e.g. /video/BV1xx411c7mD)
+    */
+
+    const bvMatch = input.match(/BV[a-zA-Z0-9]{10}/i);
+
+    if (bvMatch) {
+
+        return {
+            type: "bvid",
+            id: bvMatch[0]
+        };
+
+    }
+
+
+    /*
+        AV ID (e.g. /video/av170001, or query param aid=170001)
+    */
+
+    const avPathMatch = input.match(/av(\d+)/i);
+
+    if (avPathMatch) {
+
+        return {
+            type: "avid",
+            id: "av" + avPathMatch[1]
+        };
+
+    }
+
+    const aidParamMatch = input.match(/[?&]aid=(\d+)/i);
+
+    if (aidParamMatch) {
+
+        return {
+            type: "avid",
+            id: "av" + aidParamMatch[1]
+        };
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   GET VIDEO ID
+========================================================= */
+
+function getVideoId(input) {
+
+    input = cleanInput(input);
+
+    if (!input) {
+
+        throw new Error(
+            "Please paste a Bilibili URL or ID."
+        );
+
+    }
+
+    const directId = extractBiliId(input);
+
+    if (directId) {
+
+        return directId;
+
+    }
+
+    if (
+        input.includes("b23.tv") ||
+        input.includes("bili2233.cn")
+    ) {
+
+        throw new Error(
+            "Short URLs (b23.tv) aren't supported yet — " +
+            "please open the link in a browser and paste " +
+            "the full bilibili.com URL, BV ID, or AV ID instead."
+        );
+
+    }
+
+    throw new Error(
+        "Couldn't find a BV or AV ID in that input. " +
+        "Try a full bilibili.com URL, a BV ID (e.g. BV1xx411c7mD), " +
+        "or an AV ID (e.g. av170001)."
+    );
+
+}
+
+
+/* =========================================================
+   CREATE PLAYER URL
+========================================================= */
+
+function createPlayerUrl(video) {
+
+    let url =
+        "https://player.bilibili.com/player.html?";
+
+    if (video.type === "bvid") {
+
+        url +=
+            "bvid=" +
+            encodeURIComponent(video.id);
+
+    }
+
+    else if (video.type === "avid") {
+
+        url +=
+            "aid=" +
+            encodeURIComponent(
+                video.id.replace(/^av/i, "")
+            );
+
+    }
+
+    url +=
+        "&page=1" +
+        "&high_quality=1" +
+        "&danmaku=0";
+
+    return url;
+
+}
+
+
+/* =========================================================
+   GET GRID COLUMNS
+========================================================= */
+
+function getColumns(count, layout) {
+
+    if (layout !== "auto") {
+
+        return Number(layout);
+
+    }
+
+    if (count === 1) return 1;
+
+    if (count <= 4) return 2;
+
+    if (count <= 9) return 3;
+
+    if (count <= 16) return 4;
+
+    return 5;
+
+}
+
+
+/* =========================================================
+   LAUNCH
+========================================================= */
+
+function launchWorkspace() {
+
+    const input =
+        document.getElementById("biliUrl").value;
+
+    const slotInput =
+        document.getElementById("slotCount");
+
+    const layout =
+        document.getElementById("layoutStyle").value;
+
+    const grid =
+        document.getElementById("workspaceGrid");
+
+    const status =
+        document.getElementById("statusMessage");
+
+
+    let count =
+        parseInt(slotInput.value, 10) || 4;
+
+    count =
+        Math.max(
+            1,
+            Math.min(100, count)
+        );
+
+    slotInput.value = count;
+
+    status.innerHTML =
+        '<span class="text-yellow-400">' +
+        'Detecting Bilibili video...' +
+        '</span>';
+
+    let video;
+
+    try {
+
+        video = getVideoId(input);
+
+    }
+
+    catch (error) {
+
+        status.innerHTML =
+            '<span class="text-red-400">' +
+            escapeHtml(error.message) +
+            '</span>';
+
+        return;
+
+    }
+
+
+    const playerUrl =
+        createPlayerUrl(video);
+
+    grid.innerHTML = "";
+
+    const columns =
+        getColumns(count, layout);
+
+    grid.style.gridTemplateColumns =
+        `repeat(${columns}, minmax(0, 1fr))`;
+
+    status.innerHTML =
+        '<span class="text-green-400">' +
+        'Detected: ' +
+        escapeHtml(video.id) +
+        ' — Creating ' +
+        count +
+        ' player(s)...' +
+        '</span>';
+
+    const fragment =
+        document.createDocumentFragment();
+
+
+    for (let i = 1; i <= count; i++) {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "video-card p-3 shadow-xl";
+
+        card.innerHTML = `
+
+            <div class="flex justify-between
+                items-center mb-2">
+
+                <span class="text-xs">
+                    <span class="slot-number">
+                        Slot ${i}
+                    </span>
+
+                    <span class="text-slate-500">
+                        • ${escapeHtml(video.id)}
+                    </span>
+                </span>
+
+                <button
+                    onclick="removeSlot(this)"
+                    class="text-xs text-slate-500
+                    hover:text-red-400">
+
+                    ✕
+
+                </button>
+
+            </div>
+
+
+            <div class="video-wrapper">
+
+                <div class="loader">
+
+                    <div class="spinner"></div>
+
+                </div>
+
+                <iframe
+                    src="${playerUrl}"
+                    allowfullscreen
+                    loading="lazy"
+                    allow="autoplay; fullscreen; picture-in-picture">
+
+                </iframe>
+
+            </div>
+        `;
+
+        const iframe =
+            card.querySelector("iframe");
+
+        iframe.addEventListener(
+            "load",
+            function() {
+
+                const loader =
+                    card.querySelector(".loader");
+
+                if (loader) {
+
+                    loader.remove();
+
+                }
+
+            }
+        );
+
+        fragment.appendChild(card);
+
+    }
+
+    grid.appendChild(fragment);
+
+    status.innerHTML =
+        '<span class="text-green-400">' +
+        'Video detected: ' +
+        escapeHtml(video.id) +
+        ' • ' +
+        count +
+        ' slot(s) created.' +
+        '</span>';
+
+}
+
+
+/* =========================================================
+   REMOVE SLOT
+========================================================= */
+
+function removeSlot(button) {
+
+    const card =
+        button.closest(".video-card");
+
+    if (card) {
+
+        card.remove();
+
+    }
+
+}
+
+
+/* =========================================================
+   CLEAR
+========================================================= */
+
+function clearAll() {
+
+    document.getElementById("biliUrl").value = "";
+
+    document.getElementById("slotCount").value = "4";
+
+    document.getElementById("workspaceGrid").innerHTML = "";
+
+    document.getElementById("statusMessage").innerHTML = "";
+
+}
+
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = value;
+
+    return div.innerHTML;
+
+}
+
+
+/* =========================================================
+   SLOT VALIDATION
+========================================================= */
+
+document
+    .getElementById("slotCount")
+    .addEventListener("change", function() {
+
+        let value =
+            parseInt(this.value, 10) || 1;
+
+        if (value < 1) value = 1;
+
+        if (value > 100) value = 100;
+
+        this.value = value;
+
+    });
+
+
+/* =========================================================
+   ENTER KEY
+========================================================= */
+
+document
+    .getElementById("biliUrl")
+    .addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter") {
+
+            launchWorkspace();
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
