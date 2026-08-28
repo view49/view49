@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Studio Editor</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fabric.js Canvas Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f5f5f7; color: #1d1d1f; height: 100vh; overflow: hidden; }
+
+        /* Top Header Navigation */
+        .top-nav { height: 50px; background: #ffffff; border-bottom: 1px solid #e5e5e7; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 10; }
+        .logo-section { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; color: #0066cc; }
+        .nav-center { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #6e6e73; }
+        .nav-controls { display: flex; align-items: center; gap: 12px; }
+        .btn-preview { background: #0066cc; color: white; border: none; padding: 7px 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .btn-preview:hover { background: #0052a3; }
+        .btn-export { background: #10b981; color: white; border: none; padding: 7px 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .btn-export:hover { background: #059669; }
+
+        .studio-container { display: flex; height: calc(100vh - 50px); }
+
+        /* Main Left Sidebar Navigation (Sidebar Icons) */
+        .left-sidebar { width: 72px; background: #ffffff; border-right: 1px solid #e5e5e7; display: flex; flex-direction: column; align-items: center; padding-top: 8px; gap: 4px; overflow-y: auto; z-index: 5; }
+        .tool-icon { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 500; color: #424245; cursor: pointer; padding: 9px 0; width: 100%; transition: 0.2s; border-left: 3px solid transparent; }
+        .tool-icon i { font-size: 18px; }
+        .tool-icon:hover, .tool-icon.active { color: #0066cc; background: #f0f7ff; border-left-color: #0066cc; }
+
+        /* Secondary Left Drawer Panel (Options Content) */
+        .drawer-panel { width: 240px; background: #ffffff; border-right: 1px solid #e5e5e7; display: flex; flex-direction: column; padding: 15px; gap: 15px; overflow-y: auto; }
+        .drawer-title { font-size: 13px; font-weight: 700; text-transform: uppercase; color: #86868b; letter-spacing: 0.5px; }
+        
+        .option-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .option-card { background: #f5f5f7; border: 1px solid #e5e5e7; border-radius: 8px; padding: 12px 8px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 500; transition: 0.2s; color: #1d1d1f; }
+        .option-card:hover { border-color: #0066cc; background: #f0f7ff; color: #0066cc; }
+        .option-card i { font-size: 20px; display: block; margin-bottom: 6px; }
+
+        /* Center Canvas Viewport */
+        .canvas-viewport { flex: 1; background: #eaeaea; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: auto; padding: 20px; }
+        .canvas-card { background: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; position: relative; }
+
+        /* Right Panel Inspector Properties */
+        .right-sidebar { width: 260px; background: #ffffff; border-left: 1px solid #e5e5e7; padding: 16px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+        .panel-section { display: flex; flex-direction: column; gap: 10px; }
+        .prop-group { display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
+        .prop-group label { font-weight: 600; color: #6e6e73; }
+        .prop-group input, .prop-group select { padding: 7px 10px; border: 1px solid #d2d2d7; border-radius: 6px; font-size: 13px; outline: none; }
+        .prop-group input:focus, .prop-group select:focus { border-color: #0066cc; }
+        .prop-group input[type="color"] { height: 38px; cursor: pointer; padding: 2px; }
+
+        .btn-delete { background: #ef4444; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px; }
+        .btn-delete:hover { background: #dc2626; }
+        .no-selection { text-align: center; color: #86868b; font-size: 12px; margin-top: 30px; }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="logo-section">
+            <i class="fa-solid fa-layer-group"></i> All Brand Legacy Studio
+        </div>
+        <div class="nav-center">
+            <i class="fa-solid fa-mobile-screen"></i> 103 / 400 components used
+        </div>
+        <div class="nav-controls">
+            <button class="btn-preview"><i class="fa-solid fa-play"></i> Preview</button>
+            <button class="btn-export" onclick="exportCanvas()"><i class="fa-solid fa-download"></i> Export</button>
+        </div>
+    </div>
+
+    <div class="studio-container">
+        <!-- 1. Left Sidebar Tools Icon Navigation (Complete Menu requested) -->
+        <div class="left-sidebar">
+            <div class="tool-icon active" onclick="switchTab('screen')"><i class="fa-solid fa-mobile-screen"></i><span>Screen</span></div>
+            <div class="tool-icon" onclick="switchTab('template')"><i class="fa-solid fa-cubes"></i><span>Template</span></div>
+            <div class="tool-icon" onclick="switchTab('shape')"><i class="fa-shapes"></i><span>Shape</span></div>
+            <div class="tool-icon" onclick="switchTab('text')"><i class="fa-solid fa-font"></i><span>Text</span></div>
+            <div class="tool-icon" onclick="switchTab('image')"><i class="fa-regular fa-image"></i><span>Image</span></div>
+            <div class="tool-icon" onclick="switchTab('icon')"><i class="fa-solid fa-icons"></i><span>Icon</span></div>
+            <div class="tool-icon" onclick="switchTab('button')"><i class="fa-solid fa-square-poll-horizontal"></i><span>Button</span></div>
+            <div class="tool-icon" onclick="switchTab('frame')"><i class="fa-solid fa-crop"></i><span>Frame</span></div>
+            <div class="tool-icon" onclick="switchTab('brand')"><i class="fa-solid fa-palette"></i><span>Brand</span></div>
+            <div class="tool-icon" onclick="switchTab('design')"><i class="fa-solid fa-pen-ruler"></i><span>Design</span></div>
+            <div class="tool-icon" onclick="switchTab('magic')"><i class="fa-solid fa-wand-magic-sparkles" style="color:#8b5cf6;"></i><span>Magic AI</span></div>
+        </div>
+
+        <!-- 2. Drawer Content Panel for Tools -->
+        <div class="drawer-panel" id="drawerPanel">
+            <!-- Dynamic Drawer Content populated by JS -->
+        </div>
+
+        <!-- 3. Center Interactive Canvas -->
+        <div class="canvas-viewport">
+            <div class="canvas-card">
+                <canvas id="studioCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- 4. Right Properties Inspector -->
+        <div class="right-sidebar">
+            <div class="drawer-title">Properties</div>
+            <div id="inspectorContent">
+                <div class="no-selection">Select any element on the canvas to edit its properties.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden File Input for Image Upload -->
+    <input type="file" id="imageUploader" accept="image/*" style="display:none;" onchange="uploadImage(event)">
+
+    <script>
+        // Initialize Fabric.js Canvas
+        const canvas = new fabric.Canvas('studioCanvas', {
+            width: 380,
+            height: 680,
+            backgroundColor: '#ffffff'
+        });
+
+        // Tab Switcher and Drawer Population Logic
+        function switchTab(tab) {
+            document.querySelectorAll('.tool-icon').forEach(icon => icon.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            const drawer = document.getElementById('drawerPanel');
+            
+            if (tab === 'screen') {
+                drawer.innerHTML = `
+                    <div class="drawer-title">Screens & Presets</div>
+                    <div class="option-grid">
+                        <div class="option-card" onclick="setCanvasSize(380, 680)"><i class="fa-solid fa-mobile"></i> Mobile</div>
+                        <div class="option-card" onclick="setCanvasSize(600, 400)"><i class="fa-solid fa-tablet"></i> Tablet</div>
+                        <div class="option-card" onclick="setCanvasSize(500, 500)"><i class="fa-solid fa-square"></i> Square</div>
+                        <div class="option-card" onclick="setCanvasSize(700, 450)"><i class="fa-solid fa-desktop"></i> Desktop</div>
+                    </div>
+                `;
+            } else if (tab === 'template') {
+                drawer.innerHTML = `
+                    <div class="drawer-title">Brand Templates</div>
+                    <div class="option-card" onclick="loadTemplate('login')" style="margin-bottom:8px;"><i class="fa-solid fa-right-to-bracket"></i> Login Screen</div>
+                    <div class="option-card" onclick="loadTemplate('profile')"><i class="fa-solid fa-id-card"></i> Profile Card</div>
+                `;
+            } else if (tab === 'shape') {
+                drawer.innerHTML = `
+                    <div class="drawer-title">Shapes</div>
+                    <div class="option-grid">
+                        <div class="option-card" onclick="addRectangle()"><i class="fa-regular fa-square"></i> Rectangle</div>
+                        <div class="option-card" onclick="addCircle()"><i class="fa-regular fa-circle"></i> Circle</div>
+                        <div class="option-card" onclick="addTriangle()"><i class="fa-solid fa-play" style="transform:rotate(-90deg);"></i> Triangle</div>
+                        <div class="option-card" onclick="addLine()"><i class="fa-solid fa-minus"></i> Line</div>
+                    </div>
+                `;
+            } else if (tab === 'text') {
+                drawer.innerHTML = `
+                    <div class="drawer-title">Text Options</div>
+                    <div class="option-card" onclick="addText('Heading', 28, 'bold')" style="margin-bottom:8px;"><i class="fa-solid fa-heading"></i> Add Heading</div>
+                    <div class="option-card" onclick="addText('Subheading text', 18, 'normal')" style="margin-bottom:8px;"><i class="fa-solid fa-font"></i> Add Subheading</div>
+                    <div class="option-card" onclick="addText('Body text description goes here.', 14, 'normal')"><i class="fa-solid fa-align-left"></i> Body Text</div>
+                `;
+            } else if (tab === 'image') {
+                drawer.innerHTML = `
+                    <div class="drawer-title">Image Upload</div>
+                    <div class="option-card" onclick="document.getElementById('imageUploader').click()"><i class="fa-solid fa-upload"></i> Upload Image</div>
+                `;
+            } else if (tab === 'icon') {
+                drawer.innerHTML = `
+                    <div class="drawer-title">Icons</div>
+                    <div class="option-grid">
+                        <div class="option-card" onclick="addIcon('★')"><i class="fa-solid fa-star"></i> Star</div>
+                        <div class="option-card" onclick="addIcon('♥')"><i class="fa-solid fa-heart"></i> Heart</div>
+                        <div class="option-card" onclick="addIcon('✔')"><i class="fa-solid fa-check"></i> Check</div>
+                        <div class="option-card" onclick="addIcon('🔍')"><i class="fa-solid fa-magnifying-glass"></i> Search</div>
+                    </div>
+                `;
+            } else if (tab === 'button') {
+                drawer.innerHTML = `
+                    <div class="drawer-title">Buttons</div>
+                    <div class="option-card" onclick="addButton('Primary Button', '#0066cc', '#ffffff')" style="margin-bottom:8px;"><i class="fa-solid fa-square-poll-horizontal"></i> Primary Button</div>
+                    <div class="option-card" onclick="addButton('Secondary Button', '#e5e5e7', '#1d1d1f')"><i class="fa-regular fa-square"></i> Outline Button</div>
+                `;
+            } else if (tab === 'frame') {
+                drawer.innerHTML = `
+                    <div class="drawer-title">Frames</div>
+                    <div class="option-card" onclick="addFrame('#f5f5f7')"><i class="fa-solid fa-border-all"></i> Card Container</div>
+                `;
+            } else if (tab === 'brand') {
+                drawer.innerHTML = `
+                    <div class="drawer-title">Brand Colors</div>
+                    <div class="option-grid">
+                        <div class="option-card" style="background:#0066cc; color:#fff;" onclick="setBg('#0066cc')">Primary Blue</div>
+                        <div class="option-card" style="background:#10b981; color:#fff;" onclick="setBg('#10b981')">Emerald</div>
+                        <div class="option-card" style="background:#8b5cf6; color:#fff;" onclick="setBg('#8b5cf6')">Purple</div>
+                        <div class="option-card" style="background:#1d1d1f; color:#fff;" onclick="setBg('#1d1d1f')">Dark Tech</div>
+                    </div>
+                `;
+            } else if (tab === 'design') {
+                drawer.innerHTML = `
+                    <div class="drawer-title">Design Tools</div>
+                    <div class="option-card" onclick="clearCanvas()"><i class="fa-solid fa-trash-can"></i> Clear All</div>
+                `;
+            } else if (tab === 'magic') {
+                drawer.innerHTML = `
+                    <div class="drawer-title">Magic AI</div>
+                    <div class="option-card" onclick="runMagicAI()" style="border-color:#8b5cf6; background:#f5f3ff; color:#7c3aed;"><i class="fa-solid fa-wand-magic-sparkles"></i> Auto Generate Screen</div>
+                `;
+            }
+        }
+
+        // Default Load First Drawer
+        switchTab('screen');
+
+        // Canvas Object Functions
+        function setCanvasSize(w, h) {
+            canvas.setWidth(w);
+            canvas.setHeight(h);
+            canvas.renderAll();
+        }
+
+        function setBg(color) {
+            canvas.setBackgroundColor(color, canvas.renderAll.bind(canvas));
+        }
+
+        function addText(val, size, weight) {
+            const text = new fabric.IText(val, {
+                left: 40,
+                top: 40,
+                fontSize: size,
+                fontWeight: weight,
+                fill: '#1d1d1f',
+                fontFamily: 'Inter'
+            });
+            canvas.add(text);
+            canvas.setActiveObject(text);
+        }
+
+        function addRectangle() {
+            const rect = new fabric.Rect({
+                left: 50, top: 50, fill: '#0066cc', width: 100, height: 100, rx: 8, ry: 8
+            });
+            canvas.add(rect);
+            canvas.setActiveObject(rect);
+        }
+
+        function addCircle() {
+            const circle = new fabric.Circle({
+                left: 50, top: 50, fill: '#10b981', radius: 50
+            });
+            canvas.add(circle);
+            canvas.setActiveObject(circle);
+        }
+
+        function addTriangle() {
+            const tri = new fabric.Triangle({
+                left: 50, top: 50, fill: '#f59e0b', width: 90, height: 90
+            });
+            canvas.add(tri);
+            canvas.setActiveObject(tri);
+        }
+
+        function addLine() {
+            const line = new fabric.Line([50, 50, 250, 50], {
+                stroke: '#6e6e73', strokeWidth: 3
+            });
+            canvas.add(line);
+            canvas.setActiveObject(line);
+        }
+
+        function addIcon(symbol) {
+            const iconText = new fabric.Text(symbol, {
+                left: 60, top: 60, fontSize: 40, fill: '#1d1d1f'
+            });
+            canvas.add(iconText);
+            canvas.setActiveObject(iconText);
+        }
+
+        function addButton(label, bg, textColor) {
+            const rect = new fabric.Rect({
+                width: 200, height: 45, fill: bg, rx: 8, ry: 8, originX: 'center', originY: 'center'
+            });
+            const text = new fabric.Text(label, {
+                fontSize: 15, fill: textColor, fontFamily: 'Inter', originX: 'center', originY: 'center'
+            });
+            const group = new fabric.Group([rect, text], {
+                left: 50, top: 100
+            });
+            canvas.add(group);
+            canvas.setActiveObject(group);
+        }
+
+        function addFrame(bg) {
+            const rect = new fabric.Rect({
+                left: 30, top: 30, width: 320, height: 200, fill: bg, rx: 12, ry: 12, stroke: '#e5e5e7', strokeWidth: 1
+            });
+            canvas.add(rect);
+            canvas.sendToBack(rect);
+            canvas.setActiveObject(rect);
+        }
+
+        function uploadImage(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(f) {
+                fabric.Image.fromURL(f.target.result, function(img) {
+                    img.scaleToWidth(200);
+                    img.set({ left: 50, top: 50 });
+                    canvas.add(img);
+                    canvas.setActiveObject(img);
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadTemplate(type) {
+            canvas.clear();
+            if (type === 'login') {
+                addText('Welcome Back', 24, 'bold');
+                addButton('Login with Email', '#0066cc', '#ffffff');
+            } else if (type === 'profile') {
+                addFrame('#f5f5f7');
+                addCircle();
+                addText('User Profile', 18, 'bold');
+            }
+        }
+
+        function runMagicAI() {
+            canvas.clear();
+            setBg('#ffffff');
+            addText('Magic AI Screen', 26, 'bold');
+            addButton('Get Started', '#8b5cf6', '#ffffff');
+        }
+
+        function clearCanvas() {
+            canvas.clear();
+        }
+
+        // Selection Property Inspector Logic
+        canvas.on('selection:created', updateInspector);
+        canvas.on('selection:updated', updateInspector);
+        canvas.on('selection:cleared', () => {
+            document.getElementById('inspectorContent').innerHTML = '<div class="no-selection">Select any element on the canvas to edit its properties.</div>';
+        });
+
+        function updateInspector() {
+            const active = canvas.getActiveObject();
+            if (!active) return;
+
+            const inspector = document.getElementById('inspectorContent');
+            let html = `<div class="panel-section">`;
+
+            if (active.type === 'i-text' || active.type === 'text') {
+                html += `
+                    <div class="prop-group">
+                        <label>Text Content</label>
+                        <input type="text" value="${active.text}" oninput="updateActiveProp('text', this.value)">
+                    </div>
+                    <div class="prop-group">
+                        <label>Font Size</label>
+                        <input type="number" value="${Math.round(active.fontSize)}" oninput="updateActiveProp('fontSize', parseInt(this.value))">
+                    </div>
+                    <div class="prop-group">
+                        <label>Color</label>
+                        <input type="color" value="${active.fill}" oninput="updateActiveProp('fill', this.value)">
+                    </div>
+                `;
+            } else if (active.type === 'rect' || active.type === 'circle' || active.type === 'triangle') {
+                html += `
+                    <div class="prop-group">
+                        <label>Fill Color</label>
+                        <input type="color" value="${active.fill}" oninput="updateActiveProp('fill', this.value)">
+                    </div>
+                `;
+            }
+
+            html += `
+                <button class="btn-delete" onclick="deleteActive()"><i class="fa-solid fa-trash"></i> Delete Object</button>
+            </div>`;
+
+            inspector.innerHTML = html;
+        }
+
+        function updateActiveProp(prop, val) {
+            const active = canvas.getActiveObject();
+            if (active) {
+                active.set(prop, val);
+                canvas.renderAll();
+            }
+        }
+
+        function deleteActive() {
+            const active = canvas.getActiveObject();
+            if (active) {
+                canvas.remove(active);
+                canvas.discardActiveObject();
+                canvas.renderAll();
+                document.getElementById('inspectorContent').innerHTML = '<div class="no-selection">Select any element on the canvas to edit its properties.</div>';
+            }
+        }
+
+        function exportCanvas() {
+            canvas.discardActiveObject();
+            canvas.renderAll();
+            const link = document.createElement('a');
+            link.download = 'studio-design.png';
+            link.href = canvas.toDataURL({ format: 'png', multiplier: 2 });
+            link.click();
+        }
+    </script>
+</body>
+</html>
