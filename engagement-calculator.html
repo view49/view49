@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Engagement & Earnings Analytics Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN for Professional Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        body { background: #0a0a0a; color: #fff; padding: 30px 20px; }
+        
+        .container { max-width: 950px; margin: 0 auto; background: #121212; border: 1px solid #262626; border-radius: 14px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .header-title { font-size: 22px; font-weight: 800; color: #ff2d2d; margin-bottom: 24px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        .input-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        @media (max-width: 650px) { .input-grid { grid-template-columns: 1fr; } }
+        
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full-width { grid-column: span 2; }
+        @media (max-width: 650px) { .form-group.full-width { grid-column: span 1; } }
+
+        label { font-size: 12px; font-weight: 600; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select { width: 100%; padding: 12px 14px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 14px; outline: none; transition: 0.2s; }
+        input:focus, select:focus { border-color: #ff2d2d; background: #222; }
+        
+        .btn-calc { width: 100%; background: linear-gradient(135deg, #e01313, #ff2d2d); color: white; border: none; padding: 14px; font-weight: 700; font-size: 14px; border-radius: 8px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(224, 19, 19, 0.3); }
+        .btn-calc:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        /* Results Section */
+        .analytics-dashboard { margin-top: 32px; border-top: 1px solid #262626; padding-top: 24px; }
+        .dashboard-title { font-size: 16px; font-weight: 700; color: #f4f4f5; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+        @media (max-width: 800px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
+        
+        .stat-card { background: #18181b; border: 1px solid #27272a; padding: 16px; border-radius: 10px; text-align: center; }
+        .stat-card .label { font-size: 11px; color: #71717a; text-transform: uppercase; font-weight: 600; margin-bottom: 6px; }
+        .stat-card .value { font-size: 20px; font-weight: 800; color: #facc15; }
+        .stat-card .sub-value { font-size: 11px; color: #22c55e; margin-top: 4px; }
+
+        /* Chart Wrapper */
+        .chart-box { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 20px; height: 320px; display: flex; justify-content: center; align-items: center; position: relative; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-title">
+        <i class="fa-solid fa-chart-line"></i> Social Media Earnings & Analytics Studio
+    </div>
+
+    <div class="input-grid">
+        <div class="form-group full-width">
+            <label>Channel / Profile / Post Link (Optional)</label>
+            <input type="text" id="channelLink" placeholder="Paste YouTube, Instagram, or Facebook link..." onchange="autoDetectPlatform(this.value)">
+        </div>
+
+        <div class="form-group">
+            <label>Platform</label>
+            <select id="platform">
+                <option value="youtube">YouTube</option>
+                <option value="instagram">Instagram</option>
+                <option value="facebook">Facebook</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Total Subscribers / Followers</label>
+            <input type="number" id="followers" placeholder="e.g. 100000" value="100000">
+        </div>
+
+        <div class="form-group">
+            <label>Average Views Per Post / Video</label>
+            <input type="number" id="avgViews" placeholder="e.g. 25000" value="25000">
+        </div>
+
+        <div class="form-group">
+            <label>Average Likes & Comments</label>
+            <input type="number" id="avgEngagement" placeholder="e.g. 2000" value="2000">
+        </div>
+    </div>
+
+    <button class="btn-calc" onclick="calculateAnalytics()"><i class="fa-solid fa-bolt"></i> Generate Revenue & Engagement Breakdown</button>
+
+    <div class="analytics-dashboard">
+        <div class="dashboard-title"><i class="fa-solid fa-square-poll-vertical"></i> Performance & Revenue Breakdown</div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">Engagement Rate</div>
+                <div class="value" id="resRate">0%</div>
+                <div class="sub-value" id="resScore">Good Rating</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Est. Per Post / Video</div>
+                <div class="value" id="resPerPost">$0</div>
+                <div class="sub-value">Sponsorship + Ads</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Est. Monthly Revenue</div>
+                <div class="value" id="resMonthly">$0</div>
+                <div class="sub-value">Based on 4-8 Posts</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Est. Yearly Potential</div>
+                <div class="value" id="resYearly">$0</div>
+                <div class="sub-value">Annual Growth Rate</div>
+            </div>
+        </div>
+
+        <div class="chart-box">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    let myChart = null;
+
+    function autoDetectPlatform(url) {
+        const select = document.getElementById('platform');
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+            select.value = 'youtube';
+        } else if (url.includes('instagram.com')) {
+            select.value = 'instagram';
+        } else if (url.includes('facebook.com')) {
+            select.value = 'facebook';
+        }
+    }
+
+    function calculateAnalytics() {
+        const followers = parseFloat(document.getElementById('followers').value) || 0;
+        const views = parseFloat(document.getElementById('avgViews').value) || 0;
+        const engagement = parseFloat(document.getElementById('avgEngagement').value) || 0;
+        const platform = document.getElementById('platform').value;
+
+        // Engagement Rate (%)
+        let rate = views > 0 ? ((engagement / views) * 100) : 0;
+        document.getElementById('resRate').innerText = rate.toFixed(2) + '%';
+
+        let scoreText = "Average";
+        if(rate > 8) scoreText = "🔥 Highly Active";
+        else if(rate > 4) scoreText = "⚡ Healthy Score";
+        else if(rate > 0) scoreText = "📈 Needs Growth";
+        document.getElementById('resScore').innerText = scoreText;
+
+        // Calculation Mechanics by Platform
+        let perPostSponsor = 0;
+        let perPostAdsense = 0;
+        let perPostAffiliate = 0;
+
+        if (platform === 'youtube') {
+            perPostAdsense = (views / 1000) * 3.5; // Approx $3.5 RPM
+            perPostSponsor = (views / 1000) * 18;
+            perPostAffiliate = (views / 1000) * 2.5;
+        } else if (platform === 'instagram') {
+            perPostAdsense = 0; // Primarily sponsored
+            perPostSponsor = (followers / 1000) * 9 + (engagement * 0.08);
+            perPostAffiliate = (views / 1000) * 3;
+        } else if (platform === 'facebook') {
+            perPostAdsense = (views / 1000) * 1.8; // Facebook In-stream ads
+            perPostSponsor = (followers / 1000) * 6 + (views / 1000) * 4;
+            perPostAffiliate = (views / 1000) * 1.5;
+        }
+
+        let totalPerPost = perPostSponsor + perPostAdsense + perPostAffiliate;
+        let monthlyEst = totalPerPost * 4; // assuming 4 videos/posts per month
+        let yearlyEst = monthlyEst * 12;
+
+        document.getElementById('resPerPost').innerText = '$' + Math.round(totalPerPost).toLocaleString();
+        document.getElementById('resMonthly').innerText = '$' + Math.round(monthlyEst).toLocaleString();
+        document.getElementById('resYearly').innerText = '$' + Math.round(yearlyEst).toLocaleString();
+
+        // Render Professional Chart
+        renderChart(Math.round(perPostSponsor * 4), Math.round(perPostAdsense * 4), Math.round(perPostAffiliate * 4));
+    }
+
+    function renderChart(sponsor, adsense, affiliate) {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        
+        if (myChart) {
+            myChart.destroy();
+        }
+
+        myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Sponsorships & Brand Deals', 'AdSense / Bonus Revenue', 'Affiliate & Merchandise'],
+                datasets: [{
+                    data: [sponsor, adsense, affiliate],
+                    backgroundColor: ['#ff2d2d', '#facc15', '#3b82f6'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#a1a1aa', font: { size: 12 } }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Monthly Revenue Sources ($)',
+                        color: '#ffffff',
+                        font: { size: 14, weight: 'bold' }
+                    }
+                }
+            }
+        });
+    }
+
+    // Auto calculate on load
+    calculateAnalytics();
+</script>
+
+</body>
+</html>
