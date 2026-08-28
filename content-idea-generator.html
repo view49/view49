@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Idea Generator</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #0b0f19;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .glow-border {
+            background: linear-gradient(90deg, #ff0000, #3b82f6);
+            padding: 2px;
+            border-radius: 18px;
+        }
+
+        .custom-card { background: #121826; }
+
+        .idea-card {
+            background: #121826;
+            border: 1px solid #263247;
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .format-tag {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 999px;
+            display: inline-block;
+            margin-bottom: 6px;
+        }
+
+        #statusMessage { min-height: 20px; }
+    </style>
+</head>
+
+<body class="min-h-screen p-4">
+
+    <div class="glow-border w-full max-w-3xl mx-auto shadow-2xl">
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-red-950/80 text-red-400 border border-red-800/50 text-xs font-bold px-4 py-2 rounded-full">
+                    ● Idea Engine 2026
+                </span>
+                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-yellow-400 text-xs font-bold px-3 py-2 rounded-full border border-slate-700 no-underline transition-colors">
+                    📺 View49
+                </a>
+            </div>
+
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3">
+                    Content Idea Generator
+                </h1>
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto">
+                    Enter your niche or topic — get 20 ready-to-use video ideas
+                    across proven content formats.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+
+                <input
+                    id="topicInput"
+                    type="text"
+                    placeholder="Your niche or topic (e.g. personal finance, home cooking, fitness)"
+                    class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500"
+                />
+
+                <button onclick="generateIdeas()" class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg">
+                    💡 Generate 20 Ideas
+                </button>
+
+                <div id="statusMessage" class="text-center text-xs text-slate-400"></div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="resultsArea" class="w-full max-w-3xl mx-auto mt-6 space-y-3"></div>
+
+<script>
+
+const FORMATS = [
+    { tag: "LIST", color: "bg-blue-950 text-blue-400 border border-blue-800/50", templates: [
+        "Top 10 {topic} Tips Nobody Tells You About",
+        "7 {topic} Mistakes Beginners Always Make",
+        "5 {topic} Tools/Products That Actually Work",
+        "10 {topic} Ideas You Can Try This Week"
+    ]},
+    { tag: "HOW-TO", color: "bg-green-950 text-green-400 border border-green-800/50", templates: [
+        "How to Get Started With {topic} in 2026",
+        "How to Master {topic} as a Complete Beginner",
+        "How I Improved My {topic} in 30 Days",
+        "How to {topic} on a Budget"
+    ]},
+    { tag: "VS", color: "bg-purple-950 text-purple-400 border border-purple-800/50", templates: [
+        "{topic}: Beginner vs Advanced — What Changes?",
+        "Cheap vs Expensive {topic} — Is It Worth It?",
+        "{topic} Myths vs Reality"
+    ]},
+    { tag: "STORY", color: "bg-yellow-950 text-yellow-400 border border-yellow-800/50", templates: [
+        "My {topic} Journey — What I Wish I Knew Sooner",
+        "I Tried {topic} for 30 Days — Here's What Happened",
+        "The Biggest {topic} Mistake I Ever Made"
+    ]},
+    { tag: "QUESTION", color: "bg-pink-950 text-pink-400 border border-pink-800/50", templates: [
+        "Is {topic} Still Worth It in 2026?",
+        "What Nobody Tells You About {topic}",
+        "Why Is {topic} So Hard for Beginners?"
+    ]},
+    { tag: "REACTION", color: "bg-cyan-950 text-cyan-400 border border-cyan-800/50", templates: [
+        "Reacting to the Worst {topic} Advice Online",
+        "Trying the Most Popular {topic} Trend"
+    ]},
+];
+
+function toTitleCase(str) {
+    return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+}
+
+function generateIdeas() {
+    const rawTopic = document.getElementById("topicInput").value.trim();
+    const status = document.getElementById("statusMessage");
+    const results = document.getElementById("resultsArea");
+
+    if (!rawTopic) {
+        status.innerHTML = '<span class="text-red-400">Please enter a niche or topic.</span>';
+        results.innerHTML = "";
+        return;
+    }
+
+    const topic = toTitleCase(rawTopic);
+    const ideas = [];
+
+    FORMATS.forEach(format => {
+        format.templates.forEach(template => {
+            ideas.push({
+                tag: format.tag,
+                color: format.color,
+                title: template.replace(/{topic}/g, topic)
+            });
+        });
+    });
+
+    status.innerHTML = `<span class="text-green-400">Generated ${ideas.length} ideas for "${escapeHtml(topic)}"</span>`;
+
+    results.innerHTML = `
+        <div class="flex justify-end mb-1">
+            <button onclick="copyAllIdeas()" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-3 py-1.5 rounded-lg">
+                📋 Copy All
+            </button>
+        </div>
+        ${ideas.map((idea, i) => `
+            <div class="idea-card">
+                <div>
+                    <span class="format-tag ${idea.color}">${idea.tag}</span>
+                    <div class="text-white text-sm font-semibold idea-text" data-idea="${escapeHtml(idea.title)}">${escapeHtml(idea.title)}</div>
+                </div>
+                <button onclick="copyIdea(this)" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-3 py-1.5 rounded-lg shrink-0">
+                    📋
+                </button>
+            </div>
+        `).join("")}
+    `;
+
+    window._generatedIdeas = ideas;
+}
+
+function copyIdea(button) {
+    const title = button.closest(".idea-card").querySelector(".idea-text").dataset.idea;
+    navigator.clipboard.writeText(title).then(() => {
+        const original = button.textContent;
+        button.textContent = "✅";
+        setTimeout(() => { button.textContent = original; }, 1200);
+    });
+}
+
+function copyAllIdeas() {
+    if (!window._generatedIdeas) return;
+    const text = window._generatedIdeas.map(i => i.title).join("\n");
+    navigator.clipboard.writeText(text).then(() => {
+        const status = document.getElementById("statusMessage");
+        const original = status.innerHTML;
+        status.innerHTML = '<span class="text-green-400">All ideas copied!</span>';
+        setTimeout(() => { status.innerHTML = original; }, 1500);
+    });
+}
+
+function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = value;
+    return div.innerHTML;
+}
+
+document.getElementById("topicInput").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") generateIdeas();
+});
+
+</script>
+
+</body>
+</html>
