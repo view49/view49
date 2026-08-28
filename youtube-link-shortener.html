@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Link Shortener</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #0b0f19;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .glow-border {
+            background: linear-gradient(90deg, #ff0000, #3b82f6);
+            padding: 2px;
+            border-radius: 18px;
+        }
+
+        .custom-card { background: #121826; }
+
+        .result-card {
+            background: #121826;
+            border: 1px solid #263247;
+            border-radius: 16px;
+        }
+
+        #statusMessage { min-height: 20px; }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #333;
+            border-top-color: #ec4899;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .history-item {
+            border-bottom: 1px solid #1e293b;
+            padding: 10px 0;
+        }
+
+        .history-item:last-child { border-bottom: none; }
+    </style>
+</head>
+
+<body class="min-h-screen p-4">
+
+    <div class="glow-border w-full max-w-2xl mx-auto shadow-2xl">
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-red-950/80 text-red-400 border border-red-800/50 text-xs font-bold px-4 py-2 rounded-full">
+                    ● Link Engine 2026
+                </span>
+                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-yellow-400 text-xs font-bold px-3 py-2 rounded-full border border-slate-700 no-underline transition-colors">
+                    📺 View49
+                </a>
+            </div>
+
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3">
+                    YouTube Link Shortener
+                </h1>
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto">
+                    Paste any YouTube video URL and get a short, shareable link instantly.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+
+                <input
+                    id="videoUrl"
+                    type="text"
+                    placeholder="Paste YouTube video URL"
+                    class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500"
+                />
+
+                <button id="shortenBtn" onclick="shortenLink()" class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg">
+                    🔗 Shorten Link
+                </button>
+
+                <div id="statusMessage" class="text-center text-xs text-slate-400"></div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="resultArea" class="w-full max-w-2xl mx-auto mt-6"></div>
+
+    <div id="historyArea" class="w-full max-w-2xl mx-auto mt-4"></div>
+
+<script>
+
+let history = [];
+
+function isValidYouTubeUrl(input) {
+    input = input.trim();
+    const pattern = /(?:youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtu\.be\/)[a-zA-Z0-9_-]{11}/;
+    return pattern.test(input);
+}
+
+async function shortenViaTinyUrl(longUrl) {
+    const targetUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`;
+    const proxyUrl = `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(targetUrl)}`;
+
+    const response = await fetch(proxyUrl);
+
+    if (!response.ok) {
+        throw new Error("Shortening service is unavailable right now. Please try again in a moment.");
+    }
+
+    const text = await response.text();
+
+    if (!text.startsWith("http")) {
+        throw new Error("Couldn't generate a short link for this URL.");
+    }
+
+    return text.trim();
+}
+
+async function shortenLink() {
+    const input = document.getElementById("videoUrl").value.trim();
+    const status = document.getElementById("statusMessage");
+    const resultArea = document.getElementById("resultArea");
+    const btn = document.getElementById("shortenBtn");
+
+    if (!input) {
+        status.innerHTML = '<span class="text-red-400">Please paste a YouTube URL.</span>';
+        return;
+    }
+
+    if (!isValidYouTubeUrl(input)) {
+        status.innerHTML = '<span class="text-red-400">That doesn\'t look like a valid YouTube video URL.</span>';
+        return;
+    }
+
+    btn.disabled = true;
+    status.innerHTML = '<span class="spinner"></span> <span class="text-yellow-400">Shortening...</span>';
+    resultArea.innerHTML = "";
+
+    try {
+        const shortUrl = await shortenViaTinyUrl(input);
+
+        status.innerHTML = '<span class="text-green-400">Done!</span>';
+
+        resultArea.innerHTML = `
+            <div class="result-card p-5 flex flex-col md:flex-row items-center gap-3">
+                <input id="shortUrlOutput" type="text" readonly value="${escapeHtml(shortUrl)}"
+                    class="flex-1 w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-3 text-sm text-green-400 font-semibold" />
+                <button onclick="copyShortUrl(this)" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold px-5 py-3 rounded-xl w-full md:w-auto">
+                    📋 Copy
+                </button>
+            </div>
+        `;
+
+        history.unshift({ original: input, short: shortUrl });
+        history = history.slice(0, 5);
+        renderHistory();
+
+    } catch (error) {
+        status.innerHTML = `<span class="text-red-400">${escapeHtml(error.message)}</span>`;
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+function renderHistory() {
+    const historyArea = document.getElementById("historyArea");
+
+    if (history.length === 0) {
+        historyArea.innerHTML = "";
+        return;
+    }
+
+    historyArea.innerHTML = `
+        <div class="result-card p-5">
+            <h3 class="text-white font-bold text-sm mb-2">Recent Links (this session)</h3>
+            ${history.map(h => `
+                <div class="history-item flex justify-between items-center gap-3">
+                    <span class="text-slate-400 text-xs truncate flex-1">${escapeHtml(h.original)}</span>
+                    <a href="${escapeHtml(h.short)}" target="_blank" class="text-green-400 text-xs font-semibold whitespace-nowrap">${escapeHtml(h.short)}</a>
+                </div>
+            `).join("")}
+        </div>
+    `;
+}
+
+function copyShortUrl(button) {
+    const input = document.getElementById("shortUrlOutput");
+    input.select();
+    navigator.clipboard.writeText(input.value).then(() => {
+        const originalText = button.textContent;
+        button.textContent = "✅ Copied!";
+        setTimeout(() => { button.textContent = originalText; }, 1500);
+    });
+}
+
+function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = value;
+    return div.innerHTML;
+}
+
+document.getElementById("videoUrl").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") shortenLink();
+});
+
+</script>
+
+</body>
+</html>
