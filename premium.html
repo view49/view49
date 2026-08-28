@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Premium - View49</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #0b0f19;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .glow-border {
+            background: linear-gradient(90deg, #ff0000, #3b82f6);
+            padding: 2px;
+            border-radius: 18px;
+        }
+
+        .custom-card { background: #121826; }
+
+        .plan-card {
+            background: #121826;
+            border: 1px solid #263247;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .plan-card.featured {
+            border: 2px solid #e01313;
+            position: relative;
+        }
+
+        .qr-box {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            max-width: 260px;
+            margin: 0 auto;
+        }
+
+        .qr-box img {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .step-card {
+            background: #121826;
+            border: 1px solid #263247;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .step-num {
+            background: #e01313;
+            color: #fff;
+            font-weight: 800;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4">
+
+    <div class="glow-border w-full max-w-4xl mx-auto shadow-2xl mb-6">
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-red-950/80 text-red-400 border border-red-800/50 text-xs font-bold px-4 py-2 rounded-full">
+                    ● Premium 2026
+                </span>
+                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-yellow-400 text-xs font-bold px-3 py-2 rounded-full border border-slate-700 no-underline transition-colors">
+                    📺 View49
+                </a>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3">
+                    Go Premium
+                </h1>
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto">
+                    Support View49 and unlock unlimited access to every tool —
+                    no ads, no limits.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- PLANS -->
+    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+
+        <div class="plan-card">
+            <h3 class="text-white font-bold text-lg mb-1">Monthly</h3>
+            <div class="text-3xl font-extrabold text-red-400 mb-3">₹99<span class="text-sm text-slate-400 font-normal">/month</span></div>
+            <ul class="text-slate-400 text-sm space-y-2 mb-2 text-left max-w-[220px] mx-auto">
+                <li>✅ Unlimited access to all tools</li>
+                <li>✅ No usage limits</li>
+                <li>✅ Priority support</li>
+            </ul>
+        </div>
+
+        <div class="plan-card featured">
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">BEST VALUE</div>
+            <h3 class="text-white font-bold text-lg mb-1">Yearly</h3>
+            <div class="text-3xl font-extrabold text-red-400 mb-3">₹799<span class="text-sm text-slate-400 font-normal">/year</span></div>
+            <ul class="text-slate-400 text-sm space-y-2 mb-2 text-left max-w-[220px] mx-auto">
+                <li>✅ Unlimited access to all tools</li>
+                <li>✅ No usage limits</li>
+                <li>✅ Priority support</li>
+                <li>✅ 2 months free vs monthly</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- QR PAYMENT -->
+    <div class="glow-border w-full max-w-4xl mx-auto shadow-2xl mb-6">
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+
+            <h2 class="text-white font-bold text-xl text-center mb-6">💳 Pay via UPI</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+
+                <div class="qr-box">
+                    <img src="upi-qr.jpeg" alt="UPI QR Code for payment" />
+                </div>
+
+                <div class="space-y-4">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <div>
+                            <div class="text-white text-sm font-semibold">Scan the QR code</div>
+                            <div class="text-slate-400 text-xs mt-1">Open any UPI app (PhonePe, Google Pay, Paytm) and scan the QR shown here.</div>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <div>
+                            <div class="text-white text-sm font-semibold">Pay your chosen plan amount</div>
+                            <div class="text-slate-400 text-xs mt-1">₹99 for Monthly or ₹799 for Yearly.</div>
+                        </div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-num">3</div>
+                        <div>
+                            <div class="text-white text-sm font-semibold">Send your payment screenshot</div>
+                            <div class="text-slate-400 text-xs mt-1">Email your screenshot to confirm and activate your premium access.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="max-w-4xl mx-auto mb-10">
+        <div class="custom-card rounded-2xl p-6 text-center border border-[#263247]">
+            <p class="text-slate-400 text-sm mb-3">Send your payment screenshot to activate premium:</p>
+            <a href="mailto:dilipirl.business@gmail.com?subject=Premium%20Payment%20Confirmation" class="inline-block bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg no-underline">
+                ✉️ dilipirl.business@gmail.com
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
