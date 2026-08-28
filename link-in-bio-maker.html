@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link-in-Bio Page Maker</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #0b0f19;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .glow-border {
+            background: linear-gradient(90deg, #ff0000, #3b82f6);
+            padding: 2px;
+            border-radius: 18px;
+        }
+
+        .custom-card { background: #121826; }
+
+        .link-row {
+            background: #0d1322;
+            border: 1px solid #263247;
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        #statusMessage { min-height: 20px; }
+
+        /* Preview phone frame */
+        .phone-frame {
+            background: #000;
+            border-radius: 36px;
+            padding: 10px;
+            width: 320px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .phone-screen {
+            border-radius: 28px;
+            overflow-y: auto;
+            height: 560px;
+            padding: 32px 20px;
+            text-align: center;
+        }
+
+        .bio-link-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            margin-bottom: 12px;
+            transition: transform 0.1s ease;
+        }
+
+        .bio-link-btn:hover {
+            transform: scale(1.03);
+        }
+
+        .bio-avatar {
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            margin: 0 auto 12px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 800;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4">
+
+    <div class="glow-border w-full max-w-5xl mx-auto shadow-2xl">
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-red-950/80 text-red-400 border border-red-800/50 text-xs font-bold px-4 py-2 rounded-full">
+                    ● Bio Engine 2026
+                </span>
+                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-yellow-400 text-xs font-bold px-3 py-2 rounded-full border border-slate-700 no-underline transition-colors">
+                    📺 View49
+                </a>
+            </div>
+
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3">
+                    Link-in-Bio Page Maker
+                </h1>
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto">
+                    Add your name, bio, and social links — see a live preview,
+                    then copy the page as a single HTML file you can host anywhere.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- FORM -->
+                <div class="space-y-4">
+
+                    <input id="displayName" type="text" placeholder="Your name / channel name"
+                        class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500" />
+
+                    <input id="bioText" type="text" placeholder="Short bio (e.g. Content creator | Tech & Gaming)"
+                        class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500" />
+
+                    <select id="themeSelect" class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white">
+                        <option value="red">Red / Dark</option>
+                        <option value="purple">Purple / Dark</option>
+                        <option value="teal">Teal / Dark</option>
+                        <option value="light">Clean Light</option>
+                    </select>
+
+                    <div id="linksList" class="space-y-2"></div>
+
+                    <button onclick="addLinkRow()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl">
+                        ➕ Add Link
+                    </button>
+
+                    <button onclick="updatePreview()" class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg">
+                        🔄 Update Preview
+                    </button>
+
+                    <button onclick="downloadPage()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold px-6 py-3 rounded-xl">
+                        ⬇ Download Page (HTML)
+                    </button>
+
+                    <div id="statusMessage" class="text-center text-xs text-slate-400"></div>
+
+                </div>
+
+                <!-- PREVIEW -->
+                <div>
+                    <div class="phone-frame">
+                        <div id="phoneScreen" class="phone-screen"></div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+<script>
+
+const THEMES = {
+    red:    { bg: "#0b0f19", text: "#ffffff", sub: "#94a3b8", btnBg: "#e01313", btnText: "#ffffff", avatarBg: "#e01313" },
+    purple: { bg: "#120b19", text: "#ffffff", sub: "#a78bfa", btnBg: "#7c3aed", btnText: "#ffffff", avatarBg: "#7c3aed" },
+    teal:   { bg: "#0a1512", text: "#ffffff", sub: "#5eead4", btnBg: "#0d9488", btnText: "#ffffff", avatarBg: "#0d9488" },
+    light:  { bg: "#f8fafc", text: "#0f172a", sub: "#64748b", btnBg: "#1e293b", btnText: "#ffffff", avatarBg: "#1e293b" },
+};
+
+let linkCount = 0;
+
+function addLinkRow(label = "", url = "") {
+    linkCount++;
+    const id = linkCount;
+    const container = document.getElementById("linksList");
+
+    const row = document.createElement("div");
+    row.className = "link-row";
+    row.id = `linkRow${id}`;
+    row.innerHTML = `
+        <input type="text" placeholder="Label (e.g. My YouTube)" value="${escapeAttr(label)}"
+            class="flex-1 bg-transparent border-0 text-white text-xs focus:outline-none link-label" />
+        <input type="text" placeholder="URL" value="${escapeAttr(url)}"
+            class="flex-1 bg-transparent border-0 text-white text-xs focus:outline-none link-url" />
+        <button onclick="document.getElementById('linkRow${id}').remove()" class="text-slate-500 hover:text-red-400 text-xs shrink-0">✕</button>
+    `;
+    container.appendChild(row);
+}
+
+function getLinksData() {
+    const rows = document.querySelectorAll(".link-row");
+    const links = [];
+    rows.forEach(row => {
+        const label = row.querySelector(".link-label").value.trim();
+        const url = row.querySelector(".link-url").value.trim();
+        if (label && url) links.push({ label, url });
+    });
+    return links;
+}
+
+function buildBioHtml({ name, bio, theme, links, standalone }) {
+    const t = THEMES[theme] || THEMES.red;
+    const initial = (name || "?").trim().charAt(0).toUpperCase() || "?";
+
+    const linksHtml = links.map(l => `
+        <a href="${escapeAttr(ensureUrl(l.url))}" target="_blank" class="bio-link-btn" style="background:${t.btnBg}; color:${t.btnText};">
+            ${escapeHtml(l.label)}
+        </a>
+    `).join("");
+
+    const body = `
+        <div class="bio-avatar" style="background:${t.avatarBg}; color:${t.btnText};">${escapeHtml(initial)}</div>
+        <h2 style="color:${t.text}; font-weight:800; font-size:20px; margin-bottom:4px;">${escapeHtml(name || "Your Name")}</h2>
+        <p style="color:${t.sub}; font-size:13px; margin-bottom:24px;">${escapeHtml(bio || "Your bio goes here")}</p>
+        ${linksHtml || `<p style="color:${t.sub}; font-size:12px;">No links added yet</p>`}
+    `;
+
+    if (!standalone) {
+        return `<div style="background:${t.bg}; min-height:100%;">${body}</div>`;
+    }
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(name || "My Links")}</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        background: ${t.bg};
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: system-ui, -apple-system, sans-serif;
+        padding: 20px;
+    }
+    .bio-container { max-width: 420px; width: 100%; text-align: center; padding: 32px 20px; }
+    .bio-avatar { width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; }
+    .bio-link-btn { display: block; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 15px; text-decoration: none; margin-bottom: 12px; transition: transform 0.1s ease; }
+    .bio-link-btn:hover { transform: scale(1.03); }
+</style>
+</head>
+<body>
+<div class="bio-container">${body}</div>
+</body>
+</html>`;
+}
+
+function ensureUrl(url) {
+    if (!/^https?:\/\//i.test(url)) return "https://" + url;
+    return url;
+}
+
+function updatePreview() {
+    const name = document.getElementById("displayName").value.trim();
+    const bio = document.getElementById("bioText").value.trim();
+    const theme = document.getElementById("themeSelect").value;
+    const links = getLinksData();
+
+    const html = buildBioHtml({ name, bio, theme, links, standalone: false });
+    document.getElementById("phoneScreen").innerHTML = html;
+
+    document.getElementById("statusMessage").innerHTML = '<span class="text-green-400">Preview updated.</span>';
+}
+
+function downloadPage() {
+    const name = document.getElementById("displayName").value.trim();
+    const bio = document.getElementById("bioText").value.trim();
+    const theme = document.getElementById("themeSelect").value;
+    const links = getLinksData();
+
+    if (!name) {
+        document.getElementById("statusMessage").innerHTML = '<span class="text-red-400">Please enter a name first.</span>';
+        return;
+    }
+
+    const fullHtml = buildBioHtml({ name, bio, theme, links, standalone: true });
+    const blob = new Blob([fullHtml], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${name.toLowerCase().replace(/\s+/g, "-")}-bio.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    document.getElementById("statusMessage").innerHTML = '<span class="text-green-400">Page downloaded! Upload it anywhere to make it live.</span>';
+}
+
+function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = value;
+    return div.innerHTML;
+}
+
+function escapeAttr(value) {
+    return escapeHtml(value).replace(/"/g, "&quot;");
+}
+
+// Initial rows
+addLinkRow("My YouTube Channel", "https://youtube.com/@yourchannel");
+addLinkRow("My Instagram", "https://instagram.com/yourhandle");
+updatePreview();
+
+</script>
+
+</body>
+</html>
