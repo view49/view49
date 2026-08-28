@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube 30s Clips & Shorts Splitter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #0b0f19;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .glow-border {
+            background: linear-gradient(90deg, #ef4444, #3b82f6);
+            padding: 2px;
+            border-radius: 18px;
+        }
+        .custom-card { background: #121826; }
+        .video-card {
+            background: #121826;
+            border: 1px solid #263247;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        /* Vertical Shorts Aspect Ratio (9:16) */
+        .shorts-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 9 / 16;
+            background: #000;
+        }
+        .shorts-wrapper iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+
+    <!-- Top Container Matching Your Theme -->
+    <div class="glow-border w-full max-w-4xl mx-auto shadow-2xl mb-8">
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-red-950/80 text-red-400 border border-red-800/50 text-xs font-bold px-4 py-2 rounded-full">
+                    ● Link Engine 2026
+                </span>
+                <span class="bg-slate-800 text-yellow-400 text-xs font-bold px-3 py-2 rounded-full border border-slate-700">
+                    📺 View49
+                </span>
+            </div>
+
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3">
+                    YouTube 30s Shorts Splitter
+                </h1>
+                <p class="text-slate-400 text-sm max-w-xl mx-auto">
+                    Paste any YouTube video URL, and it will automatically generate multiple 30-second sequential clip boxes in vertical Shorts format!
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <input type="text" id="youtubeUrl" 
+                    placeholder="e.g. https://www.youtube.com/watch?v=k3AqQzW3cGI" 
+                    class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500 shadow-inner">
+
+                <button onclick="generateShortsClips()" class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold py-3.5 rounded-xl shadow-lg transition text-sm">
+                    ⚡ Generate 30s Shorts Clips
+                </button>
+
+                <div id="statusMessage" class="text-center text-xs text-slate-400"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Output Grid for 30s Shorts Boxes -->
+    <div id="shortsGrid" class="w-full max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <!-- Generated clip boxes will appear here -->
+    </div>
+
+    <script>
+        function extractYouTubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function generateShortsClips() {
+            const urlInput = document.getElementById('youtubeUrl').value;
+            const grid = document.getElementById('shortsGrid');
+            const status = document.getElementById('statusMessage');
+
+            grid.innerHTML = '';
+
+            const videoId = extractYouTubeId(urlInput);
+            if (!videoId) {
+                status.innerHTML = '<span class="text-red-400">Please enter a valid YouTube video URL!</span>';
+                return;
+            }
+
+            status.innerHTML = '<span class="text-green-400">Generating 30-second clips boxes...</span>';
+
+            // Generate 6 sequential boxes of 30 seconds each (0-30, 30-60, 60-90, 90-120, etc.)
+            const clipDuration = 30;
+            const totalClips = 6; 
+
+            for (let i = 0; i < totalClips; i++) {
+                const startTime = i * clipDuration;
+                const endTime = startTime + clipDuration;
+
+                const card = document.createElement('div');
+                card.className = "video-card p-3 shadow-xl flex flex-col";
+
+                // YouTube embed with start and end time parameters
+                const embedUrl = `https://www.youtube.com/embed/${videoId}?start=${startTime}&end=${endTime}&autoplay=0`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-2 px-1">
+                        <span class="text-xs font-bold text-red-400">Clip ${i + 1} (${startTime}s - ${endTime}s)</span>
+                        <span class="text-xs text-slate-500">Shorts</span>
+                    </div>
+                    <div class="shorts-wrapper rounded-xl overflow-hidden border border-slate-800">
+                        <iframe src="${embedUrl}" 
+                            title="YouTube clip ${i + 1}"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            }
+        }
+    </script>
+</body>
+</html>
