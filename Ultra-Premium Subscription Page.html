@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View49 Premium — Unlock Superpowers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background: #08090d;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 45, 45, 0.12) 0px, transparent 40%),
+                radial-gradient(at 100% 100%, rgba(120, 40, 200, 0.08) 0px, transparent 40%);
+            color: #f4f4f5;
+            padding: 60px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Top Header */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .badge-pro {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 45, 45, 0.12);
+            border: 1px solid rgba(255, 45, 45, 0.3);
+            color: #ff4d4d;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 30px;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+
+        .hero-desc {
+            color: #8a8d9b;
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Billing Toggle */
+        .toggle-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 50px;
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #8a8d9b;
+        }
+
+        .toggle-label.active { color: #fff; }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .3s;
+            border-radius: 34px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: #ff2d2d; }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        .discount-badge {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        /* Pricing Cards Grid */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        @media (max-width: 900px) { .pricing-grid { grid-template-columns: 1fr; } }
+
+        .price-card {
+            background: rgba(18, 20, 29, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 36px 28px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .price-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        .price-card.featured {
+            background: rgba(24, 20, 32, 0.85);
+            border: 1px solid rgba(255, 45, 45, 0.5);
+            box-shadow: 0 0 50px rgba(255, 45, 45, 0.15);
+        }
+
+        .popular-tag {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, #ff2d2d, #cc0000);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .plan-name { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+        .plan-desc { font-size: 13px; color: #8a8d9b; margin-bottom: 24px; }
+
+        .price-box { margin-bottom: 24px; }
+        .price-num { font-size: 38px; font-weight: 800; color: #fff; }
+        .price-period { font-size: 14px; color: #8a8d9b; font-weight: 500; }
+
+        .feature-list { list-style: none; margin-bottom: 32px; }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #c4c7d5;
+            margin-bottom: 14px;
+        }
+
+        .feature-item i { color: #ff4d4d; font-size: 14px; }
+        .feature-item.disabled { color: #52525b; text-decoration: line-through; }
+        .feature-item.disabled i { color: #52525b; }
+
+        .btn-subscribe {
+            width: 100%;
+            padding: 14px 0;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-free {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-free:hover { background: rgba(255, 255, 255, 0.1); }
+
+        .btn-pro {
+            background: linear-gradient(135deg, #ff2d2d 0%, #b91c1c 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 45, 45, 0.4);
+        }
+
+        .btn-pro:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 45, 45, 0.6);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .modal-card {
+            background: #12141d;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 32px;
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 16px; right: 18px;
+            color: #8a8d9b;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .payment-qr {
+            width: 180px;
+            height: 180px;
+            margin: 20px auto;
+            border-radius: 12px;
+            border: 2px solid #ff2d2d;
+            padding: 8px;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="hero-section">
+        <div class="badge-pro"><i class="fa-solid fa-crown"></i> View49 Membership</div>
+        <h1 class="hero-title">Unlock Full Creator Potential</h1>
+        <p class="hero-desc">Access unlimited YouTube analytics, multi-viewers, AI prompt architectures, and priority processing.</p>
+    </div>
+
+    <!-- Toggle Monthly/Yearly -->
+    <div class="toggle-wrapper">
+        <span class="toggle-label active" id="monthlyLbl">Monthly Billing</span>
+        <label class="switch">
+            <input type="checkbox" id="billingToggle" onchange="toggleBilling()">
+            <span class="slider"></span>
+        </label>
+        <span class="toggle-label" id="yearlyLbl">Annual Billing <span class="discount-badge">Save 20%</span></span>
+    </div>
+
+    <!-- Pricing Grid -->
+    <div class="pricing-grid">
+        
+        <!-- Starter Plan -->
+        <div class="price-card">
+            <div>
+                <div class="plan-name">Free Starter</div>
+                <div class="plan-desc">Essential tools for beginner creators.</div>
+                <div class="price-box">
+                    <span class="price-num">$0</span>
+                    <span class="price-period">/ forever</span>
+                </div>
+                <ul class="feature-list">
+                    <li class="feature-item"><i class="fa-solid fa-check"></i> Standard Channel Analytics</li>
+                    <li class="feature-item"><i class="fa-solid fa-check"></i> Basic Thumbnail Downloader</li>
+                    <li class="feature-item"><i class="fa-solid fa-check"></i> Single Stream Multi-Viewer</li>
+                    <li class="feature-item disabled"><i class="fa-solid fa-xmark"></i> Bilibili Multi Viewer Pro</li>
+                    <li class="feature-item disabled"><i class="fa-solid fa-xmark"></i> Unlimited API Requests</li>
+                    <li class="feature-item disabled"><i class="fa-solid fa-xmark"></i> AI Studio Access</li>
+                </ul>
+            </div>
+            <button class="btn-subscribe btn-free">Current Free Plan</button>
+        </div>
+
+        <!-- Pro Creator (Featured) -->
+        <div class="price-card featured">
+            <div class="popular-tag">Most Popular</div>
+            <div>
+                <div class="plan-name">Pro Creator</div>
+                <div class="plan-desc">For active YouTubers & agency owners.</div>
+                <div class="price-box">
+                    <span class="price-num" id="proPrice">$9.99</span>
+                    <span class="price-period" id="proPeriod">/ month</span>
+                </div>
+                <ul class="feature-list">
+                    <li class="feature-item"><i class="fa-solid fa-circle-check"></i> Unlimited Live Analytics Studio</li>
+                    <li class="feature-item"><i class="fa-solid fa-circle-check"></i> Bilibili & YouTube Multi Viewer</li>
+                    <li class="feature-item"><i class="fa-solid fa-circle-check"></i> Full SEO & Tag Generator</li>
+                    <li class="feature-item"><i class="fa-solid fa-circle-check"></i> AI Visual Prompt Studio</li>
+                    <li class="feature-item"><i class="fa-solid fa-circle-check"></i> Instant Revenue Projections</li>
+                    <li class="feature-item disabled"><i class="fa-solid fa-xmark"></i> Custom API Key Access</li>
+                </ul>
+            </div>
+            <button class="btn-subscribe btn-pro" onclick="openPaymentModal('Pro Creator', '$9.99')">Upgrade to Pro</button>
+        </div>
+
+        <!-- Agency / Ultimate Plan -->
+        <div class="price-card">
+            <div>
+                <div class="plan-name">Agency Ultimate</div>
+                <div class="plan-desc">Maximum horsepower for large teams.</div>
+                <div class="price-box">
+                    <span class="price-num" id="agencyPrice">$24.99</span>
+                    <span class="price-period" id="agencyPeriod">/ month</span>
+                </div>
+                <ul class="feature-list">
+                    <li class="feature-item"><i class="fa-solid fa-check"></i> Everything in Pro Plan</li>
+                    <li class="feature-item"><i class="fa-solid fa-check"></i> 10 Multi-Viewer Grid Windows</li>
+                    <li class="feature-item"><i class="fa-solid fa-check"></i> Dedicated High-Speed Proxy</li>
+                    <li class="feature-item"><i class="fa-solid fa-check"></i> Custom API Key Integration</li>
+                    <li class="feature-item"><i class="fa-solid fa-check"></i> 24/7 VIP Priority Support</li>
+                    <li class="feature-item"><i class="fa-solid fa-check"></i> Early Access to New Tools</li>
+                </ul>
+            </div>
+            <button class="btn-subscribe btn-pro" onclick="openPaymentModal('Agency Ultimate', '$24.99')">Get Ultimate</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="modal" id="paymentModal">
+    <div class="modal-card">
+        <i class="fa-solid fa-xmark close-btn" onclick="closeModal()"></i>
+        <h2 style="font-size:20px; font-weight:800; color:#fff; margin-bottom:6px;" id="modalPlanName">Pro Plan</h2>
+        <p style="font-size:13px; color:#8a8d9b; margin-bottom:16px;">Scan UPI QR or complete transaction</p>
+        
+        <div style="font-size:28px; font-weight:800; color:#facc15;" id="modalPlanPrice">$9.99</div>
+
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=view49@upi" alt="QR" class="payment-qr">
+
+        <p style="font-size:12px; color:#8a8d9b; margin-bottom:20px;"><i class="fa-solid fa-lock" style="color:#4ade80;"></i> Encrypted 256-bit Secure Gateway</p>
+        
+        <button class="btn-subscribe btn-pro" onclick="alert('Payment processing! Instant access will unlock upon confirmation.')">Complete Subscription</button>
+    </div>
+</div>
+
+<script>
+    function toggleBilling() {
+        const isYearly = document.getElementById('billingToggle').checked;
+        
+        document.getElementById('monthlyLbl').classList.toggle('active', !isYearly);
+        document.getElementById('yearlyLbl').classList.toggle('active', isYearly);
+
+        if (isYearly) {
+            document.getElementById('proPrice').innerText = '$7.99';
+            document.getElementById('proPeriod').innerText = '/ month (Billed Yearly)';
+            
+            document.getElementById('agencyPrice').innerText = '$19.99';
+            document.getElementById('agencyPeriod').innerText = '/ month (Billed Yearly)';
+        } else {
+            document.getElementById('proPrice').innerText = '$9.99';
+            document.getElementById('proPeriod').innerText = '/ month';
+
+            document.getElementById('agencyPrice').innerText = '$24.99';
+            document.getElementById('agencyPeriod').innerText = '/ month';
+        }
+    }
+
+    function openPaymentModal(plan, price) {
+        document.getElementById('modalPlanName').innerText = plan;
+        document.getElementById('modalPlanPrice').innerText = price;
+        document.getElementById('paymentModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('paymentModal').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
