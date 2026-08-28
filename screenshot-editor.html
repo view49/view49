@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshot Eraser & Text Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        canvas { cursor: crosshair; }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="w-full max-w-6xl bg-[#141414] border border-[#2a2a2a] rounded-2xl p-6 shadow-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-bold text-white">🧹 Screenshot Eraser & Editor</h1>
+            <a href="index.html" class="text-xs bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 hover:text-white">← Back</a>
+        </div>
+
+        <!-- Upload Box -->
+        <div class="mb-6 border-2 border-dashed border-slate-700 hover:border-blue-500 rounded-xl p-6 text-center bg-[#0d1322] cursor-pointer" onclick="document.getElementById('imageLoader').click()">
+            <input type="file" id="imageLoader" accept="image/*" class="hidden">
+            <p class="text-sm font-semibold text-slate-300">📁 Upload Screenshot to Erase & Edit</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Controls Sidebar -->
+            <div class="bg-[#0f1523] p-4 rounded-xl border border-slate-800 space-y-4 lg:col-span-1">
+                <h3 class="text-xs font-bold tracking-wider text-red-400 uppercase">Step 1: Erase Old Text</h3>
+                <button onclick="currentTool = 'erase'" class="w-full bg-red-600/80 hover:bg-red-600 text-white font-semibold py-2 rounded-lg text-xs transition">
+                    🔴 Eraser Brush Mode
+                </button>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Eraser Size</label>
+                    <input type="range" id="brushSize" min="5" max="50" value="15" class="w-full accent-red-500">
+                </div>
+
+                <hr class="border-slate-800">
+
+                <h3 class="text-xs font-bold tracking-wider text-emerald-400 uppercase">Step 2: Add New Text</h3>
+                <button onclick="currentTool = 'write'" class="w-full bg-emerald-600/80 hover:bg-emerald-600 text-white font-semibold py-2 rounded-lg text-xs transition">
+                    ✍️ Write New Text Mode
+                </button>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">New Text / Number</label>
+                    <input type="text" id="newText" value="100%" class="w-full bg-[#090d16] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Font Size</label>
+                        <input type="number" id="fontSize" value="20" class="w-full bg-[#090d16] border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Color</label>
+                        <input type="color" id="textColor" value="#ffffff" class="w-full h-8 bg-[#090d16] border border-slate-700 rounded-lg px-1 py-0.5 cursor-pointer">
+                    </div>
+                </div>
+
+                <hr class="border-slate-800">
+
+                <button onclick="downloadImage()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg">
+                    📥 Download Final Image
+                </button>
+            </div>
+
+            <!-- Canvas Area -->
+            <div class="lg:col-span-3 bg-[#090d16] border border-slate-800 rounded-xl p-4 flex items-center justify-center overflow-auto min-h-[450px]">
+                <canvas id="imageCanvas" class="max-w-full rounded shadow-xl"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const imageLoader = document.getElementById('imageLoader');
+        const canvas = document.getElementById('imageCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let uploadedImage = new Image();
+        let currentTool = 'erase'; // 'erase' or 'write'
+        let isDrawing = false;
+
+        imageLoader.addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                uploadedImage.onload = function() {
+                    canvas.width = uploadedImage.width;
+                    canvas.height = uploadedImage.height;
+                    ctx.drawImage(uploadedImage, 0, 0);
+                }
+                uploadedImage.src = event.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        window.onload = function() {
+            canvas.width = 600;
+            canvas.height = 400;
+            ctx.fillStyle = "#121826";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#64748b";
+            ctx.font = "14px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("Upload screenshot to erase and edit text", canvas.width / 2, canvas.height / 2);
+        }
+
+        // Mouse events for Eraser Brush and Writing
+        canvas.addEventListener('mousedown', function(e) {
+            if (!uploadedImage.src) return;
+            const { x, y } = getMousePos(e);
+
+            if (currentTool === 'erase') {
+                isDrawing = true;
+                eraseAt(x, y);
+            } else if (currentTool === 'write') {
+                const text = document.getElementById('newText').value;
+                const size = document.getElementById('fontSize').value;
+                const color = document.getElementById('textColor').value;
+
+                ctx.font = `${size}px sans-serif`;
+                ctx.fillStyle = color;
+                ctx.fillText(text, x, y);
+            }
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+            if (!isDrawing || currentTool !== 'erase') return;
+            const { x, y } = getMousePos(e);
+            eraseAt(x, y);
+        });
+
+        window.addEventListener('mouseup', function() {
+            isDrawing = false;
+        });
+
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+
+        function eraseAt(x, y) {
+            const size = parseInt(document.getElementById('brushSize').value);
+            // Sample nearby background color to blend the erasing smoothly
+            const p = ctx.getImageData(x, y, 1, 1).data;
+            ctx.fillStyle = `rgb(${p[0]}, ${p[1]}, ${p[2]})`;
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'edited-screenshot.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>
