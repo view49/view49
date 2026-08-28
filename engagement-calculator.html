@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Engagement & Earnings Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background: #0a0a0a; color: #fff; padding: 30px 20px; }
+        
+        .container { max-width: 800px; margin: 0 auto; background: #141414; border: 1px solid #2a2a2a; border-radius: 12px; padding: 24px; }
+        h1 { font-size: 22px; color: #ff2d2d; margin-bottom: 20px; text-align: center; }
+        
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 13px; color: #aaa; margin-bottom: 6px; }
+        input, select { width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 6px; color: #fff; font-size: 14px; outline: none; }
+        input:focus, select:focus { border-color: #ff2d2d; }
+        
+        .btn-calc { width: 100%; background: #e01313; color: white; border: none; padding: 12px; font-weight: 700; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+        .btn-calc:hover { background: #ff2d2d; }
+        
+        .results-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 24px; }
+        @media (max-width: 600px) { .results-grid { grid-template-columns: 1fr; } }
+        
+        .res-card { background: #1a1a1a; border: 1px solid #333; padding: 16px; border-radius: 8px; text-align: center; }
+        .res-card .title { font-size: 12px; color: #888; text-transform: uppercase; margin-bottom: 8px; }
+        .res-card .value { font-size: 18px; font-weight: 700; color: #facc15; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1><i class="fa-solid fa-calculator"></i> Creator Earnings & Engagement Calculator</h1>
+    
+    <div class="form-group">
+        <label>Platform</label>
+        <select id="platform">
+            <option value="youtube">YouTube</option>
+            <option value="instagram">Instagram</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label>Total Followers / Subscribers</label>
+        <input type="number" id="followers" placeholder="e.g. 50000" value="50000">
+    </div>
+    
+    <div class="form-group">
+        <label>Average Views Per Post/Video</label>
+        <input type="number" id="views" placeholder="e.g. 15000" value="15000">
+    </div>
+
+    <div class="form-group">
+        <label>Average Engagement (Likes + Comments)</label>
+        <input type="number" id="engagement" placeholder="e.g. 1200" value="1200">
+    </div>
+
+    <button class="btn-calc" onclick="calculateStats()">Calculate Earnings & Score</button>
+
+    <div class="results-grid">
+        <div class="res-card">
+            <div class="title">Engagement Rate</div>
+            <div class="value" id="resRate">0%</div>
+        </div>
+        <div class="res-card">
+            <div class="title">Est. Sponsorship / Post</div>
+            <div class="value" id="resSponsor">$0</div>
+        </div>
+        <div class="res-card">
+            <div class="title">Est. Monthly Revenue</div>
+            <div class="value" id="resMonthly">$0</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calculateStats() {
+        const followers = parseFloat(document.getElementById('followers').value) || 0;
+        const views = parseFloat(document.getElementById('views').value) || 0;
+        const engagement = parseFloat(document.getElementById('engagement').value) || 0;
+        const platform = document.getElementById('platform').value;
+
+        // Engagement Rate = (Engagement / Views) * 100
+        let rate = views > 0 ? ((engagement / views) * 100).toFixed(2) : 0;
+        document.getElementById('resRate').innerText = rate + '%';
+
+        // Sponsor rate approximation
+        let sponsorEst = 0;
+        if (platform === 'youtube') {
+            sponsorEst = (views / 1000) * 18; // approx $18 CPM
+        } else {
+            sponsorEst = (followers / 1000) * 8 + (engagement * 0.05);
+        }
+        document.getElementById('resSponsor').innerText = '$' + sponsorEst.toFixed(0);
+
+        // Monthly Est (assuming 4 sponsored posts or CPM equivalent)
+        let monthlyEst = sponsorEst * 4;
+        document.getElementById('resMonthly').innerText = '$' + monthlyEst.toFixed(0);
+    }
+    
+    calculateStats();
+</script>
+
+</body>
+</html>
