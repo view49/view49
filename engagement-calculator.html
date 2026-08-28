@@ -17,15 +17,12 @@
         .search-input { flex: 1; padding: 14px 16px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 14px; outline: none; }
         .search-input:focus { border-color: #ff2d2d; background: #222; }
         
-        .btn-calc { background: linear-gradient(135deg, #e01313, #ff2d2d); color: white; border: none; padding: 0 24px; font-weight: 700; font-size: 14px; border-radius: 8px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        .btn-calc { background: linear-gradient(135deg, #e01313, #ff2d2d); color: white; border: none; padding: 0 24px; font-weight: 700; font-size: 14px; border-radius: 8px; cursor: pointer; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
         .btn-calc:hover { opacity: 0.9; }
-
-        .api-notice { font-size: 12px; color: #71717a; margin-bottom: 24px; background: #18181b; padding: 10px 14px; border-radius: 6px; border: 1px solid #27272a; display: flex; gap: 8px; align-items: center; }
-        .api-notice input { background: #09090b; border: 1px solid #3f3f46; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; width: 220px; }
 
         /* Channel Header Profile */
         .channel-header { display: none; align-items: center; gap: 16px; background: #18181b; border: 1px solid #27272a; padding: 16px; border-radius: 10px; margin-bottom: 24px; }
-        .channel-avatar { width: 64px; height: 64px; border-radius: 50%; border: 2px solid #ff2d2d; }
+        .channel-avatar { width: 64px; height: 64px; border-radius: 50%; border: 2px solid #ff2d2d; object-fit: cover; }
         .channel-info h2 { font-size: 18px; color: #fff; }
         .channel-info p { font-size: 12px; color: #a1a1aa; margin-top: 2px; }
 
@@ -44,6 +41,7 @@
 
         .chart-box { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 20px; height: 320px; display: flex; justify-content: center; align-items: center; position: relative; }
         .error-msg { color: #ef4444; font-size: 13px; margin-top: 8px; display: none; }
+        .loading-text { font-size: 13px; color: #facc15; margin-top: 8px; display: none; }
     </style>
 </head>
 <body>
@@ -53,20 +51,14 @@
         <i class="fa-brands fa-youtube" style="color: #ff2d2d;"></i> YouTube Live Earnings & Channel Analytics
     </div>
 
-    <div class="api-notice">
-        <i class="fa-solid fa-key" style="color:#facc15;"></i> 
-        <span>YouTube API Key:</span>
-        <input type="text" id="apiKeyInput" placeholder="Paste YouTube Data API Key">
-        <span style="font-size:10px; color:#a1a1aa;">(Required to fetch live channel stats directly)</span>
-    </div>
-
     <div class="search-box">
-        <input type="text" id="channelInput" class="search-input" placeholder="Paste Channel Link, Handle (e.g. @MrBeast), or Channel ID...">
-        <button class="btn-calc" onclick="fetchChannelData()"><i class="fa-solid fa-bolt"></i> Fetch Stats</button>
+        <input type="text" id="channelInput" class="search-input" placeholder="Paste YouTube Link or Handle (e.g. @MrBeast, @CarryMinati)...">
+        <button class="btn-calc" onclick="fetchChannelData()"><i class="fa-solid fa-bolt"></i> Fetch Analytics</button>
     </div>
+    <div id="loadingText" class="loading-text"><i class="fa-solid fa-spinner fa-spin"></i> Fetching live channel metrics...</div>
     <div id="errorMsg" class="error-msg"></div>
 
-    <!-- Live Channel Header Profile -->
+    <!-- Live Channel Profile Header -->
     <div class="channel-header" id="channelHeader">
         <img id="cAvatar" class="channel-avatar" src="" alt="Avatar">
         <div class="channel-info">
@@ -77,7 +69,7 @@
 
     <!-- Live Analytics Results Dashboard -->
     <div class="analytics-dashboard" id="dashboard">
-        <div class="dashboard-title"><i class="fa-solid fa-chart-pie"></i> Revenue & Growth Breakdown</div>
+        <div class="dashboard-title"><i class="fa-solid fa-chart-pie"></i> Revenue & Performance Breakdown</div>
         
         <div class="stats-grid">
             <div class="stat-card">
@@ -93,7 +85,7 @@
             <div class="stat-card">
                 <div class="label">Est. Monthly Revenue</div>
                 <div class="value" id="resMonthly">$0</div>
-                <div class="sub-value">Current Growth Trend</div>
+                <div class="sub-value">Current Growth Rate</div>
             </div>
             <div class="stat-card">
                 <div class="label">Est. Yearly Potential</div>
@@ -109,57 +101,59 @@
 </div>
 
 <script>
+    // Embedded API Key
+    const API_KEY = 'AIzaSyDTUlX9MF-hSYKArIr13aPaza_GikKyrFY';
     let myChart = null;
 
     async function fetchChannelData() {
         const query = document.getElementById('channelInput').value.trim();
-        const apiKey = document.getElementById('apiKeyInput').value.trim();
         const errorMsg = document.getElementById('errorMsg');
+        const loadingText = document.getElementById('loadingText');
 
         errorMsg.style.display = 'none';
+        loadingText.style.display = 'none';
 
         if (!query) {
             showError("Please enter a YouTube channel link or handle.");
             return;
         }
 
-        if (!apiKey) {
-            showError("Please enter a valid YouTube Data API v3 Key in the top box.");
-            return;
-        }
+        loadingText.style.display = 'block';
 
-        // Clean input handle or ID
-        let cleanHandle = query.replace(/https?:\/\/(www\.)?youtube\.com\//, '').replace('@', '');
+        // Extract clean handle or name
+        let cleanHandle = query.replace(/https?:\/\/(www\.)?youtube\.com\//, '').replace('@', '').split('/')[0];
 
         try {
-            // Fetch channel details from YouTube API
-            let url = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&forHandle=${cleanHandle}&key=${apiKey}`;
+            // First attempt: fetch by handle
+            let url = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&forHandle=${cleanHandle}&key=${API_KEY}`;
             let response = await fetch(url);
             let data = await response.json();
 
+            // Second attempt: search channel ID if handle lookup fails
             if (!data.items || data.items.length === 0) {
-                // Fallback search if handle lookup fails
-                let searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q=${cleanHandle}&key=${apiKey}`;
+                let searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q=${cleanHandle}&key=${API_KEY}`;
                 let searchRes = await fetch(searchUrl);
                 let searchData = await searchRes.json();
                 
                 if (searchData.items && searchData.items.length > 0) {
                     let channelId = searchData.items[0].id.channelId;
-                    url = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelId}&key=${apiKey}`;
+                    url = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelId}&key=${API_KEY}`;
                     response = await fetch(url);
                     data = await response.json();
                 }
             }
 
+            loadingText.style.display = 'none';
+
             if (data.items && data.items.length > 0) {
-                const channel = data.items[0];
-                renderDashboard(channel);
+                renderDashboard(data.items[0]);
             } else {
-                showError("Channel not found. Check the link or handle.");
+                showError("Channel not found. Please check the link or handle.");
             }
 
         } catch (err) {
-            showError("API Error: Unable to fetch channel data. Verify your API Key.");
+            loadingText.style.display = 'none';
+            showError("Unable to fetch data right now. Please check the URL.");
         }
     }
 
@@ -167,13 +161,13 @@
         const snippet = channel.snippet;
         const stats = channel.statistics;
 
-        // Populate Header Profile
+        // Profile Header
         document.getElementById('cAvatar').src = snippet.thumbnails.default.url;
         document.getElementById('cTitle').innerText = snippet.title;
-        document.getElementById('cHandle').innerText = snippet.customUrl ? snippet.customUrl : '';
+        document.getElementById('cHandle').innerText = snippet.customUrl ? snippet.customUrl : '@' + snippet.title;
         document.getElementById('channelHeader').style.display = 'flex';
 
-        // Stats
+        // Metrics
         const subs = parseInt(stats.subscriberCount) || 0;
         const totalViews = parseInt(stats.viewCount) || 0;
         const videoCount = parseInt(stats.videoCount) || 1;
@@ -181,19 +175,18 @@
         const avgViewsPerVideo = Math.round(totalViews / videoCount);
 
         // Earnings Calculation Algorithm
-        // Average CPM estimated around $2.5 - $4.0 per 1000 views
-        const estAdsensePerVideo = (avgViewsPerVideo / 1000) * 3.2;
-        const estSponsorPerVideo = (avgViewsPerVideo / 1000) * 15;
+        const estAdsensePerVideo = (avgViewsPerVideo / 1000) * 3.2; // ~$3.2 RPM
+        const estSponsorPerVideo = (avgViewsPerVideo / 1000) * 14;  // Brand sponsorships
         
         const estPerVideoTotal = estAdsensePerVideo + estSponsorPerVideo;
         
-        // Assuming 2 uploads per week
+        // Estimation: 2 videos per week
         const weeklyEst = estPerVideoTotal * 2;
         const monthlyEst = weeklyEst * 4;
         const yearlyEst = monthlyEst * 12;
 
         document.getElementById('resSubscribers').innerText = subs.toLocaleString();
-        document.getElementById('resVideos').innerText = `${videoCount.toLocaleString()} Uploads`;
+        document.getElementById('resVideos').innerText = `${videoCount.toLocaleString()} Total Videos`;
         
         document.getElementById('resWeekly').innerText = '$' + Math.round(weeklyEst).toLocaleString();
         document.getElementById('resMonthly').innerText = '$' + Math.round(monthlyEst).toLocaleString();
@@ -211,7 +204,7 @@
         myChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Sponsorships & Brand Deals', 'YouTube AdSense Revenue'],
+                labels: ['Brand Sponsorships', 'YouTube AdSense Revenue'],
                 datasets: [{
                     data: [sponsorMonthly, adsenseMonthly],
                     backgroundColor: ['#ff2d2d', '#facc15'],
@@ -223,7 +216,7 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { position: 'bottom', labels: { color: '#a1a1aa' } },
-                    title: { display: true, text: 'Estimated Monthly Income Stream ($)', color: '#ffffff', font: { size: 14, weight: 'bold' } }
+                    title: { display: true, text: 'Monthly Revenue Breakdown ($)', color: '#ffffff', font: { size: 14, weight: 'bold' } }
                 }
             }
         });
