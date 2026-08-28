@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Multi Viewer</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #0b0f19;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .glow-border {
+            background: linear-gradient(90deg, #ff0000, #3b82f6);
+            padding: 2px;
+            border-radius: 18px;
+        }
+
+        .custom-card { background: #121826; }
+
+        .video-card {
+            background: #121826;
+            border: 1px solid #263247;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .slot-number { color: #ff4d4d; font-weight: 700; }
+
+        #statusMessage { min-height: 20px; }
+
+        textarea {
+            resize: vertical;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4">
+
+    <div class="glow-border w-full max-w-6xl mx-auto shadow-2xl">
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-red-950/80 text-red-400 border border-red-800/50 text-xs font-bold px-4 py-2 rounded-full">
+                    ● YouTube Engine 2026
+                </span>
+                <span class="bg-slate-800 text-yellow-400 text-xs font-bold px-3 py-2 rounded-full border border-slate-700">
+                    📺 View49
+                </span>
+            </div>
+
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3">
+                    YouTube Multi-Viewer
+                </h1>
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto">
+                    Paste one YouTube URL or video ID per line to watch several
+                    different videos side by side — great for comparing content,
+                    monitoring multiple channels, or research.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+
+                <textarea
+                    id="videoUrls"
+                    rows="4"
+                    placeholder="Paste YouTube URLs or video IDs, one per line&#10;e.g.&#10;https://www.youtube.com/watch?v=dQw4w9WgXcQ&#10;https://youtu.be/9bZkp7q19f0"
+                    class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500"
+                ></textarea>
+
+                <div class="flex flex-wrap gap-3">
+
+                    <select id="layoutStyle" class="bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white">
+                        <option value="auto">Auto Layout</option>
+                        <option value="1">1 Column</option>
+                        <option value="2">2 Columns</option>
+                        <option value="3">3 Columns</option>
+                        <option value="4">4 Columns</option>
+                    </select>
+
+                    <button onclick="launchWorkspace()" class="flex-1 min-w-[200px] bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg">
+                        ▶ Launch Workspace
+                    </button>
+
+                    <button onclick="clearAll()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-5 py-3 rounded-xl">
+                        ✕ Clear
+                    </button>
+
+                </div>
+
+                <div id="statusMessage" class="text-center text-xs text-slate-400"></div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="w-full max-w-[1800px] mx-auto mt-6">
+        <div class="custom-card rounded-2xl p-4 mb-4 border border-slate-700">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold text-white">100 Independent Slots</h2>
+                    <p class="text-xs text-slate-400">Pehle sirf Slot 1 dikhega. Valid YouTube link load karte hi automatic next slot open hoga — maximum 100 slots.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="loadAllSlots()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-sm">▶ Load All</button>
+                    <button onclick="clearAllSlots()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-4 py-2 rounded-xl text-sm">✕ Clear All</button>
+                </div>
+            </div>
+        </div>
+        <div id="workspaceGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+    </div>
+
+<script>
+
+function extractAllVideoIds(text) {
+    const ids = [];
+    const seen = new Set();
+
+    const urlPattern = /(?:youtube\.com\/watch\?v=|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/g;
+    let m;
+    while ((m = urlPattern.exec(text)) !== null) {
+        if (!seen.has(m[1])) { seen.add(m[1]); ids.push(m[1]); }
+    }
+
+    const tokens = text.split(/[\s,]+/).map(t => t.trim()).filter(Boolean);
+    for (const token of tokens) {
+        if (/^[a-zA-Z0-9_-]{11}$/.test(token) && !seen.has(token)) {
+            seen.add(token);
+            ids.push(token);
+        }
+    }
+
+    return ids;
+}
+
+function getColumns(count, layout) {
+    if (layout !== "auto") return Number(layout);
+    if (count === 1) return 1;
+    if (count <= 4) return 2;
+    if (count <= 9) return 3;
+    return 4;
+}
+
+function createSlot(slotNumber) {
+    const card = document.createElement("div");
+    card.className = "video-card p-3 shadow-xl";
+    if (slotNumber > 1) card.classList.add("hidden");
+    card.dataset.slot = slotNumber;
+
+    card.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-xs">
+                <span class="slot-number">Slot ${slotNumber}</span>
+            </span>
+            <button onclick="clearSlot(${slotNumber})"
+                    class="text-xs text-slate-500 hover:text-red-400">✕ Clear</button>
+        </div>
+
+        <div class="flex gap-2 mb-3">
+            <input
+                id="slotInput${slotNumber}"
+                type="text"
+                placeholder="YouTube URL / video ID"
+                class="min-w-0 flex-1 bg-[#0d1322] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500"
+                onkeydown="if(event.key === 'Enter') loadSlot(${slotNumber})"
+            >
+            <button
+                onclick="loadSlot(${slotNumber})"
+                class="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-2 rounded-lg text-xs">
+                Load
+            </button>
+        </div>
+
+        <div class="video-wrapper">
+            <div id="slotPlaceholder${slotNumber}" class="absolute inset-0 flex items-center justify-center text-xs text-slate-600">
+                Slot ${slotNumber} — paste a YouTube link
+            </div>
+            <iframe
+                id="slotFrame${slotNumber}"
+                class="hidden"
+                title="YouTube Slot ${slotNumber}"
+                allowfullscreen
+                loading="lazy"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+            </iframe>
+        </div>
+    `;
+
+    return card;
+}
+
+function initializeSlots() {
+    const grid = document.getElementById("workspaceGrid");
+    grid.innerHTML = "";
+
+    const fragment = document.createDocumentFragment();
+    for (let i = 1; i <= 100; i++) {
+        fragment.appendChild(createSlot(i));
+    }
+    grid.appendChild(fragment);
+
+    document.getElementById("statusMessage").innerHTML =
+        '<span class="text-slate-400">100 independent slots ready.</span>';
+}
+
+function loadSlot(slotNumber) {
+    const input = document.getElementById(`slotInput${slotNumber}`);
+    const frame = document.getElementById(`slotFrame${slotNumber}`);
+    const placeholder = document.getElementById(`slotPlaceholder${slotNumber}`);
+
+    const value = input.value.trim();
+    const ids = extractAllVideoIds(value);
+
+    if (ids.length === 0) {
+        input.classList.add("border-red-500");
+        placeholder.textContent = "Invalid YouTube URL or video ID";
+        frame.classList.add("hidden");
+        return;
+    }
+
+    input.classList.remove("border-red-500");
+
+    const id = ids[0];
+    frame.src = `https://www.youtube.com/embed/${encodeURIComponent(id)}`;
+    frame.classList.remove("hidden");
+    placeholder.classList.add("hidden");
+
+    // Automatically reveal the next slot only after this slot gets a valid link.
+    if (slotNumber < 100) {
+        const nextCard = document.querySelector(`.video-card[data-slot="${slotNumber + 1}"]`);
+        if (nextCard) {
+            nextCard.classList.remove("hidden");
+            nextCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+    }
+}
+
+function loadAllSlots() {
+    let loaded = 0;
+
+    for (let i = 1; i <= 100; i++) {
+        const input = document.getElementById(`slotInput${i}`);
+        if (input && input.value.trim()) {
+            const before = document.getElementById(`slotFrame${i}`).classList.contains("hidden");
+            loadSlot(i);
+            const after = document.getElementById(`slotFrame${i}`).classList.contains("hidden");
+            if (before && !after) loaded++;
+        }
+    }
+
+    document.getElementById("statusMessage").innerHTML =
+        `<span class="text-green-400">Loaded ${loaded} slot(s).</span>`;
+}
+
+function clearSlot(slotNumber) {
+    const input = document.getElementById(`slotInput${slotNumber}`);
+    const frame = document.getElementById(`slotFrame${slotNumber}`);
+    const placeholder = document.getElementById(`slotPlaceholder${slotNumber}`);
+
+    input.value = "";
+    input.classList.remove("border-red-500");
+    frame.src = "";
+    frame.classList.add("hidden");
+    placeholder.classList.remove("hidden");
+    placeholder.textContent = `Slot ${slotNumber} — paste a YouTube link`;
+}
+
+function clearAllSlots() {
+    for (let i = 1; i <= 100; i++) {
+        clearSlot(i);
+        const card = document.querySelector(`.video-card[data-slot="${i}"]`);
+        if (card) {
+            if (i === 1) card.classList.remove("hidden");
+            else card.classList.add("hidden");
+        }
+    }
+    document.getElementById("statusMessage").innerHTML = "";
+}
+
+function launchWorkspace() {
+    // Keep the original top input useful: put each supplied URL into the next slot.
+    const raw = document.getElementById("videoUrls").value;
+    const videoIds = extractAllVideoIds(raw);
+
+    if (videoIds.length === 0) {
+        document.getElementById("statusMessage").innerHTML =
+            '<span class="text-red-400">Please paste at least one valid YouTube URL or video ID.</span>';
+        return;
+    }
+
+    if (videoIds.length > 100) {
+        document.getElementById("statusMessage").innerHTML =
+            '<span class="text-red-400">Maximum 100 slots supported.</span>';
+        return;
+    }
+
+    for (let i = 1; i <= 100; i++) {
+        clearSlot(i);
+        const card = document.querySelector(`.video-card[data-slot="${i}"]`);
+        if (card) {
+            if (i === 1) card.classList.remove("hidden");
+            else card.classList.add("hidden");
+        }
+    }
+
+    videoIds.forEach((id, index) => {
+        const slotNumber = index + 1;
+        const card = document.querySelector(`.video-card[data-slot="${slotNumber}"]`);
+        if (card) card.classList.remove("hidden");
+        document.getElementById(`slotInput${slotNumber}`).value = id;
+        loadSlot(slotNumber);
+    });
+
+    document.getElementById("statusMessage").innerHTML =
+        `<span class="text-green-400">Loaded ${videoIds.length} independent slot(s).</span>`;
+}
+
+function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = value;
+    return div.innerHTML;
+}
+
+document.addEventListener("DOMContentLoaded", initializeSlots);
+</script>
+
+</body>
+</html>
