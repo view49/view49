@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link-in-Bio Page Maker</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #0b0f19;
+            color: #e2e8f0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .glow-border {
+            background: linear-gradient(90deg, #ff0000, #3b82f6);
+            padding: 2px;
+            border-radius: 18px;
+        }
+
+        .custom-card { background: #121826; }
+
+        .step-progress {
+            height: 4px;
+            background: #263247;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .step-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e01313, #ff2d2d);
+            transition: width 0.3s ease;
+        }
+
+        .choice-card {
+            background: #0d1322;
+            border: 2px solid #263247;
+            border-radius: 14px;
+            padding: 18px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.15s ease;
+        }
+
+        .choice-card:hover { border-color: #475569; }
+
+        .choice-card.selected {
+            border-color: #e01313;
+            background: rgba(224,19,19,0.08);
+        }
+
+        .choice-icon { font-size: 26px; margin-bottom: 8px; }
+
+        .platform-input-row {
+            background: #0d1322;
+            border: 1px solid #263247;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+        }
+
+        .theme-preview-card {
+            border-radius: 20px;
+            padding: 22px 16px;
+            text-align: center;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+        }
+
+        .theme-preview-card:hover { transform: translateY(-3px); }
+
+        .theme-preview-card.selected {
+            border-color: #ffffff;
+            transform: translateY(-3px);
+        }
+
+        .theme-preview-avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            margin: 0 auto 8px auto;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800;
+        }
+
+        .theme-preview-name {
+            font-weight: 800;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .theme-preview-handle {
+            font-size: 10px;
+            margin-bottom: 12px;
+        }
+
+        .theme-preview-pill {
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 7px 0;
+            margin-bottom: 6px;
+        }
+
+        .theme-preview-label {
+            margin-top: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .phone-frame {
+            background: #000;
+            border-radius: 36px;
+            padding: 10px;
+            width: 300px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .phone-screen {
+            border-radius: 28px;
+            overflow-y: auto;
+            height: 520px;
+            padding: 32px 20px;
+            text-align: center;
+        }
+
+        .bio-link-btn {
+            display: block;
+            width: 100%;
+            padding: 13px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            margin-bottom: 10px;
+        }
+
+        .bio-avatar {
+            width: 76px; height: 76px; border-radius: 50%;
+            margin: 0 auto 12px auto;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; font-weight: 800;
+        }
+
+        .wizard-nav {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(90deg, #e01313, #ff2d2d);
+            color: #fff;
+            font-weight: 700;
+            padding: 13px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #fff;
+            font-weight: 700;
+            padding: 13px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .custom-link-row {
+            background: #0d1322;
+            border: 1px solid #263247;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4">
+
+    <div id="wizardContainer" class="glow-border w-full max-w-2xl mx-auto shadow-2xl mb-6 transition-all">
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-red-950/80 text-red-400 border border-red-800/50 text-xs font-bold px-4 py-2 rounded-full">
+                    ● Bio Engine 2026
+                </span>
+                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-yellow-400 text-xs font-bold px-3 py-2 rounded-full border border-slate-700 no-underline transition-colors">
+                    📺 View49
+                </a>
+            </div>
+
+            <div class="step-progress">
+                <div id="stepProgressFill" class="step-progress-fill" style="width: 20%;"></div>
+            </div>
+            <div class="text-right text-xs text-slate-500 mb-4" id="stepLabel">Step 1 of 5</div>
+
+            <!-- STEP 1: USERNAME -->
+            <div id="step1" class="wizard-step">
+                <h1 class="text-2xl font-extrabold text-white mb-2 text-center">Pick your username</h1>
+                <p class="text-slate-400 text-sm text-center mb-6">This is your page's display handle.</p>
+
+                <input id="usernameInput" type="text" placeholder="yourname"
+                    class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-4 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500 text-center" />
+
+                <div class="wizard-nav">
+                    <button class="btn-primary" onclick="goToStep(2)">Continue</button>
+                </div>
+            </div>
+
+            <!-- STEP 2: CATEGORY -->
+            <div id="step2" class="wizard-step hidden">
+                <h1 class="text-2xl font-extrabold text-white mb-2 text-center">What do you do?</h1>
+                <p class="text-slate-400 text-sm text-center mb-6">Pick one that fits best.</p>
+
+                <div class="grid grid-cols-2 gap-3 mb-6" id="categoryGrid">
+                    <div class="choice-card" data-value="Creator & Personal" onclick="selectCategory(this)">
+                        <div class="choice-icon">✨</div>
+                        <div class="text-white text-sm font-bold">Creators</div>
+                        <div class="text-slate-500 text-xs">& Personal</div>
+                    </div>
+                    <div class="choice-card" data-value="Business & Shop" onclick="selectCategory(this)">
+                        <div class="choice-icon">💼</div>
+                        <div class="text-white text-sm font-bold">Business</div>
+                        <div class="text-slate-500 text-xs">& Shops</div>
+                    </div>
+                    <div class="choice-card" data-value="Restaurant & Cafe" onclick="selectCategory(this)">
+                        <div class="choice-icon">🍽️</div>
+                        <div class="text-white text-sm font-bold">Restaurants</div>
+                        <div class="text-slate-500 text-xs">& Cafes</div>
+                    </div>
+                    <div class="choice-card" data-value="Musician & Podcaster" onclick="selectCategory(this)">
+                        <div class="choice-icon">🎤</div>
+                        <div class="text-white text-sm font-bold">Musicians</div>
+                        <div class="text-slate-500 text-xs">& Podcasters</div>
+                    </div>
+                </div>
+
+                <div class="wizard-nav">
+                    <button class="btn-secondary" onclick="goToStep(1)">Back</button>
+                    <button id="step2Continue" class="btn-primary" disabled onclick="goToStep(3)">Continue</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: PLATFORMS -->
+            <div id="step3" class="wizard-step hidden">
+                <h1 class="text-2xl font-extrabold text-white mb-2 text-center">Where are you active?</h1>
+                <p class="text-slate-400 text-sm text-center mb-6">Pick all platforms you want to show.</p>
+
+                <div class="grid grid-cols-3 gap-3 mb-6" id="platformGrid"></div>
+
+                <div class="wizard-nav">
+                    <button class="btn-secondary" onclick="goToStep(2)">Back</button>
+                    <button id="step3Continue" class="btn-primary" disabled onclick="prepareStep4(); goToStep(4)">Continue</button>
+                </div>
+            </div>
+
+            <!-- STEP 4: LINKS -->
+            <div id="step4" class="wizard-step hidden">
+                <h1 class="text-2xl font-extrabold text-white mb-2 text-center">Add your links</h1>
+                <p class="text-slate-400 text-sm text-center mb-6">Enter your handle or paste the full URL.</p>
+
+                <div id="platformLinksArea" class="mb-4"></div>
+
+                <div class="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">Custom Links (optional)</div>
+                <div id="customLinksArea" class="mb-3"></div>
+
+                <button onclick="addCustomLinkRow()" class="w-full border border-dashed border-slate-600 text-slate-400 text-sm rounded-xl py-3 mb-4 hover:border-red-500 hover:text-white">
+                    + Add another link
+                </button>
+
+                <div class="wizard-nav">
+                    <button class="btn-secondary" onclick="goToStep(3)">Back</button>
+                    <button class="btn-primary" onclick="goToStep(5)">Continue</button>
+                </div>
+            </div>
+
+            <!-- STEP 5: THEME -->
+            <div id="step5" class="wizard-step hidden">
+                <h1 class="text-2xl font-extrabold text-white mb-2 text-center">Pick a theme</h1>
+                <p class="text-slate-400 text-sm text-center mb-6">Set the vibe for your page.</p>
+
+                <div class="grid grid-cols-2 gap-4 mb-6" id="themeGrid"></div>
+
+                <div class="wizard-nav">
+                    <button class="btn-secondary" onclick="goToStep(4)">Back</button>
+                    <button class="btn-primary" onclick="finishWizard()">Finish</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FINAL RESULT -->
+    <div id="resultArea" class="max-w-4xl mx-auto hidden">
+        <div class="glow-border shadow-2xl">
+            <div class="custom-card rounded-2xl p-6 md:p-8">
+                <h2 class="text-white font-bold text-xl text-center mb-6">🎉 Your Page is Ready</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="phone-frame">
+                        <div id="phoneScreen" class="phone-screen"></div>
+                    </div>
+
+                    <div class="text-center md:text-left space-y-3">
+                        <p class="text-slate-400 text-sm">Download your page as a single HTML file and host it anywhere — GitHub Pages, Netlify, or your own domain.</p>
+                        <button onclick="downloadPage()" class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg">
+                            ⬇ Download Page (HTML)
+                        </button>
+                        <button onclick="restartWizard()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold px-6 py-3 rounded-xl">
+                            ↺ Start Over
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+
+const PLATFORMS = [
+    { key: "instagram", label: "Instagram", icon: "📸" },
+    { key: "tiktok", label: "TikTok", icon: "🎵" },
+    { key: "youtube", label: "YouTube", icon: "▶️" },
+    { key: "x", label: "X", icon: "✖️" },
+    { key: "snapchat", label: "Snapchat", icon: "👻" },
+    { key: "pinterest", label: "Pinterest", icon: "📌" },
+    { key: "threads", label: "Threads", icon: "🧵" },
+    { key: "spotify", label: "Spotify", icon: "🎧" },
+    { key: "twitch", label: "Twitch", icon: "🎮" },
+    { key: "website", label: "Website", icon: "🌐" },
+];
+
+const THEMES = {
+    red:      { name: "Salsa Red",     bg: "#c81e1e", text: "#fff", sub: "rgba(255,255,255,0.85)", pillBg: "#ffffff", pillText: "#c81e1e" },
+    purple:   { name: "Cyber Magenta", bg: "linear-gradient(160deg,#3b0764,#831843)", text: "#fff", sub: "#f0abfc", pillBg: "transparent", pillText: "#f0abfc", pillBorder: "#f0abfc" },
+    teal:     { name: "Cottage Sage",  bg: "#bcd9b0", text: "#1a2e1a", sub: "#3f5c3f", pillBg: "#ffffff", pillText: "#1a2e1a" },
+    blue:     { name: "Wall Street",   bg: "#0b1f4b", text: "#fff", sub: "#93c5fd", pillBg: "#ffffff", pillText: "#0b1f4b" },
+    sunshine: { name: "Sunshine Pop",  bg: "linear-gradient(160deg,#fbbf24,#ec4899)", text: "#fff", sub: "rgba(255,255,255,0.9)", pillBg: "#ffffff", pillText: "#c2410c" },
+    mono:     { name: "Carbon Mono",   bg: "#0a0a0a", text: "#fff", sub: "#64748b", pillBg: "transparent", pillText: "#22d3ee", pillBorder: "#22d3ee" },
+    pink:     { name: "Rose Quartz",   bg: "linear-gradient(160deg,#f472b6,#db2777)", text: "#fff", sub: "rgba(255,255,255,0.9)", pillBg: "#ffffff", pillText: "#be185d" },
+    light:    { name: "Editorial",     bg: "#f1ede4", text: "#1c1917", sub: "#78716c", pillBg: "#ffffff", pillText: "#1c1917" },
+    lime:     { name: "Electric Lime", bg: "#0f1c0a", text: "#a3e635", sub: "#65a30d", pillBg: "#166534", pillText: "#bef264" },
+};
+
+const wizard = {
+    username: "",
+    category: "",
+    platforms: [],
+    platformLinks: {},
+    customLinks: [],
+    theme: "red"
+};
+
+function goToStep(n) {
+    if (n === 2) wizard.username = document.getElementById("usernameInput").value.trim();
+
+    document.querySelectorAll(".wizard-step").forEach(s => s.classList.add("hidden"));
+    document.getElementById("step" + n).classList.remove("hidden");
+    document.getElementById("stepProgressFill").style.width = (n / 5 * 100) + "%";
+    document.getElementById("stepLabel").textContent = `Step ${n} of 5`;
+
+    const container = document.getElementById("wizardContainer");
+    container.classList.toggle("max-w-2xl", n !== 5);
+    container.classList.toggle("max-w-3xl", n === 5);
+}
+
+function selectCategory(el) {
+    document.querySelectorAll("#categoryGrid .choice-card").forEach(c => c.classList.remove("selected"));
+    el.classList.add("selected");
+    wizard.category = el.dataset.value;
+    document.getElementById("step2Continue").disabled = false;
+}
+
+function renderPlatformGrid() {
+    const grid = document.getElementById("platformGrid");
+    grid.innerHTML = PLATFORMS.map(p => `
+        <div class="choice-card" data-key="${p.key}" onclick="togglePlatform(this, '${p.key}')">
+            <div class="choice-icon">${p.icon}</div>
+            <div class="text-white text-xs font-semibold">${p.label}</div>
+        </div>
+    `).join("");
+}
+
+function togglePlatform(el, key) {
+    const idx = wizard.platforms.indexOf(key);
+    if (idx === -1) {
+        wizard.platforms.push(key);
+        el.classList.add("selected");
+    } else {
+        wizard.platforms.splice(idx, 1);
+        el.classList.remove("selected");
+    }
+    document.getElementById("step3Continue").disabled = wizard.platforms.length === 0;
+}
+
+function prepareStep4() {
+    const area = document.getElementById("platformLinksArea");
+    area.innerHTML = wizard.platforms.map(key => {
+        const platform = PLATFORMS.find(p => p.key === key);
+        return `
+            <div class="platform-input-row">
+                <div class="text-xs text-slate-400 mb-1">${platform.icon} ${platform.label}</div>
+                <input type="text" placeholder="@your-handle or full URL" data-platform="${key}"
+                    class="platform-link-input w-full bg-transparent text-white text-sm focus:outline-none" />
+            </div>
+        `;
+    }).join("");
+}
+
+function addCustomLinkRow(title = "", url = "") {
+    const area = document.getElementById("customLinksArea");
+    const row = document.createElement("div");
+    row.className = "custom-link-row";
+    row.innerHTML = `
+        <input type="text" placeholder="Link title (e.g. My latest project)" value="${escapeAttr(title)}"
+            class="custom-link-title w-full bg-transparent text-white text-sm mb-2 focus:outline-none" />
+        <div class="flex gap-2">
+            <input type="text" placeholder="https://..." value="${escapeAttr(url)}"
+                class="custom-link-url flex-1 bg-transparent text-slate-300 text-sm focus:outline-none" />
+            <button onclick="this.closest('.custom-link-row').remove()" class="text-slate-500 hover:text-red-400 text-xs">✕</button>
+        </div>
+    `;
+    area.appendChild(row);
+}
+
+function renderThemeGrid() {
+    const grid = document.getElementById("themeGrid");
+    grid.innerHTML = Object.entries(THEMES).map(([key, t]) => {
+        const border = t.pillBorder ? `border:1.5px solid ${t.pillBorder};` : "";
+        const pills = ["Latest", "Press", "Shop"].map(label => `
+            <div class="theme-preview-pill" style="background:${t.pillBg}; color:${t.pillText}; ${border}">${label}</div>
+        `).join("");
+
+        return `
+            <div class="theme-preview-card ${key === wizard.theme ? 'selected' : ''}" data-key="${key}" onclick="selectTheme(this, '${key}')" style="background:${t.bg};">
+                <div class="theme-preview-avatar" style="background:${t.pillText === t.text ? 'rgba(255,255,255,0.2)' : t.pillBg}; color:${t.text};">👤</div>
+                <div class="theme-preview-name" style="color:${t.text};">Your Name</div>
+                <div class="theme-preview-handle" style="color:${t.sub};">@yourhandle</div>
+                ${pills}
+                <div class="theme-preview-label" style="color:${t.text};">${t.name}</div>
+            </div>
+        `;
+    }).join("");
+}
+
+function selectTheme(el, key) {
+    document.querySelectorAll("#themeGrid .theme-preview-card").forEach(s => s.classList.remove("selected"));
+    el.classList.add("selected");
+    wizard.theme = key;
+}
+
+function collectStep4Data() {
+    wizard.platformLinks = {};
+    document.querySelectorAll(".platform-link-input").forEach(input => {
+        const key = input.dataset.platform;
+        const val = input.value.trim();
+        if (val) wizard.platformLinks[key] = val;
+    });
+
+    wizard.customLinks = [];
+    document.querySelectorAll("#customLinksArea .custom-link-row").forEach(row => {
+        const title = row.querySelector(".custom-link-title").value.trim();
+        const url = row.querySelector(".custom-link-url").value.trim();
+        if (title && url) wizard.customLinks.push({ title, url });
+    });
+}
+
+function ensureUrl(url) {
+    if (/^https?:\/\//i.test(url)) return url;
+    if (url.startsWith("@")) return null;
+    return "https://" + url;
+}
+
+function platformUrl(key, value) {
+    if (/^https?:\/\//i.test(value)) return value;
+    const handle = value.replace(/^@/, "");
+    const bases = {
+        instagram: "https://instagram.com/",
+        tiktok: "https://tiktok.com/@",
+        youtube: "https://youtube.com/@",
+        x: "https://x.com/",
+        snapchat: "https://snapchat.com/add/",
+        pinterest: "https://pinterest.com/",
+        threads: "https://threads.net/@",
+        spotify: "https://open.spotify.com/user/",
+        twitch: "https://twitch.tv/",
+        website: "https://",
+    };
+    return (bases[key] || "https://") + handle;
+}
+
+function buildLinksList() {
+    const links = [];
+    wizard.platforms.forEach(key => {
+        const value = wizard.platformLinks[key];
+        if (!value) return;
+        const platform = PLATFORMS.find(p => p.key === key);
+        links.push({ label: `${platform.icon} ${platform.label}`, url: platformUrl(key, value) });
+    });
+    wizard.customLinks.forEach(l => {
+        links.push({ label: l.title, url: ensureUrl(l.url) || l.url });
+    });
+    return links;
+}
+
+function buildBioHtml({ standalone }) {
+    const t = THEMES[wizard.theme] || THEMES.red;
+    const name = wizard.username || "Your Name";
+    const initial = name.trim().charAt(0).toUpperCase() || "?";
+    const links = buildLinksList();
+    const pillBorder = t.pillBorder ? `border:1.5px solid ${t.pillBorder};` : "";
+
+    const linksHtml = links.map(l => `
+        <a href="${escapeAttr(l.url)}" target="_blank" class="bio-link-btn" style="background:${t.pillBg === 'transparent' ? 'transparent' : t.pillBg}; color:${t.pillText}; ${pillBorder}">
+            ${escapeHtml(l.label)}
+        </a>
+    `).join("");
+
+    const body = `
+        <div class="bio-avatar" style="background:rgba(255,255,255,0.15); color:${t.text};">${escapeHtml(initial)}</div>
+        <h2 style="color:${t.text}; font-weight:800; font-size:20px; margin-bottom:2px;">@${escapeHtml(name)}</h2>
+        <p style="color:${t.sub}; font-size:12px; margin-bottom:24px;">${escapeHtml(wizard.category || "")}</p>
+        ${linksHtml || `<p style="color:${t.sub}; font-size:12px;">No links added yet</p>`}
+    `;
+
+    if (!standalone) {
+        return `<div style="background:${t.bg}; min-height:100%;">${body}</div>`;
+    }
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@${escapeHtml(name)}</title>
+<style>
+    * { box-sizing: border-box; }
+    body { background: ${t.bg}; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: system-ui, -apple-system, sans-serif; padding: 20px; }
+    .bio-container { max-width: 420px; width: 100%; text-align: center; padding: 32px 20px; }
+    .bio-avatar { width: 76px; height: 76px; border-radius: 50%; margin: 0 auto 12px auto; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; }
+    .bio-link-btn { display: block; width: 100%; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 15px; text-decoration: none; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="bio-container">${body}</div>
+</body>
+</html>`;
+}
+
+function finishWizard() {
+    collectStep4Data();
+
+    document.getElementById("phoneScreen").innerHTML = buildBioHtml({ standalone: false });
+
+    document.getElementById("wizardContainer").classList.add("hidden");
+    document.getElementById("resultArea").classList.remove("hidden");
+}
+
+function downloadPage() {
+    const fullHtml = buildBioHtml({ standalone: true });
+    const blob = new Blob([fullHtml], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${(wizard.username || "my").toLowerCase().replace(/\s+/g, "-")}-bio.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function restartWizard() {
+    location.reload();
+}
+
+function escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = value;
+    return div.innerHTML;
+}
+
+function escapeAttr(value) {
+    return escapeHtml(value).replace(/"/g, "&quot;");
+}
+
+renderPlatformGrid();
+renderThemeGrid();
+
+</script>
+
+</body>
+</html>
