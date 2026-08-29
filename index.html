@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Link in Bio Builder</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f4f7f6;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    /* Left Form Panel */
+    .form-panel {
+      flex: 1;
+      min-width: 320px;
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .form-panel h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .form-group input[type="file"] {
+      padding: 6px;
+    }
+
+    .social-section {
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+      margin-top: 15px;
+    }
+
+    .social-section h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      color: #555;
+    }
+
+    /* Right Mobile Preview */
+    .preview-panel {
+      flex: 1;
+      min-width: 320px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .phone-mockup {
+      width: 360px;
+      min-height: 650px;
+      background: #ffffff;
+      border: 12px solid #1a1a1a;
+      border-radius: 40px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      position: relative;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Top Right Controls (Copy & QR) */
+    .top-actions {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      background: #f0f0f0;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #333;
+      transition: background 0.2s;
+    }
+
+    .action-btn:hover {
+      background: #e0e0e0;
+    }
+
+    /* Profile Elements */
+    .avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-top: 20px;
+      margin-bottom: 12px;
+      border: 3px solid #6c5ce7;
+      background-color: #eee;
+    }
+
+    .profile-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2d3436;
+      margin-bottom: 6px;
+    }
+
+    .profile-bio {
+      font-size: 14px;
+      color: #636e72;
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 0 10px;
+    }
+
+    /* Links Container */
+    .links-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .link-card {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: #6c5ce7;
+      color: #ffffff;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .link-card:hover {
+      transform: translateY(-2px);
+      background: #5b4cc4;
+    }
+
+    .social-links {
+      margin-top: 25px;
+      display: flex;
+      gap: 15px;
+    }
+
+    .social-icon {
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+      color: #6c5ce7;
+      background: #f0edff;
+      padding: 8px 14px;
+      border-radius: 20px;
+    }
+
+    /* QR Code Modal Box */
+    .qr-modal {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 15px;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      z-index: 10;
+    }
+
+    .qr-modal img {
+      width: 120px;
+      height: 120px;
+    }
+
+    .toast {
+      display: none;
+      position: absolute;
+      bottom: 20px;
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 15px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Left Form Section -->
+    <div class="form-panel">
+      <h2>Link in Bio Creator</h2>
+      
+      <div class="form-group">
+        <label>Profile Image (Direct Upload)</label>
+        <input type="file" id="imageInput" accept="image/*" />
+      </div>
+
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="nameInput" value="Aapka Naam" placeholder="Apna naam likhein" />
+      </div>
+
+      <div class="form-group">
+        <label>Bio</label>
+        <input type="text" id="bioInput" value="Content Creator | Digital Enthusiast" placeholder="Short bio likhein" />
+      </div>
+
+      <div class="social-section">
+        <h3>Primary Links</h3>
+        <div class="form-group">
+          <label>Website / Primary Link</label>
+          <input type="text" id="link1Input" value="https://example.com" placeholder="https://..." />
+        </div>
+      </div>
+
+      <div class="social-section">
+        <h3>Social Profiles</h3>
+        <div class="form-group">
+          <label>Instagram URL</label>
+          <input type="text" id="instaInput" value="https://instagram.com" placeholder="https://instagram.com/username" />
+        </div>
+        <div class="form-group">
+          <label>Facebook URL</label>
+          <input type="text" id="fbInput" value="https://facebook.com" placeholder="https://facebook.com/username" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Preview Section -->
+    <div class="preview-panel">
+      <div class="phone-mockup">
+        
+        <!-- Top Right Copy & QR Buttons -->
+        <div class="top-actions">
+          <button class="action-btn" onclick="copyBioPageLink()">🔗 Copy</button>
+          <button class="action-btn" onclick="toggleQRCode()">📱 QR</button>
+        </div>
+
+        <!-- QR Modal -->
+        <div class="qr-modal" id="qrModal">
+          <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://example.com" alt="QR Code" />
+          <p style="font-size: 10px; margin-top: 5px; color: #666;">Scan QR Code</p>
+        </div>
+
+        <!-- Profile Picture -->
+        <img id="previewAvatar" class="avatar" src="https://via.placeholder.com/150" alt="Profile" />
+        
+        <!-- Profile Info -->
+        <h3 id="previewName" class="profile-name">Aapka Naam</h3>
+        <p id="previewBio" class="profile-bio">Content Creator | Digital Enthusiast</p>
+
+        <!-- Main Link -->
+        <div class="links-container">
+          <a id="previewLink1" href="https://example.com" target="_blank" class="link-card">Visit Website</a>
+        </div>
+
+        <!-- Social Media Icons/Buttons -->
+        <div class="social-links">
+          <a id="previewInsta" href="https://instagram.com" target="_blank" class="social-icon">Instagram</a>
+          <a id="previewFb" href="https://facebook.com" target="_blank" class="social-icon">Facebook</a>
+        </div>
+
+        <!-- Notification Toast -->
+        <div id="toast" class="toast">Link Copied!</div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Elements Reference
+    const imageInput = document.getElementById('imageInput');
+    const nameInput = document.getElementById('nameInput');
+    const bioInput = document.getElementById('bioInput');
+    const link1Input = document.getElementById('link1Input');
+    const instaInput = document.getElementById('instaInput');
+    const fbInput = document.getElementById('fbInput');
+
+    const previewAvatar = document.getElementById('previewAvatar');
+    const previewName = document.getElementById('previewName');
+    const previewBio = document.getElementById('previewBio');
+    const previewLink1 = document.getElementById('previewLink1');
+    const previewInsta = document.getElementById('previewInsta');
+    const previewFb = document.getElementById('previewFb');
+    const qrImage = document.getElementById('qrImage');
+    const qrModal = document.getElementById('qrModal');
+    const toast = document.getElementById('toast');
+
+    // 1. Local Image Upload Handler
+    imageInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          previewAvatar.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // 2. Real-time Text Updates
+    nameInput.addEventListener('input', () => {
+      previewName.textContent = nameInput.value || 'Aapka Naam';
+    });
+
+    bioInput.addEventListener('input', () => {
+      previewBio.textContent = bioInput.value || '';
+    });
+
+    link1Input.addEventListener('input', () => {
+      previewLink1.href = link1Input.value;
+      updateQRCode();
+    });
+
+    instaInput.addEventListener('input', () => {
+      previewInsta.href = instaInput.value;
+    });
+
+    fbInput.addEventListener('input', () => {
+      previewFb.href = fbInput.value;
+    });
+
+    // 3. QR Code Toggle & Update Function
+    function updateQRCode() {
+      const targetURL = link1Input.value || window.location.href;
+      qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(targetURL)}`;
+    }
+
+    function toggleQRCode() {
+      qrModal.style.display = qrModal.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // 4. Copy Page Link Functionality
+    function copyBioPageLink() {
+      const pageURL = window.location.href;
+      navigator.clipboard.writeText(pageURL).then(() => {
+        toast.style.display = 'block';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
