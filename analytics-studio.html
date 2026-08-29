@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0b0f19; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
+        .glow-border { background: linear-gradient(90deg, #ff0000, #3b82f6); padding: 2px; border-radius: 18px; }
+        .custom-card { background: #121826; }
+        .result-card { background: #121826; border: 1px solid #263247; border-radius: 16px; }
+        .stat-box { background: #0d1322; border: 1px solid #263247; border-radius: 14px; padding: 16px; text-align: center; }
+        .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .bar-track { flex: 1; background: #1e293b; border-radius: 999px; height: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 999px; }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+
+    <div class="glow-border w-full max-w-2xl mx-auto shadow-2xl mb-6">
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-red-950/80 text-red-400 border border-red-800/50 text-xs font-bold px-4 py-2 rounded-full">● Analytics Engine 2026</span>
+                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-yellow-400 text-xs font-bold px-3 py-2 rounded-full border border-slate-700 no-underline transition-colors">📺 View49</a>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3">Analytics Studio</h1>
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto">Enter your channel stats from two points in time to calculate growth rate and see a projection.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <div class="text-slate-400 text-xs font-bold uppercase mb-2">Starting Point</div>
+                    <input id="startSubs" type="number" placeholder="Subscribers" class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500 mb-2" />
+                    <input id="startViews" type="number" placeholder="Total Views" class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500" />
+                </div>
+                <div>
+                    <div class="text-slate-400 text-xs font-bold uppercase mb-2">Current Point</div>
+                    <input id="endSubs" type="number" placeholder="Subscribers" class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500 mb-2" />
+                    <input id="endViews" type="number" placeholder="Total Views" class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500" />
+                </div>
+            </div>
+
+            <input id="daysBetween" type="number" placeholder="Days between these two points (e.g. 30)" class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500 mb-4" />
+
+            <button onclick="calculate()" class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg">📈 Analyze Growth</button>
+            <div id="statusMessage" class="text-center text-xs text-slate-400 mt-3"></div>
+        </div>
+    </div>
+
+    <div id="resultArea" class="max-w-2xl mx-auto"></div>
+
+<script>
+
+function calculate() {
+    const startSubs = parseFloat(document.getElementById("startSubs").value) || 0;
+    const endSubs = parseFloat(document.getElementById("endSubs").value) || 0;
+    const startViews = parseFloat(document.getElementById("startViews").value) || 0;
+    const endViews = parseFloat(document.getElementById("endViews").value) || 0;
+    const days = parseFloat(document.getElementById("daysBetween").value) || 0;
+
+    const status = document.getElementById("statusMessage");
+    const results = document.getElementById("resultArea");
+
+    if (days <= 0 || (startSubs === 0 && startViews === 0)) {
+        status.innerHTML = '<span class="text-red-400">Please fill in your starting stats and the number of days.</span>';
+        results.innerHTML = "";
+        return;
+    }
+
+    const subsGained = endSubs - startSubs;
+    const viewsGained = endViews - startViews;
+    const subsPerDay = subsGained / days;
+    const viewsPerDay = viewsGained / days;
+
+    const subsGrowthPct = startSubs > 0 ? (subsGained / startSubs) * 100 : 0;
+    const viewsGrowthPct = startViews > 0 ? (viewsGained / startViews) * 100 : 0;
+
+    const proj30Subs = Math.round(endSubs + subsPerDay * 30);
+    const proj90Subs = Math.round(endSubs + subsPerDay * 90);
+    const proj30Views = Math.round(endViews + viewsPerDay * 30);
+
+    status.innerHTML = '<span class="text-green-400">Analysis complete!</span>';
+
+    results.innerHTML = `
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="stat-box">
+                <div class="text-slate-400 text-xs mb-1">Subscribers Gained</div>
+                <div class="text-2xl font-extrabold ${subsGained >= 0 ? 'text-green-400' : 'text-red-400'}">${subsGained >= 0 ? '+' : ''}${subsGained.toLocaleString()}</div>
+                <div class="text-slate-500 text-xs mt-1">${subsGrowthPct.toFixed(1)}% growth</div>
+            </div>
+            <div class="stat-box">
+                <div class="text-slate-400 text-xs mb-1">Views Gained</div>
+                <div class="text-2xl font-extrabold ${viewsGained >= 0 ? 'text-green-400' : 'text-red-400'}">${viewsGained >= 0 ? '+' : ''}${viewsGained.toLocaleString()}</div>
+                <div class="text-slate-500 text-xs mt-1">${viewsGrowthPct.toFixed(1)}% growth</div>
+            </div>
+        </div>
+
+        <div class="result-card p-6 mb-4">
+            <h3 class="text-white font-bold text-sm mb-3">📅 Daily Velocity</h3>
+            <div class="bar-row">
+                <span class="text-slate-400 text-xs w-24">Subs/day</span>
+                <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100, Math.abs(subsPerDay) * 5)}%; background:#ff4d4d;"></div></div>
+                <span class="text-white text-xs font-semibold w-16 text-right">${subsPerDay.toFixed(1)}</span>
+            </div>
+            <div class="bar-row">
+                <span class="text-slate-400 text-xs w-24">Views/day</span>
+                <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100, Math.abs(viewsPerDay) / 50)}%; background:#3b82f6;"></div></div>
+                <span class="text-white text-xs font-semibold w-16 text-right">${Math.round(viewsPerDay).toLocaleString()}</span>
+            </div>
+        </div>
+
+        <div class="result-card p-6">
+            <h3 class="text-white font-bold text-sm mb-3">🔮 Projection (if this pace continues)</h3>
+            <div class="grid grid-cols-2 gap-3 text-center">
+                <div>
+                    <div class="text-slate-400 text-xs">In 30 days</div>
+                    <div class="text-white font-bold">${proj30Subs.toLocaleString()} subs</div>
+                    <div class="text-slate-500 text-xs">${proj30Views.toLocaleString()} views</div>
+                </div>
+                <div>
+                    <div class="text-slate-400 text-xs">In 90 days</div>
+                    <div class="text-white font-bold">${proj90Subs.toLocaleString()} subs</div>
+                </div>
+            </div>
+            <p class="text-slate-500 text-xs mt-4">Projections assume a steady pace and are estimates only — actual growth depends on content, algorithm changes, and consistency.</p>
+        </div>
+    `;
+}
+
+</script>
+</body>
+</html>
