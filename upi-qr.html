@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI QR Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { background: #0b0f19; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
+        .glow-border { background: linear-gradient(90deg, #ff0000, #3b82f6); padding: 2px; border-radius: 18px; }
+        .custom-card { background: #121826; }
+        .qr-box { background: #fff; border-radius: 16px; padding: 20px; max-width: 260px; margin: 0 auto; display: flex; align-items: center; justify-content: center; min-height: 260px; }
+        #statusMessage { min-height: 20px; }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+
+    <div class="glow-border w-full max-w-xl mx-auto shadow-2xl mb-6">
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-red-950/80 text-red-400 border border-red-800/50 text-xs font-bold px-4 py-2 rounded-full">● QR Engine 2026</span>
+                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-yellow-400 text-xs font-bold px-3 py-2 rounded-full border border-slate-700 no-underline transition-colors">📺 View49</a>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3">UPI QR Generator</h1>
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto">Generate a scannable UPI payment QR code for donations, tips, or client payments.</p>
+            </div>
+
+            <div class="space-y-3 mb-4">
+                <input id="upiId" type="text" placeholder="Your UPI ID (e.g. yourname@okhdfcbank)"
+                    class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500" />
+
+                <input id="payeeName" type="text" placeholder="Your name (shown to the payer)"
+                    class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500" />
+
+                <input id="amount" type="number" placeholder="Amount in ₹ (optional — leave blank to let payer choose)"
+                    class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500" />
+            </div>
+
+            <button onclick="generateQR()" class="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg">
+                🔳 Generate QR Code
+            </button>
+
+            <div id="statusMessage" class="text-center text-xs text-slate-400 mt-3"></div>
+        </div>
+    </div>
+
+    <div id="qrResultArea" class="max-w-xl mx-auto hidden">
+        <div class="custom-card rounded-2xl p-6 text-center">
+            <div class="qr-box">
+                <div id="qrcode"></div>
+            </div>
+            <button onclick="downloadQR()" class="mt-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm">
+                ⬇ Download QR
+            </button>
+        </div>
+    </div>
+
+<script>
+
+let qrInstance = null;
+
+function generateQR() {
+    const upiId = document.getElementById("upiId").value.trim();
+    const name = document.getElementById("payeeName").value.trim();
+    const amount = document.getElementById("amount").value.trim();
+    const status = document.getElementById("statusMessage");
+    const resultArea = document.getElementById("qrResultArea");
+
+    if (!upiId || !upiId.includes("@")) {
+        status.innerHTML = '<span class="text-red-400">Please enter a valid UPI ID (e.g. name@bank).</span>';
+        resultArea.classList.add("hidden");
+        return;
+    }
+
+    let upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}`;
+    if (name) upiUrl += `&pn=${encodeURIComponent(name)}`;
+    if (amount) upiUrl += `&am=${encodeURIComponent(amount)}`;
+    upiUrl += `&cu=INR`;
+
+    document.getElementById("qrcode").innerHTML = "";
+    qrInstance = new QRCode(document.getElementById("qrcode"), {
+        text: upiUrl,
+        width: 220,
+        height: 220,
+        colorDark: "#000000",
+        colorLight: "#ffffff"
+    });
+
+    resultArea.classList.remove("hidden");
+    status.innerHTML = '<span class="text-green-400">QR code generated! Scan with any UPI app to test.</span>';
+}
+
+function downloadQR() {
+    const img = document.querySelector("#qrcode img") || document.querySelector("#qrcode canvas");
+    if (!img) return;
+
+    const link = document.createElement("a");
+    link.download = "upi-qr-code.png";
+
+    if (img.tagName === "CANVAS") {
+        link.href = img.toDataURL("image/png");
+    } else {
+        link.href = img.src;
+    }
+
+    link.click();
+}
+
+</script>
+</body>
+</html>
