@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View49 Pro AI Prompt Studio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background: #06070a;
+      color: #f4f4f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Prompt Navigation */
+    .top-prompt-nav {
+      background: #0d0f17;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+    .top-prompt-nav::-webkit-scrollbar { display: none; }
+
+    .prompt-tab {
+      padding: 14px 22px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #8e8e93;
+      cursor: pointer;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .prompt-tab:hover { color: #fff; background: rgba(255, 255, 255, 0.04); }
+    .prompt-tab.active { background: #ff2d2d; color: #fff; }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 4%;
+      background: rgba(10, 11, 16, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo { font-size: 20px; font-weight: 800; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .logo span { color: #ff2d2d; }
+
+    .btn-upgrade {
+      background: linear-gradient(135deg, #ff2d2d 0%, #b91c1c 100%);
+      color: #fff !important;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 18px rgba(255, 45, 45, 0.35);
+    }
+
+    /* Studio Layout */
+    .studio-container {
+      max-width: 1440px;
+      margin: 24px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 1.3fr 300px;
+      gap: 22px;
+      width: 100%;
+      flex: 1;
+    }
+
+    @media (max-width: 1150px) {
+      .studio-container { grid-template-columns: 1fr 1fr; }
+      .improve-sidebar { grid-column: span 2; }
+    }
+
+    @media (max-width: 768px) {
+      .studio-container { grid-template-columns: 1fr; }
+      .improve-sidebar { grid-column: span 1; }
+    }
+
+    .card-panel {
+      background: rgba(15, 17, 26, 0.75);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+    }
+
+    .panel-header {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-header-title { display: flex; align-items: center; gap: 10px; }
+
+    /* Mode Toggles */
+    .prompt-type-toggle {
+      display: flex;
+      background: rgba(8, 9, 13, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 18px;
+      gap: 4px;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #90909a;
+      background: transparent;
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .toggle-btn.active { background: #ffffff; color: #06070a; font-weight: 800; }
+
+    /* AI Engine Buttons */
+    .ai-engine-selector { display: flex; gap: 10px; margin-bottom: 16px; }
+
+    .ai-model-btn {
+      flex: 1;
+      padding: 12px;
+      background: rgba(8, 9, 13, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: #a1a1aa;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s;
+    }
+
+    .ai-model-btn:hover { border-color: rgba(255,45,45,0.4); color: #fff; }
+
+    .ai-model-btn.active-gemini { background: rgba(26, 115, 232, 0.2); border-color: #4285f4; color: #669df6; }
+    .ai-model-btn.active-chatgpt { background: rgba(16, 163, 127, 0.2); border-color: #10a37f; color: #2dd4bf; }
+    .ai-model-btn.active-claude { background: rgba(217, 119, 6, 0.2); border-color: #d97706; color: #fbbf24; }
+
+    .form-group { margin-bottom: 16px; position: relative; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; color: #a1a1aa; margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+    input[type="text"], select, textarea {
+      width: 100%;
+      background: rgba(8, 9, 13, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input[type="text"]:focus, select:focus, textarea:focus {
+      border-color: #ff2d2d;
+      box-shadow: 0 0 15px rgba(255, 45, 45, 0.2);
+    }
+
+    select option { background: #11131a; color: #fff; }
+    textarea { height: 320px; resize: none; line-height: 1.6; font-size: 13px; font-family: 'Courier New', Courier, monospace; }
+
+    .search-badge {
+      position: absolute;
+      right: 12px;
+      top: 36px;
+      font-size: 11px;
+      color: #ff2d2d;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, #ff2d2d 0%, #b91c1c 100%);
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-size: 13px;
+    }
+
+    .btn-action:hover { opacity: 0.95; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,45,45,0.4); }
+    .btn-full { width: 100%; margin-top: 10px; justify-content: center; }
+
+    .direct-link-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+    .direct-link-btn:hover { background: rgba(255, 255, 255, 0.15); }
+
+    /* Sidebar */
+    .improve-card {
+      background: rgba(15, 17, 26, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .improve-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .question-box {
+      background: rgba(8, 9, 13, 0.6);
+      border: 1px dashed rgba(255, 45, 45, 0.3);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #d1d1d6;
+    }
+
+    footer { text-align: center; padding: 22px; color: #52525b; font-size: 12px; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+  </style>
+</head>
+<body>
+
+  <!-- Top Prompt Generators Navbar -->
+  <div class="top-prompt-nav" id="topNav">
+    <div class="prompt-tab active" onclick="switchMainTab(this, 'AI Prompt Generator')"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Prompt Generator</div>
+    <div class="prompt-tab" onclick="switchMainTab(this, 'ChatGPT Prompt Generator')"><i class="fa-solid fa-comments"></i> ChatGPT Prompt Generator</div>
+    <div class="prompt-tab" onclick="switchMainTab(this, 'Reasoning Prompt Generator')"><i class="fa-solid fa-brain"></i> Reasoning Prompt Generator</div>
+    <div class="prompt-tab" onclick="switchMainTab(this, 'Image Prompt Generator')"><i class="fa-regular fa-image"></i> Image Prompt Generator</div>
+    <div class="prompt-tab" onclick="switchMainTab(this, 'Video Prompt Generator')"><i class="fa-solid fa-video"></i> Video Prompt Generator</div>
+  </div>
+
+  <!-- Main Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="logo"><i class="fa-solid fa-bolt" style="color:#ff2d2d;"></i> View<span>49</span></a>
+    <span id="activeTabLabel" style="font-size: 13px; color: #a1a1aa; font-weight: 600;">Pro Multi-AI Prompt Architecture</span>
+    <a href="Ultra-Premium Subscription Page.html" class="btn-upgrade"><i class="fa-solid fa-crown"></i> Upgrade Pro</a>
+  </nav>
+
+  <div class="studio-container">
+
+    <!-- Panel 1: Input Engine -->
+    <div class="card-panel">
+      
+      <div class="prompt-type-toggle">
+        <button class="toggle-btn active" id="btnTextPrompt" onclick="setPromptType('text')"><i class="fa-solid fa-pen"></i> Text Prompt</button>
+        <button class="toggle-btn" id="btnImagePrompt" onclick="setPromptType('image')"><i class="fa-regular fa-image"></i> Image Prompt</button>
+        <button class="toggle-btn" id="btnVideoPrompt" onclick="setPromptType('video')"><i class="fa-solid fa-video"></i> Video Prompt</button>
+      </div>
+
+      <div class="panel-header">
+        <div class="panel-header-title">
+          <i class="fa-solid fa-sliders" style="color:#ff2d2d;"></i> 
+          <span>Prompt Parameters</span>
+        </div>
+      </div>
+      
+      <!-- Video Title Input -->
+      <div class="form-group">
+        <label>Video Title / Topic (Instant Auto Engine)</label>
+        <input type="text" id="topicInput" placeholder="Write video topic e.g. How to get 10k subscribers" oninput="triggerAutoSearch()">
+        <span class="search-badge" id="searchBadge"><i class="fa-solid fa-rotate fa-spin"></i> Synthesizing...</span>
+      </div>
+
+      <!-- AI Target Model Selector -->
+      <div class="form-group">
+        <label>Select Target AI Engine</label>
+        <div class="ai-engine-selector">
+          <button class="ai-model-btn active-gemini" id="btnGemini" onclick="selectAIModel('Gemini')">
+            <i class="fa-solid fa-sparkles"></i> Gemini 1.5
+          </button>
+          <button class="ai-model-btn" id="btnChatGPT" onclick="selectAIModel('ChatGPT')">
+            <i class="fa-solid fa-robot"></i> ChatGPT-4o
+          </button>
+          <button class="ai-model-btn" id="btnClaude" onclick="selectAIModel('Claude')">
+            <i class="fa-solid fa-brain"></i> Claude 3.5
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Framework Style</label>
+        <select id="frameworkSelect" onchange="generateTargetPrompt()">
+          <option value="ViralRetention">Viral Retention Script & Visual Cues</option>
+          <option value="DeepReasoning">Deep-Dive Technical & Strategy Breakdown</option>
+          <option value="ShortsFast">Shorts / Reels Ultra-Fast Hook System</option>
+        </select>
+      </div>
+
+      <button class="btn-action btn-full" onclick="generateTargetPrompt()">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Advanced Target Prompt
+      </button>
+
+    </div>
+
+    <!-- Panel 2: Highly Detailed AI Master Prompt Output -->
+    <div class="card-panel">
+      <div class="panel-header">
+        <div class="panel-header-title">
+          <i class="fa-solid fa-terminal" style="color:#ff2d2d;"></i> 
+          <span id="outputTitle">Master Ready-to-Use AI Prompt</span>
+        </div>
+        <button class="btn-action" style="padding: 6px 14px; font-size: 12px;" onclick="copyPromptOutput()">
+          <i class="fa-regular fa-copy"></i> Copy Prompt
+        </button>
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 0;">
+        <textarea id="promptOutputBox" readonly placeholder="Type your Video Topic on the left to generate a fully engineered, multi-layered Master Prompt..."></textarea>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 10px;" id="launchLinks">
+        <!-- Links open targeted AI tool -->
+      </div>
+    </div>
+
+    <!-- Panel 3: Live Specs Sidebar -->
+    <div class="improve-sidebar">
+      <div class="improve-card">
+        <h3><i class="fa-solid fa-layer-group" style="color:#ff2d2d;"></i> Prompt Architecture</h3>
+        <p style="font-size: 12px; color: #a1a1aa;">Structural parameters active:</p>
+        
+        <div class="question-box" id="qBox1">
+          <b>Target Engine:</b> Google Gemini 1.5 Pro
+        </div>
+        <div class="question-box" id="qBox2">
+          <b>Topic Status:</b> Awaiting Topic Input
+        </div>
+        <div class="question-box" id="qBox3">
+          <b>Prompt Depth:</b> Master Multi-Layered Format
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>&copy; 2026 View49 Creator Tools. All rights reserved.</footer>
+
+  <script>
+    let searchTimer = null;
+    let selectedAI = 'Gemini';
+    let promptType = 'text';
+
+    function switchMainTab(elem, tabName) {
+      document.querySelectorAll('.prompt-tab').forEach(t => t.classList.remove('active'));
+      elem.classList.add('active');
+      document.getElementById('activeTabLabel').innerText = tabName;
+
+      if(tabName.includes('ChatGPT')) selectAIModel('ChatGPT');
+      else if(tabName.includes('Reasoning') || tabName.includes('Claude')) selectAIModel('Claude');
+      else if(tabName.includes('Image')) setPromptType('image');
+      else if(tabName.includes('Video')) setPromptType('video');
+      else selectAIModel('Gemini');
+    }
+
+    function selectAIModel(model) {
+      selectedAI = model;
+      document.getElementById('btnGemini').className = "ai-model-btn";
+      document.getElementById('btnChatGPT').className = "ai-model-btn";
+      document.getElementById('btnClaude').className = "ai-model-btn";
+
+      if (model === 'Gemini') document.getElementById('btnGemini').classList.add('active-gemini');
+      if (model === 'ChatGPT') document.getElementById('btnChatGPT').classList.add('active-chatgpt');
+      if (model === 'Claude') document.getElementById('btnClaude').classList.add('active-claude');
+
+      generateTargetPrompt();
+    }
+
+    function setPromptType(type) {
+      promptType = type;
+      document.getElementById('btnTextPrompt').classList.remove('active');
+      document.getElementById('btnImagePrompt').classList.remove('active');
+      document.getElementById('btnVideoPrompt').classList.remove('active');
+
+      if(type === 'text') document.getElementById('btnTextPrompt').classList.add('active');
+      if(type === 'image') document.getElementById('btnImagePrompt').classList.add('active');
+      if(type === 'video') document.getElementById('btnVideoPrompt').classList.add('active');
+
+      generateTargetPrompt();
+    }
+
+    function triggerAutoSearch() {
+      const badge = document.getElementById('searchBadge');
+      badge.style.display = 'flex';
+
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        badge.style.display = 'none';
+        generateTargetPrompt();
+      }, 300);
+    }
+
+    // ADVANCED MASTER PROMPT BUILDER ENGINE
+    function generateTargetPrompt() {
+      const topic = document.getElementById('topicInput').value.trim();
+      const framework = document.getElementById('frameworkSelect').value;
+      const outputBox = document.getElementById('promptOutputBox');
+      const titleLabel = document.getElementById('outputTitle');
+      const launchLinks = document.getElementById('launchLinks');
+
+      if (!topic) {
+        outputBox.value = "";
+        document.getElementById('qBox2').innerHTML = `<b>Topic Status:</b> Awaiting Topic Input`;
+        launchLinks.innerHTML = "";
+        return;
+      }
+
+      titleLabel.innerText = `Detailed ${selectedAI} (${promptType.toUpperCase()}) Master Prompt`;
+
+      let masterPrompt = "";
+
+      if (promptType === 'image') {
+        masterPrompt = `[SYSTEM ROLE: MASTER AI ART DIRECTOR & MIDJOURNEY/GEMINI VISION PROMPTER]\n\n` +
+          `TASK: Create a photorealistic, 8K resolution, hyper-detailed cinematic image for thumbnail/visual graphics.\n\n` +
+          `CORE SUBJECT: ${topic}\n\n` +
+          `SPECIFICATIONS:\n` +
+          `- Camera Gear: Hasselblad H6D-100c, 85mm Prime Lens, f/1.8 aperture\n` +
+          `- Visual Aesthetics: Cinematic volumetric studio lighting, high contrast dynamic range, sharp focal details on subject\n` +
+          `- Color Palette: Deep rich tones, natural skin textures, subtle neon accents\n` +
+          `- Aspect Ratio: 16:9 widescreen\n` +
+          `- Negatives: Low quality, blurry, deformed hands, exaggerated distortion, over-saturated.`;
+      } 
+      else if (promptType === 'video') {
+        masterPrompt = `[SYSTEM ROLE: CINEMATOGRAPHER & RUNWAY GEN-3 / SORA AI VIDEO PROMPTER]\n\n` +
+          `OBJECTIVE: Generate a high-retention 4K visual scene video prompt.\n\n` +
+          `SCENE TOPIC: ${topic}\n\n` +
+          `PROMPT ARCHITECTURE:\n` +
+          `1. Camera Motion: Slow cinematic tracking push-in with 3D parallax depth\n` +
+          `2. Pacing: Fluid 60fps ultra-realistic physics and subtle motion blur\n` +
+          `3. Lighting & Environment: Volumetric sunbeams, moody environment, photorealistic render\n` +
+          `4. Render Engine Parameters: High motion fidelity, cinematic resolution, zero frame distortion.`;
+      } 
+      else {
+        // Deep Structured Text Script Prompts for AI Engines
+        if (selectedAI === 'Gemini') {
+          masterPrompt = `[ACT AS: SENIOR YOUTUBE ALGORITHM STRATEGIST & VIRAL SCRIPTWRITER]\n\n` +
+            `CONTEXT & TASK: Write a high-retention, YouTube-optimized video script for the topic: "${topic}".\n\n` +
+            `FRAMEWORK MODE: ${framework}\n\n` +
+            `EXACT OUTPUT STRUCTURE REQUIRED:\n\n` +
+            `1. PATTERN INTERRUPT HOOK (0:00 - 0:08):\n` +
+            `   - Write 3 high-impact opening lines designed to freeze scrolling.\n` +
+            `   - Include visual/sound effect cues (e.g., [Text Pop], [Zoom In], [Sound Effect]).\n\n` +
+            `2. VALUE PROPOSITION (0:08 - 0:25):\n` +
+            `   - Explain why the viewer must watch till the end. Hook them with a mystery or clear reward.\n\n` +
+            `3. CORE BODY (3 Key Pillars):\n` +
+            `   - Pillar 1: Actionable advice with zero fluff.\n` +
+            `   - Pillar 2: Common mistake to avoid.\n` +
+            `   - Pillar 3: Pro shortcut/secret tip.\n\n` +
+            `4. AUDIENCE ENGAGEMENT TRIGGER:\n` +
+            `   - Ask a strategic question to boost comment section activity.\n\n` +
+            `5. CALL TO ACTION (CTA):\n` +
+            `   - Seamless transition into asking for subscriptions without sounding pushy.`;
+        } 
+        else if (selectedAI === 'ChatGPT') {
+          masterPrompt = `System Persona: You are ChatGPT-4o, a elite content strategist and viral retention master.\n\n` +
+            `Target Video Topic: "${topic}"\n` +
+            `Framework Selected: ${framework}\n\n` +
+            `Instructions for Script Generation:\n` +
+            `1. Format output using bold headers and markdown tables where appropriate.\n` +
+            `2. Dual-Column Script Layout: Column 1 = Visual/B-Roll Instructions, Column 2 = Spoken Voiceover Narration.\n` +
+            `3. Tone: Energetic, authoritative, conversational, and fast-paced.\n` +
+            `4. Retention Triggers: Insert curiosity gaps every 45 seconds to keep watch time above 70%.\n\n` +
+            `Begin executing the script breakdown now.`;
+        } 
+        else if (selectedAI === 'Claude') {
+          masterPrompt = `You are Claude 3.5 Sonnet, a world-class narrative architect and video essay writer.\n\n` +
+            `Objective: Produce an in-depth, intellectually engaging, and persuasive script outline and full narration for: "${topic}".\n\n` +
+            `Analytical Framework: ${framework}\n\n` +
+            `Required Sections:\n` +
+            `- Executive Thesis & Psychological Hook\n` +
+            `- Historical/Industry Context & Current Problem\n` +
+            `- Step-by-Step Strategic Framework (In-Depth Explanation)\n` +
+            `- Case Study / Real-World Example\n` +
+            `- Concluding Synthesis & Retentive CTA\n\n` +
+            `Ensure rich vocabulary, compelling storytelling rhythm, and actionable insights.`;
+        }
+      }
+
+      outputBox.value = masterPrompt;
+
+      // Update Sidebar Info
+      document.getElementById('qBox1').innerHTML = `<b>Target Engine:</b> ${selectedAI}`;
+      document.getElementById('qBox2').innerHTML = `<b>Topic Active:</b> ${topic}`;
+      document.getElementById('qBox3').innerHTML = `<b>Prompt Mode:</b> Detailed ${promptType.toUpperCase()}`;
+
+      // Launch button setup
+      let targetUrl = "https://gemini.google.com/";
+      if(selectedAI === 'ChatGPT') targetUrl = "https://chatgpt.com/";
+      if(selectedAI === 'Claude') targetUrl = "https://claude.ai/";
+
+      launchLinks.innerHTML = `<a href="${targetUrl}" target="_blank" class="direct-link-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open ${selectedAI} in New Tab</a>`;
+    }
+
+    function copyPromptOutput() {
+      const box = document.getElementById('promptOutputBox');
+      if (!box.value) {
+        alert('Pehle Video Title enter karein!');
+        return;
+      }
+      box.select();
+      document.execCommand('copy');
+      alert('Detailed Master Prompt copied to clipboard! Ab aap target AI me ise paste kar sakte hain.');
+    }
+
+    // Initial Trigger
+    generateTargetPrompt();
+  </script>
+</body>
+</html>
