@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Visual Prompt Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0b0f19; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
+        .glow-border { background: linear-gradient(90deg, #ff0000, #3b82f6); padding: 2px; border-radius: 18px; }
+        .custom-card { background: #121826; }
+        .result-card { background: #121826; border: 1px solid #263247; border-radius: 16px; }
+        select, input[type="text"] { background: #0d1322; border: 1px solid #263247; border-radius: 10px; color: #fff; font-size: 13px; padding: 10px 12px; width: 100%; }
+        .field-label { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; display: block; }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+
+    <div class="glow-border w-full max-w-2xl mx-auto shadow-2xl mb-6">
+        <div class="custom-card rounded-2xl p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <span class="bg-red-950/80 text-red-400 border border-red-800/50 text-xs font-bold px-4 py-2 rounded-full">● Prompt Engine 2026</span>
+                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-yellow-400 text-xs font-bold px-3 py-2 rounded-full border border-slate-700 no-underline transition-colors">📺 View49</a>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3">AI Visual Prompt Studio</h1>
+                <p class="text-slate-400 text-sm max-w-2xl mx-auto">Build a structured, cinematic prompt for AI image tools like Midjourney, DALL·E, or Stable Diffusion.</p>
+            </div>
+
+            <div class="space-y-4">
+
+                <div>
+                    <label class="field-label">Subject</label>
+                    <input id="subject" type="text" placeholder="e.g. a lone astronaut, a vintage motorcycle, a cyberpunk city street" oninput="updatePrompt()" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="field-label">Style</label>
+                        <select id="style" onchange="updatePrompt()">
+                            <option value="">None</option>
+                            <option value="photorealistic">Photorealistic</option>
+                            <option value="cinematic film still">Cinematic Film Still</option>
+                            <option value="anime style">Anime</option>
+                            <option value="oil painting">Oil Painting</option>
+                            <option value="watercolor">Watercolor</option>
+                            <option value="3D render, octane render">3D Render</option>
+                            <option value="cyberpunk concept art">Cyberpunk Concept Art</option>
+                            <option value="minimalist flat design">Minimalist Flat Design</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="field-label">Lighting</label>
+                        <select id="lighting" onchange="updatePrompt()">
+                            <option value="">None</option>
+                            <option value="golden hour lighting">Golden Hour</option>
+                            <option value="dramatic rim lighting">Dramatic Rim Light</option>
+                            <option value="soft diffused studio lighting">Soft Studio Light</option>
+                            <option value="moody low-key lighting">Moody Low-Key</option>
+                            <option value="neon glow lighting">Neon Glow</option>
+                            <option value="natural overcast lighting">Natural Overcast</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="field-label">Camera Angle</label>
+                        <select id="angle" onchange="updatePrompt()">
+                            <option value="">None</option>
+                            <option value="wide angle shot">Wide Angle</option>
+                            <option value="close-up shot">Close-Up</option>
+                            <option value="low angle shot">Low Angle</option>
+                            <option value="bird's eye view">Bird's Eye View</option>
+                            <option value="over-the-shoulder shot">Over-the-Shoulder</option>
+                            <option value="macro shot">Macro</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="field-label">Mood</label>
+                        <select id="mood" onchange="updatePrompt()">
+                            <option value="">None</option>
+                            <option value="epic and dramatic">Epic & Dramatic</option>
+                            <option value="calm and serene">Calm & Serene</option>
+                            <option value="mysterious and eerie">Mysterious & Eerie</option>
+                            <option value="joyful and vibrant">Joyful & Vibrant</option>
+                            <option value="melancholic">Melancholic</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="field-label">Color Palette (optional)</label>
+                    <input id="colors" type="text" placeholder="e.g. teal and orange, muted pastels, monochrome" oninput="updatePrompt()" />
+                </div>
+
+                <div>
+                    <label class="field-label">Extra Details (optional)</label>
+                    <input id="extra" type="text" placeholder="e.g. 8k resolution, highly detailed, shallow depth of field" oninput="updatePrompt()" />
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-2xl mx-auto">
+        <div class="result-card p-6">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-white font-bold text-sm">✨ Generated Prompt</h3>
+                <button onclick="copyPrompt()" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-3 py-1.5 rounded-lg">📋 Copy</button>
+            </div>
+            <textarea id="promptOutput" rows="5" readonly class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200"></textarea>
+        </div>
+    </div>
+
+<script>
+
+function updatePrompt() {
+    const subject = document.getElementById("subject").value.trim();
+    const style = document.getElementById("style").value;
+    const lighting = document.getElementById("lighting").value;
+    const angle = document.getElementById("angle").value;
+    const mood = document.getElementById("mood").value;
+    const colors = document.getElementById("colors").value.trim();
+    const extra = document.getElementById("extra").value.trim();
+
+    const parts = [];
+    if (subject) parts.push(subject);
+    if (style) parts.push(style);
+    if (angle) parts.push(angle);
+    if (lighting) parts.push(lighting);
+    if (mood) parts.push(mood);
+    if (colors) parts.push(`${colors} color palette`);
+    if (extra) parts.push(extra);
+
+    document.getElementById("promptOutput").value = parts.length ? parts.join(", ") : "";
+}
+
+function copyPrompt() {
+    const output = document.getElementById("promptOutput");
+    output.select();
+    navigator.clipboard.writeText(output.value);
+}
+
+</script>
+</body>
+</html>
