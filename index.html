@@ -1,0 +1,46 @@
+<script>
+  // Tool Configs & Action Logic
+  const toolsData = {
+    'Link in Bio Maker': (input) => `🔗 Link in Bio Page Ready!\n\nHeadline: Welcome to my official hub for ${input}\nLinks:\n- 📹 Latest Video: https://youtube.com\n- 📸 Instagram: @myprofile\n- 💼 Business Inquiries: contact@domain.com`,
+    'YouTube SEO Checker': (input) => `📊 SEO Analysis for "${input}":\n\n- Keyword Score: 88/100 (High Demand)\n- Competition: Medium\n- Recommended Tags: #${input.replace(/\s+/g, '')}, #Viral2026, #Trending`,
+    'Script by Gemini - View49': (input) => `🎬 Video Script: "${input}"\n\n[HOOK 0-5s]\n"Stop making this mistake if you want to grow in 2026..."\n\n[INTRO]\nWelcome back! Today we are diving into ${input}...`,
+    'Tags & Description': (input) => `🏷️ Tags:\n${input}, ${input} tutorial, ${input} tips, ${input} 2026\n\n📝 Description:\nIn this video, we cover everything about ${input}. Subscribe for more!`
+  };
+
+  let currentToolTitle = 'Link in Bio Maker';
+
+  // Function to Open Modal
+  function openToolModal(title) {
+    currentToolTitle = title;
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('toolInput').value = '';
+    document.getElementById('toolOutput').value = '';
+    document.getElementById('toolModal').style.display = 'flex';
+  }
+
+  // Function to Close Modal
+  function closeModal() {
+    document.getElementById('toolModal').style.display = 'none';
+  }
+
+  // Generate Output Logic
+  function generateOutput() {
+    const inputVal = document.getElementById('toolInput').value.trim();
+    const outputBox = document.getElementById('toolOutput');
+
+    if (!inputVal) {
+      outputBox.value = '⚠️ Please enter a topic or keyword first!';
+      return;
+    }
+
+    outputBox.value = '⚡ Generating... Please wait...';
+
+    setTimeout(() => {
+      if (toolsData[currentToolTitle]) {
+        outputBox.value = toolsData[currentToolTitle](inputVal);
+      } else {
+        outputBox.value = `✨ Results for "${inputVal}":\n\n1. Dynamic insight standard output for ${currentToolTitle}.\n2. Optimized strategy generated successfully.`;
+      }
+    }, 600);
+  }
+</script>
