@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View49 Ultra Prompt & Teleprompter Studio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background: #06070a;
+      color: #f4f4f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Horizontal Bar (From Screenshot) */
+    .top-prompt-nav {
+      background: #0d0f17;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+    .top-prompt-nav::-webkit-scrollbar { display: none; }
+
+    .prompt-tab {
+      padding: 14px 22px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #8e8e93;
+      cursor: pointer;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .prompt-tab:hover { color: #fff; background: rgba(255, 255, 255, 0.04); }
+    .prompt-tab.active {
+      background: #ff2d2d;
+      color: #fff;
+      box-shadow: inset 0 -3px 0 #fff;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 4%;
+      background: rgba(10, 11, 16, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo { font-size: 20px; font-weight: 800; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .logo span { color: #ff2d2d; }
+
+    .btn-upgrade {
+      background: linear-gradient(135deg, #ff2d2d 0%, #b91c1c 100%);
+      color: #fff !important;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 18px rgba(255, 45, 45, 0.35);
+    }
+
+    /* Layout */
+    .studio-container {
+      max-width: 1440px;
+      margin: 24px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1.1fr 1.1fr 320px;
+      gap: 22px;
+      width: 100%;
+      flex: 1;
+    }
+
+    @media (max-width: 1150px) {
+      .studio-container { grid-template-columns: 1fr 1fr; }
+      .improve-sidebar { grid-column: span 2; }
+    }
+
+    @media (max-width: 768px) {
+      .studio-container { grid-template-columns: 1fr; }
+      .improve-sidebar { grid-column: span 1; }
+    }
+
+    .card-panel {
+      background: rgba(15, 17, 26, 0.75);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+    }
+
+    .panel-header {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-header-title { display: flex; align-items: center; gap: 10px; }
+
+    /* Mode Toggles */
+    .prompt-type-toggle {
+      display: flex;
+      background: rgba(8, 9, 13, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 18px;
+      gap: 4px;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #90909a;
+      background: transparent;
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .toggle-btn.active {
+      background: #ffffff;
+      color: #06070a;
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(255,255,255,0.15);
+    }
+
+    .form-group { margin-bottom: 16px; position: relative; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; color: #a1a1aa; margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+    input[type="text"], select, textarea {
+      width: 100%;
+      background: rgba(8, 9, 13, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input[type="text"]:focus, select:focus, textarea:focus {
+      border-color: #ff2d2d;
+      box-shadow: 0 0 15px rgba(255, 45, 45, 0.2);
+    }
+
+    select option { background: #11131a; color: #fff; }
+    textarea { height: 170px; resize: none; line-height: 1.6; }
+
+    .search-badge {
+      position: absolute;
+      right: 12px;
+      top: 36px;
+      font-size: 11px;
+      color: #ff2d2d;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-bar {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #ff2d2d;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    /* Teleprompter Viewport */
+    .prompter-screen {
+      background: #000000;
+      border: 2px solid rgba(255, 45, 45, 0.35);
+      border-radius: 16px;
+      height: 380px;
+      overflow-y: auto;
+      padding: 30px 24px;
+      position: relative;
+      scroll-behavior: smooth;
+    }
+
+    .prompter-text {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+      text-align: center;
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      background: linear-gradient(135deg, #ff2d2d 0%, #b91c1c 100%);
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-size: 13px;
+    }
+
+    .btn-action:hover { opacity: 0.95; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,45,45,0.4); }
+
+    .btn-full { width: 100%; margin-top: 10px; justify-content: center; }
+
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #a1a1aa;
+    }
+
+    /* Improve Sidebar (Screenshot layout) */
+    .improve-card {
+      background: rgba(15, 17, 26, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .improve-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .question-box {
+      background: rgba(8, 9, 13, 0.6);
+      border: 1px dashed rgba(255, 45, 45, 0.3);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #d1d1d6;
+    }
+
+    footer { text-align: center; padding: 22px; color: #52525b; font-size: 12px; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+  </style>
+</head>
+<body>
+
+  <!-- Top Prompt Generators Navigation Bar -->
+  <div class="top-prompt-nav" id="topNav">
+    <div class="prompt-tab active" onclick="switchMainTab(this, 'AI Prompt Generator')"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Prompt Generator</div>
+    <div class="prompt-tab" onclick="switchMainTab(this, 'ChatGPT Prompt Generator')"><i class="fa-solid fa-comments"></i> ChatGPT Prompt Generator</div>
+    <div class="prompt-tab" onclick="switchMainTab(this, 'Reasoning Prompt Generator')"><i class="fa-solid fa-brain"></i> Reasoning Prompt Generator</div>
+    <div class="prompt-tab" onclick="switchMainTab(this, 'TOON Prompt Generator')"><i class="fa-solid fa-masks-theater"></i> TOON Prompt Generator</div>
+    <div class="prompt-tab" onclick="switchMainTab(this, 'JSON Prompt Generator')"><i class="fa-solid fa-code"></i> JSON Prompt Generator</div>
+    <div class="prompt-tab" onclick="switchMainTab(this, 'Image Prompt Generator')"><i class="fa-regular fa-image"></i> Image Prompt Generator</div>
+    <div class="prompt-tab" onclick="switchMainTab(this, 'Video Prompt Generator')"><i class="fa-solid fa-video"></i> Video Prompt Generator</div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="logo"><i class="fa-solid fa-bolt" style="color:#ff2d2d;"></i> View<span>49</span></a>
+    <span id="activeTabLabel" style="font-size: 13px; color: #a1a1aa; font-weight: 600;">AI Prompt & Teleprompter Studio</span>
+    <a href="Ultra-Premium Subscription Page.html" class="btn-upgrade"><i class="fa-solid fa-crown"></i> Upgrade Pro</a>
+  </nav>
+
+  <div class="studio-container">
+
+    <!-- Left Panel: Input & Settings -->
+    <div class="card-panel">
+      
+      <!-- Inner Buttons Toggle (Text / Image / Video Prompt) -->
+      <div class="prompt-type-toggle">
+        <button class="toggle-btn active" id="btnTextPrompt" onclick="setPromptMode('text')"><i class="fa-solid fa-pen"></i> Text Prompt</button>
+        <button class="toggle-btn" id="btnImagePrompt" onclick="setPromptMode('image')"><i class="fa-regular fa-image"></i> Image Prompt</button>
+        <button class="toggle-btn" id="btnVideoPrompt" onclick="setPromptMode('video')"><i class="fa-solid fa-video"></i> Video Prompt</button>
+      </div>
+
+      <div class="panel-header">
+        <div class="panel-header-title">
+          <i class="fa-solid fa-sliders" style="color:#ff2d2d;"></i> 
+          <span id="panelTitle">Generate Text Prompt & Script</span>
+        </div>
+      </div>
+      
+      <!-- Live Topic/Title Input with Auto-Search -->
+      <div class="form-group">
+        <label>Video Title / Topic (Type for Instant Auto-Search)</label>
+        <input type="text" id="topicInput" placeholder="Type topic e.g. YouTube Shorts Monetization Secret" oninput="handleAutoSearch()">
+        <span class="search-badge" id="searchBadge"><i class="fa-solid fa-rotate fa-spin"></i> Searching...</span>
+      </div>
+
+      <div class="form-group">
+        <label id="scriptLabel">Generated Content / Teleprompter Script</label>
+        <textarea id="scriptText" placeholder="I want a prompt that will..." oninput="syncPrompter()"></textarea>
+      </div>
+
+      <!-- Framework Options -->
+      <div class="form-group">
+        <label>Prompt Framework</label>
+        <select id="frameworkSelect" onchange="runPromptEngine()">
+          <option value="Standard">Standard (Hook + Key Points + Strong CTA)</option>
+          <option value="Storytelling">Storytelling (Problem -> Visual Action -> Solution)</option>
+          <option value="ViralShorts">YouTube Shorts Ultra-Fast Retention Hook</option>
+        </select>
+      </div>
+
+      <!-- Prompt Style Options -->
+      <div class="form-group">
+        <label>Prompt Style</label>
+        <select id="styleSelect" onchange="runPromptEngine()">
+          <option value="ORACLE">ORACLE (Strategic Master AI Assistant)</option>
+          <option value="Midjourney">Midjourney V6 Ultra-Detailed 8K</option>
+          <option value="SoraVideo">OpenAI Sora / Runway Gen-3 Motion</option>
+          <option value="ChatGPT">ChatGPT Conversation Architect</option>
+        </select>
+      </div>
+
+      <button class="btn-action btn-full" onclick="runPromptEngine()">
+        <i class="fa-solid fa-bolt"></i> Generate Prompt & Sync Teleprompter
+      </button>
+
+      <div class="meta-bar">
+        <span id="wordCount">Words: 0</span>
+        <span id="estTime">Est. Duration: 0s</span>
+      </div>
+    </div>
+
+    <!-- Middle Panel: Live Teleprompter -->
+    <div class="card-panel">
+      <div class="panel-header">
+        <div class="panel-header-title">
+          <i class="fa-solid fa-display" style="color:#ff2d2d;"></i> Live Teleprompter Screen
+        </div>
+      </div>
+      
+      <div class="prompter-screen" id="prompterScreen">
+        <div class="prompter-text" id="prompterText">Type a topic on the left to start live prompting...</div>
+      </div>
+
+      <div class="controls">
+        <button class="btn-action" id="playBtn" onclick="togglePrompter()"><i class="fa-solid fa-play"></i> Start Prompting</button>
+        
+        <div class="slider-group">
+          <label>Speed</label>
+          <input type="range" id="speedSlider" min="1" max="10" value="3">
+        </div>
+
+        <div class="slider-group">
+          <label>Font Size</label>
+          <input type="range" id="fontSlider" min="18" max="44" value="24" oninput="changeFontSize(this.value)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Improve Prompt Sidebar -->
+    <div class="improve-sidebar">
+      <div class="improve-card">
+        <h3><i class="fa-solid fa-wand-magic" style="color:#ff2d2d;"></i> Improve Prompt</h3>
+        <p style="font-size: 12px; color: #a1a1aa;">Answer these dynamically generated questions for enhanced results:</p>
+        
+        <div class="question-box" id="qBox1">
+          <b>Target Audience:</b> Creator & Video Editor
+        </div>
+        <div class="question-box" id="qBox2">
+          <b>Tone & Atmosphere:</b> High energy, informative, cinematic
+        </div>
+        <div class="question-box" id="qBox3">
+          <b>Auto-Engine State:</b> Ready to sync
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>&copy; 2026 View49 Creator Tools. All rights reserved.</footer>
+
+  <script>
+    let isScrolling = false;
+    let scrollInterval = null;
+    let searchTimer = null;
+    let currentMode = 'text';
+
+    // 1. Header Tab Click Handler
+    function switchMainTab(elem, name) {
+      document.querySelectorAll('.prompt-tab').forEach(t => t.classList.remove('active'));
+      elem.classList.add('active');
+      document.getElementById('activeTabLabel').innerText = name;
+
+      if(name.includes('Image')) setPromptMode('image');
+      else if(name.includes('Video')) setPromptMode('video');
+      else setPromptMode('text');
+    }
+
+    // 2. Mode Switching (Text / Image / Video)
+    function setPromptMode(mode) {
+      currentMode = mode;
+      document.getElementById('btnTextPrompt').classList.remove('active');
+      document.getElementById('btnImagePrompt').classList.remove('active');
+      document.getElementById('btnVideoPrompt').classList.remove('active');
+
+      const title = document.getElementById('panelTitle');
+      const styleSelect = document.getElementById('styleSelect');
+
+      if (mode === 'text') {
+        document.getElementById('btnTextPrompt').classList.add('active');
+        title.innerText = "Generate Text Prompt & Script";
+        styleSelect.value = "ORACLE";
+      } else if (mode === 'image') {
+        document.getElementById('btnImagePrompt').classList.add('active');
+        title.innerText = "Generate Image Prompt Architecture";
+        styleSelect.value = "Midjourney";
+      } else if (mode === 'video') {
+        document.getElementById('btnVideoPrompt').classList.add('active');
+        title.innerText = "Generate Video Prompt Architecture";
+        styleSelect.value = "SoraVideo";
+      }
+      runPromptEngine();
+    }
+
+    // 3. Auto-Search Handler for Video Topic
+    function handleAutoSearch() {
+      const badge = document.getElementById('searchBadge');
+      badge.style.display = 'flex';
+
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        badge.style.display = 'none';
+        runPromptEngine();
+      }, 400); // 400ms debounce live search
+    }
+
+    // 4. Main Prompt & Script Generator Engine
+    function runPromptEngine() {
+      const topic = document.getElementById('topicInput').value.trim() || "Viral YouTube Strategy 2026";
+      const style = document.getElementById('styleSelect').value;
+      const framework = document.getElementById('frameworkSelect').value;
+      
+      let result = "";
+
+      if (currentMode === 'image' || style === 'Midjourney') {
+        result = `Hyper-realistic cinematic photography of "${topic}", 8k resolution, volumetric studio lighting, dramatic shadow contrast, shot on 35mm lens, photorealistic details --ar 16:9 --v 6.0`;
+        document.getElementById('qBox1').innerHTML = `<b>Visual Subject:</b> ${topic}`;
+        document.getElementById('qBox2').innerHTML = `<b>Lighting/Vibe:</b> 8K Cinematic Volumetric`;
+        document.getElementById('qBox3').innerHTML = `<b>Engine:</b> Midjourney V6 Ready`;
+      } 
+      else if (currentMode === 'video' || style === 'SoraVideo') {
+        result = `Hyper-smooth cinematic 4K video prompt: Dynamic camera panning around "${topic}", vibrant colors, hyper-detailed texture rendering, seamless high-framerate motion graphics.`;
+        document.getElementById('qBox1').innerHTML = `<b>Video Theme:</b> ${topic}`;
+        document.getElementById('qBox2').innerHTML = `<b>Camera Motion:</b> 360 Pan & Orbit`;
+        document.getElementById('qBox3').innerHTML = `<b>Engine:</b> Sora & Gen-3 Ready`;
+      } 
+      else {
+        result = `[VIRAL HOOK]\nKya aapko pata hai ki "${topic}" me sabse bada secret kya hai?\n\n[KEY STEP 1]\nPehle 3 seconds me dynamic visual hook introduce karein.\n\n[KEY STEP 2]\nScript ki pacing fast rakhein (${framework} Mode).\n\n[CALL TO ACTION]\nAbhi View49 Suite follow karein aur apna channel grow karein!`;
+        document.getElementById('qBox1').innerHTML = `<b>Topic Target:</b> ${topic}`;
+        document.getElementById('qBox2').innerHTML = `<b>Script Framework:</b> ${framework}`;
+        document.getElementById('qBox3').innerHTML = `<b>Engine:</b> ORACLE Teleprompter Active`;
+      }
+
+      document.getElementById('scriptText').value = result;
+      syncPrompter();
+    }
+
+    // 5. Sync to Teleprompter & Word Count
+    function syncPrompter() {
+      const text = document.getElementById('scriptText').value;
+      document.getElementById('prompterText').innerText = text || "Script type ya generate hone par yahan dikhegi...";
+
+      const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+      document.getElementById('wordCount').innerText = `Words: ${words}`;
+
+      const seconds = Math.ceil(words / 2.5);
+      document.getElementById('estTime').innerText = `Est. Duration: ~${seconds}s ${seconds <= 60 ? '⚡ (Shorts Ready)' : '📹 (Long Video)'}`;
+    }
+
+    function changeFontSize(val) {
+      document.getElementById('prompterText').style.fontSize = val + 'px';
+    }
+
+    // 6. Teleprompter Play/Pause Scrolling
+    function togglePrompter() {
+      const screen = document.getElementById('prompterScreen');
+      const btn = document.getElementById('playBtn');
+
+      if (!isScrolling) {
+        isScrolling = true;
+        btn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause`;
+        
+        const speed = 11 - document.getElementById('speedSlider').value;
+        scrollInterval = setInterval(() => {
+          screen.scrollTop += 2;
+          if (screen.scrollTop + screen.clientHeight >= screen.scrollHeight) {
+            togglePrompter();
+          }
+        }, speed * 5);
+      } else {
+        isScrolling = false;
+        btn.innerHTML = `<i class="fa-solid fa-play"></i> Start Prompting`;
+        clearInterval(scrollInterval);
+      }
+    }
+
+    // Initial load sync
+    runPromptEngine();
+  </script>
+</body>
+</html>
