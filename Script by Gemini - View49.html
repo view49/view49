@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Script by Gemini - View49</title>
+  <title>Script by Gemini Pro Studio - View49</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -121,21 +121,19 @@
       display: flex;
       flex-direction: column;
       box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+      gap: 16px;
     }
 
     .panel-header {
       font-size: 16px;
       font-weight: 700;
       color: #fff;
-      margin-bottom: 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
     .panel-header-title { display: flex; align-items: center; gap: 10px; }
-
-    .action-group { display: flex; gap: 8px; }
 
     /* Mode Toggles */
     .prompt-type-toggle {
@@ -144,7 +142,6 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 12px;
       padding: 4px;
-      margin-bottom: 18px;
       gap: 4px;
     }
 
@@ -167,7 +164,7 @@
 
     .toggle-btn.active { background: #ffffff; color: #06070a; font-weight: 800; }
 
-    .form-group { margin-bottom: 16px; position: relative; }
+    .form-group { position: relative; }
     .form-group label { display: block; font-size: 12px; font-weight: 700; color: #a1a1aa; margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase; }
 
     input[type="text"], select, textarea {
@@ -188,7 +185,7 @@
     }
 
     select option { background: #11131a; color: #fff; }
-    textarea { height: 350px; resize: none; line-height: 1.6; font-size: 13px; font-family: 'Courier New', Courier, monospace; }
+    textarea { height: 260px; resize: none; line-height: 1.6; font-size: 13px; font-family: 'Courier New', Courier, monospace; }
 
     .search-badge {
       position: absolute;
@@ -217,15 +214,54 @@
       font-size: 13px;
     }
 
-    .btn-action:hover { opacity: 0.95; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,45,45,0.4); }
     .btn-secondary {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.15);
       color: #fff;
     }
-    .btn-secondary:hover { background: rgba(255, 255, 255, 0.18); }
 
-    .btn-full { width: 100%; margin-top: 10px; justify-content: center; }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.18); }
+    .btn-action:hover { opacity: 0.95; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,45,45,0.4); }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* Auto-Thumbnail Section Styling */
+    .thumbnail-box {
+      background: rgba(8, 9, 13, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .thumb-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+
+    .thumb-item span {
+      display: block;
+      color: #ff2d2d;
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .thumb-item p {
+      color: #d1d1d6;
+      line-height: 1.4;
+    }
 
     /* Sidebar */
     .improve-card {
@@ -264,7 +300,7 @@
 
   <!-- Top Navigation -->
   <div class="top-prompt-nav" id="topNav">
-    <div class="prompt-tab active" onclick="switchMainTab(this, 'Script by Gemini Engine')"><i class="fa-solid fa-sparkles" style="color:#4285f4;"></i> Script by Gemini Engine</div>
+    <div class="prompt-tab active" onclick="switchMainTab(this, 'Script by Gemini Pro Studio')"><i class="fa-solid fa-sparkles" style="color:#4285f4;"></i> Script by Gemini Engine</div>
     <div class="prompt-tab" onclick="switchMainTab(this, 'Image Visual Prompt')"><i class="fa-regular fa-image"></i> Image Visual Prompt</div>
     <div class="prompt-tab" onclick="switchMainTab(this, 'Video Scene Prompt')"><i class="fa-solid fa-video"></i> Video Scene Prompt</div>
   </div>
@@ -272,7 +308,7 @@
   <!-- Navbar -->
   <nav class="navbar">
     <a href="index.html" class="logo"><i class="fa-solid fa-bolt" style="color:#ff2d2d;"></i> View<span>49</span></a>
-    <div class="brand-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Script by Gemini</div>
+    <div class="brand-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Script by Gemini Pro Studio</div>
     <a href="Ultra-Premium Subscription Page.html" class="btn-upgrade"><i class="fa-solid fa-crown"></i> Upgrade Pro</a>
   </nav>
 
@@ -290,7 +326,7 @@
       <div class="panel-header">
         <div class="panel-header-title">
           <i class="fa-solid fa-magnifying-glass" style="color:#4285f4;"></i> 
-          <span>Gemini Input Engine</span>
+          <span>Gemini Search & Generation Input</span>
         </div>
       </div>
       
@@ -324,26 +360,59 @@
 
     </div>
 
-    <!-- Panel 2: Ready Master Output -->
+    <!-- Panel 2: Master Output & Auto-Thumbnail Generator -->
     <div class="card-panel">
+      
       <div class="panel-header">
         <div class="panel-header-title">
           <i class="fa-solid fa-terminal" style="color:#4285f4;"></i> 
-          <span id="outputTitle">Script by Gemini Output</span>
+          <span id="outputTitle">Script Output</span>
         </div>
-        <div class="action-group">
-          <button class="btn-action btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="downloadScriptFile()">
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-action btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="downloadScriptPrompt()">
             <i class="fa-solid fa-download"></i> Download
           </button>
           <button class="btn-action" style="padding: 6px 12px; font-size: 12px;" onclick="copyPromptOutput()">
-            <i class="fa-regular fa-copy"></i> Copy
+            <i class="fa-regular fa-copy"></i> Copy Prompt
           </button>
         </div>
       </div>
       
       <div class="form-group" style="margin-bottom: 0;">
-        <textarea id="promptOutputBox" readonly placeholder="Type your Topic on the left to activate Script by Gemini Engine..."></textarea>
+        <textarea id="promptOutputBox" readonly placeholder="Type your Topic on the left to activate Script by Gemini Pro Studio..."></textarea>
       </div>
+
+      <!-- Auto-Thumbnail Idea Generator Section -->
+      <div class="thumbnail-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
+          <h4 style="font-size: 13px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-image" style="color:#ff2d2d;"></i> Auto-Thumbnail Idea Generator
+          </h4>
+          <button class="btn-action btn-secondary" style="padding: 4px 10px; font-size: 10px;" onclick="copyThumbnailPrompt()">
+            <i class="fa-regular fa-copy"></i> Copy AI Image Prompt
+          </button>
+        </div>
+
+        <div class="thumb-grid">
+          <div class="thumb-item">
+            <span>Text Overlay (Bold 3-4 Words)</span>
+            <p id="thumbText">Awaiting Topic...</p>
+          </div>
+          <div class="thumb-item">
+            <span>Visual Concept / Scene</span>
+            <p id="thumbVisual">Awaiting Topic...</p>
+          </div>
+          <div class="thumb-item">
+            <span>Color Palette & Contrast</span>
+            <p id="thumbColors">Awaiting Topic...</p>
+          </div>
+          <div class="thumb-item">
+            <span>Subject Expression / Hook</span>
+            <p id="thumbEmotion">Awaiting Topic...</p>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Panel 3: Engine Stats -->
@@ -353,7 +422,7 @@
         <p style="font-size: 12px; color: #a1a1aa;">System Specifications:</p>
         
         <div class="question-box" id="qBox1">
-          <b>Core Intelligence:</b> Script by Gemini
+          <b>Core Intelligence:</b> Script by Gemini Pro Studio
         </div>
         <div class="question-box" id="qBox2">
           <b>Active Search:</b> Awaiting Topic Input
@@ -366,7 +435,7 @@
 
   </div>
 
-  <footer>&copy; 2026 View49 - Powered by Script by Gemini Engine. All rights reserved.</footer>
+  <footer>&copy; 2026 View49 - Powered by Script by Gemini Pro Studio. All rights reserved.</footer>
 
   <script>
     let searchTimer = null;
@@ -405,7 +474,7 @@
       }, 300);
     }
 
-    // SCRIPT BY GEMINI ENGINE LOGIC
+    // SCRIPT BY GEMINI PRO STUDIO LOGIC
     function generateTargetPrompt() {
       const topic = document.getElementById('topicInput').value.trim();
       const framework = document.getElementById('frameworkSelect').value;
@@ -416,15 +485,19 @@
       if (!topic) {
         outputBox.value = "";
         document.getElementById('qBox2').innerHTML = `<b>Active Search:</b> Awaiting Topic Input`;
+        document.getElementById('thumbText').innerText = "Awaiting Topic...";
+        document.getElementById('thumbVisual').innerText = "Awaiting Topic...";
+        document.getElementById('thumbColors').innerText = "Awaiting Topic...";
+        document.getElementById('thumbEmotion').innerText = "Awaiting Topic...";
         return;
       }
 
-      titleLabel.innerText = `Script by Gemini Output (${promptType.toUpperCase()})`;
+      titleLabel.innerText = `Script Output (${promptType.toUpperCase()})`;
 
       let masterPrompt = "";
 
       if (promptType === 'image') {
-        masterPrompt = `[ENGINE: SCRIPT BY GEMINI - VISION ART ARCHITECT]\n\n` +
+        masterPrompt = `[ENGINE: SCRIPT BY GEMINI PRO STUDIO - VISION ART ARCHITECT]\n\n` +
           `TASK: Create a hyper-realistic, photorealistic thumbnail image prompt.\n` +
           `SUBJECT: "${topic}"\n\n` +
           `SPECIFICATIONS:\n` +
@@ -434,7 +507,7 @@
           `- Aspect Ratio: 16:9 widescreen`;
       } 
       else if (promptType === 'video') {
-        masterPrompt = `[ENGINE: SCRIPT BY GEMINI - CINEMATIC VIDEO PROMPTER]\n\n` +
+        masterPrompt = `[ENGINE: SCRIPT BY GEMINI PRO STUDIO - CINEMATIC VIDEO PROMPTER]\n\n` +
           `TASK: Generate 4K AI Video Motion Prompt.\n` +
           `SCENE TOPIC: "${topic}"\n\n` +
           `PROMPT ARCHITECTURE:\n` +
@@ -443,7 +516,7 @@
           `- Lighting: Dramatic volumetric depth and color grading`;
       } 
       else {
-        masterPrompt = `[ENGINE: SCRIPT BY GEMINI - MASTER SCRIPTWRITER]\n\n` +
+        masterPrompt = `[ENGINE: SCRIPT BY GEMINI PRO STUDIO - MASTER SCRIPTWRITER]\n\n` +
           `ACT AS: Senior Content Strategist powered by Script by Gemini Architecture.\n\n` +
           `TARGET TOPIC: "${topic}"\n` +
           `LANGUAGE FORMAT: ${lang}\n` +
@@ -466,8 +539,14 @@
 
       outputBox.value = masterPrompt;
 
+      // Dynamic Thumbnail Generator Logic
+      document.getElementById('thumbText').innerText = `"${topic.toUpperCase().slice(0, 18)}... EXPOSED!"`;
+      document.getElementById('thumbVisual').innerText = `Split screen setup showing BEFORE vs AFTER results related to ${topic}.`;
+      document.getElementById('thumbColors').innerText = `High contrast Neon Yellow (#FFE600) text with Dark Slate & Crimson Red background.`;
+      document.getElementById('thumbEmotion').innerText = `Shocked/Intrigued expression pointing directly at the central element.`;
+
       // Update Sidebar Stats
-      document.getElementById('qBox1').innerHTML = `<b>Core Intelligence:</b> Script by Gemini`;
+      document.getElementById('qBox1').innerHTML = `<b>Core Intelligence:</b> Script by Gemini Pro Studio`;
       document.getElementById('qBox2').innerHTML = `<b>Active Search:</b> ${topic}`;
       document.getElementById('qBox3').innerHTML = `<b>Mode:</b> ${promptType.toUpperCase()} Engine`;
     }
@@ -480,24 +559,32 @@
       }
       box.select();
       document.execCommand('copy');
-      alert('Script by Gemini Prompt copied successfully!');
+      alert('Script Prompt successfully copied!');
     }
 
-    function downloadScriptFile() {
-      const content = document.getElementById('promptOutputBox').value;
-      const topic = document.getElementById('topicInput').value.trim() || 'script';
-
-      if (!content) {
-        alert('Download karne ke liye pehle topic enter karke script generate karein!');
+    function downloadScriptPrompt() {
+      const text = document.getElementById('promptOutputBox').value;
+      if (!text) {
+        alert('Pehle Topic enter karein!');
         return;
       }
+      const blob = new Blob([text], { type: 'text/plain' });
+      const anchor = document.createElement('a');
+      anchor.download = 'Script_by_Gemini_Prompt.txt';
+      anchor.href = window.URL.createObjectURL(blob);
+      anchor.click();
+    }
 
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `Script-by-Gemini-${topic.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
-      link.click();
-      URL.revokeObjectURL(link.href);
+    function copyThumbnailPrompt() {
+      const topic = document.getElementById('topicInput').value.trim();
+      if (!topic) {
+        alert('Pehle Topic enter karein!');
+        return;
+      }
+      const thumbPrompt = `YouTube Thumbnail Concept for "${topic}": Split screen BEFORE vs AFTER visual style, high contrast neon yellow text overlay reading "${topic.toUpperCase()} EXPOSED!", ultra high detail 8K studio render, shocked facial expression pointing at main element.`;
+      
+      navigator.clipboard.writeText(thumbPrompt);
+      alert('Thumbnail AI Image Prompt copied to clipboard!');
     }
 
     // Initial Trigger
