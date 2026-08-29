@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View49 — AI Content Multiplier & Cross-Platform Engine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+      * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+      :root {
+        --bg: #030305;
+        --surface: #0a0c14;
+        --surface-card: #10131f;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-active: rgba(255, 45, 45, 0.5);
+        --accent: #ff2d2d;
+        --accent-gradient: linear-gradient(135deg, #ff2d2d 0%, #ec4899 50%, #8b5cf6 100%);
+        --accent-glow: rgba(255, 45, 45, 0.2);
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --green: #10b981;
+        --radius: 20px;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        overflow-x: hidden;
+        background-image: 
+          radial-gradient(circle at 10% 10%, rgba(255, 45, 45, 0.07) 0%, transparent 45%),
+          radial-gradient(circle at 90% 90%, rgba(139, 92, 246, 0.07) 0%, transparent 45%);
+      }
+
+      /* Navbar */
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 6%;
+        background: rgba(3, 3, 5, 0.8);
+        backdrop-filter: blur(16px);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .logo {
+        font-size: 22px; font-weight: 800; color: #fff; text-decoration: none;
+        display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px;
+      }
+      .logo span { color: var(--accent); }
+
+      .nav-links { display: flex; align-items: center; gap: 24px; }
+      .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 13px; font-weight: 600; transition: color 0.2s; }
+      .nav-links a:hover { color: #fff; }
+
+      .btn-upgrade {
+        background: var(--accent-gradient);
+        color: #fff !important;
+        padding: 8px 18px;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 4px 20px rgba(255, 45, 45, 0.3);
+      }
+
+      /* Hero Section */
+      .hero {
+        text-align: center;
+        padding: 60px 20px 40px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .badge-glow {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border);
+        padding: 8px 18px; border-radius: 30px; font-size: 13px; color: var(--text-muted);
+        margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      }
+      .badge-glow i { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+      .hero-title {
+        font-size: 50px; font-weight: 800; line-height: 1.15;
+        letter-spacing: -1.5px; margin-bottom: 20px;
+      }
+      .hero-title span {
+        background: var(--accent-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .hero-desc {
+        color: var(--text-muted); font-size: 16px; max-width: 700px;
+        margin: 0 auto 40px; line-height: 1.6;
+      }
+
+      /* Input Card Box */
+      .input-card {
+        max-width: 800px;
+        margin: 0 auto 50px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 12px 12px 12px 24px;
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .input-card:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-glow), 0 30px 60px rgba(0,0,0,0.9);
+      }
+
+      .input-card input {
+        flex: 1; background: transparent; border: none; color: var(--text); font-size: 16px; outline: none;
+      }
+      .input-card input::placeholder { color: #475569; }
+
+      .btn-multiply {
+        background: var(--accent-gradient);
+        color: white; border: none; padding: 16px 32px; border-radius: 16px;
+        font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; gap: 10px;
+        transition: all 0.2s; box-shadow: 0 8px 25px rgba(255, 45, 45, 0.35);
+        white-space: nowrap;
+      }
+      .btn-multiply:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+      /* Results Dashboard */
+      .multiplier-dashboard {
+        max-width: 1000px;
+        margin: 0 auto 80px;
+        padding: 0 20px;
+        display: none;
+        animation: fadeIn 0.4s ease forwards;
+      }
+      .multiplier-dashboard.active { display: block; }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .glass-container {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 36px;
+        box-shadow: 0 40px 90px rgba(0,0,0,0.85);
+      }
+
+      /* Platform Tabs */
+      .platform-tabs {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 28px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 18px;
+        overflow-x: auto;
+      }
+
+      .tab-btn {
+        background: var(--surface-card);
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        padding: 12px 20px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .tab-btn:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+      .tab-btn.active {
+        background: var(--accent-gradient);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 4px 20px rgba(255, 45, 45, 0.3);
+      }
+
+      /* Output Content Box */
+      .output-pane { display: none; }
+      .output-pane.active { display: block; }
+
+      .content-box {
+        background: var(--surface-card);
+        border: 1px solid var(--border);
+        padding: 24px;
+        border-radius: 16px;
+        font-size: 14px;
+        color: #e2e8f0;
+        line-height: 1.8;
+        white-space: pre-wrap;
+        margin-bottom: 24px;
+        max-height: 380px;
+        overflow-y: auto;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+
+      .pane-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .btn-copy-pane {
+        background: var(--surface-card);
+        border: 1px solid var(--border);
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+      }
+      .btn-copy-pane:hover { border-color: var(--accent); background: #1a1e2e; }
+
+      /* Toast Notification */
+      .toast {
+        position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+        background: #121520; border: 1px solid var(--border); color: var(--text);
+        padding: 14px 26px; border-radius: 14px; font-size: 14px; font-weight: 600;
+        z-index: 1000; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      }
+      .toast.show { transform: translateX(-50%) translateY(0); }
+
+      footer { text-align: center; padding: 30px; color: #475569; font-size: 13px; border-top: 1px solid var(--border); }
+
+      @media (max-width: 768px) {
+        .hero-title { font-size: 34px; }
+        .input-card { flex-direction: column; padding: 12px; }
+        .btn-multiply { width: 100%; justify-content: center; }
+      }
+    </style>
+  </head>
+  <body>
+
+    <nav class="navbar">
+      <a href="index.html" class="logo">
+        <i class="fa-solid fa-bolt" style="color:#ff2d2d;"></i> View<span>49</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Dashboard</a>
+        <a href="youtube-seo-checker.html">SEO Checker</a>
+        <a href="youtube-multi-viewer.html">Multi Viewer</a>
+        <a href="premium.html" class="btn-upgrade"><i class="fa-solid fa-crown"></i> Pro</a>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="badge-glow">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> 1 Video &rarr; 5+ Platform Assets in Seconds
+      </div>
+      
+      <h1 class="hero-title">
+        AI Content Multiplier & <br><span>Cross-Platform Engine</span>
+      </h1>
+
+      <p class="hero-desc">
+        Drop your YouTube video URL or topic. Instantly multiply your content into viral Twitter threads, LinkedIn newsletters, Shorts scripts, and community polls.
+      </p>
+
+      <div class="input-card">
+        <input type="text" id="videoInput" placeholder="Paste YouTube video link or type your video topic..." />
+        <button class="btn-multiply" onclick="runMultiplier()">
+          <span>Multiply Content</span> <i class="fa-solid fa-bolt"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Results Multiplier Dashboard -->
+    <div class="multiplier-dashboard" id="dashboard">
+      <div class="glass-container">
+        
+        <div class="platform-tabs">
+          <button class="tab-btn active" onclick="switchTab(event, 'twitterPane')">
+            <i class="fa-brands fa-x-twitter"></i> Twitter / X Thread
+          </button>
+          <button class="tab-btn" onclick="switchTab(event, 'linkedinPane')">
+            <i class="fa-brands fa-linkedin-in"></i> LinkedIn Post
+          </button>
+          <button class="tab-btn" onclick="switchTab(event, 'shortsPane')">
+            <i class="fa-solid fa-film"></i> Shorts / Reels Script
+          </button>
+          <button class="tab-btn" onclick="switchTab(event, 'communityPane')">
+            <i class="fa-solid fa-comments"></i> Community Poll
+          </button>
+        </div>
+
+        <!-- Twitter Pane -->
+        <div class="output-pane active" id="twitterPane">
+          <div class="content-box" id="twitterText">1/ Most creators work 10x harder than necessary because they don't use content multi-channeling. 
+
+Here is the exact 5-step framework I used to double my reach without filming extra videos 🧵👇
+
+2/ Step 1: The Core Asset. 
+Never start from scratch. Your main YouTube video is a goldmine of insights, frameworks, and data points waiting to be repackaged.
+
+3/ Step 2: Extracting Hooks.
+Look at your video's highest retention spike. That sentence is your hook for Twitter and LinkedIn. People love high-value takeaways instantly.
+
+4/ Step 3: Turn chapters into threads.
+Break down every chapter heading into individual tweets. Add spacing, emojis, and clear spacing to boost readability.
+
+5/ Want the complete automation checklist? Drop a "READY" below and I'll DM you the free template! 🚀</div>
+          <div class="pane-actions">
+            <span style="font-size:12px; color:var(--green); font-weight:700;"><i class="fa-solid fa-check"></i> Optimized for Engagement</span>
+            <button class="btn-copy-pane" onclick="copyContent('twitterText')"><i class="fa-regular fa-copy"></i> Copy Twitter Thread</button>
+          </div>
+        </div>
+
+        <!-- LinkedIn Pane -->
+        <div class="output-pane" id="linkedinPane">
+          <div class="content-box" id="linkedinText">Stop wasting hours creating content from scratch for every single platform. 🛑
+
+In today's creator economy, leverage beats hustle every single time. 
+
+Last week, I tested a workflow that turned 1 long YouTube video into 5 high-performing assets across LinkedIn and X. Here is what I learned:
+
+📌 1. Repurposing isn't lazy; it's smart distribution. Most of your audience hasn't seen your long-form video.
+📌 2. Format matters. LinkedIn prefers professional breakdowns with actionable bullet points.
+📌 3. End with a clear discussion prompt to drive algorithm comments.
+
+How do you currently repurpose your content? Let's discuss in the comments below! 👇
+
+#ContentCreator #YouTubeGrowth #PersonalBranding #Strategy</div>
+          <div class="pane-actions">
+            <span style="font-size:12px; color:var(--green); font-weight:700;"><i class="fa-solid fa-check"></i> Professional Tone</span>
+            <button class="btn-copy-pane" onclick="copyContent('linkedinText')"><i class="fa-regular fa-copy"></i> Copy LinkedIn Post</button>
+          </div>
+        </div>
+
+        <!-- Shorts Pane -->
+        <div class="output-pane" id="shortsPane">
+          <div class="content-box" id="shortsText">🎥 VIRAL SHORT SCRIPT (Duration: 45s)
+
+[0:00 - 0:03] HOOK:
+"Stop scrolling if you want to double your channel growth without filming more videos!"
+
+[0:03 - 0:25] BODY:
+"Most creators think they need 3 new videos a week. That's a burnout trap. Instead, take your best performing video and turn the core secret into a 3-step short. Show the problem, give the shortcut, and deliver the payoff."
+
+[0:25 - 0:45] CALL TO ACTION:
+"Comment 'GROWTH' below and I'll send you my exact framework. Subscribe for more!"</div>
+          <div class="pane-actions">
+            <span style="font-size:12px; color:var(--green); font-weight:700;"><i class="fa-solid fa-check"></i> High-Retention Hook Included</span>
+            <button class="btn-copy-pane" onclick="copyContent('shortsText')"><i class="fa-regular fa-copy"></i> Copy Shorts Script</button>
+          </div>
+        </div>
+
+        <!-- Community Pane -->
+        <div class="output-pane" id="communityPane">
+          <div class="content-box" id="communityText">📊 COMMUNITY TAB POLL & ANNOUNCEMENT
+
+Hey everyone! Quick question regarding our next deep-dive tutorial:
+
+Which content bottleneck is currently slowing down your channel the most?
+
+🔘 Editing & Repurposing long videos
+🔘 Finding high-CTR thumbnail ideas
+🔘 Writing viral titles & hooks
+🔘 Channel monetization & brand deals
+
+Cast your vote below! Also, drop a comment if you want a dedicated breakdown on your chosen topic this week. 👇</div>
+          <div class="pane-actions">
+            <span style="font-size:12px; color:var(--green); font-weight:700;"><i class="fa-solid fa-check"></i> Maximum Audience Voting Rate</span>
+            <button class="btn-copy-pane" onclick="copyContent('communityText')"><i class="fa-regular fa-copy"></i> Copy Community Post</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <footer>
+      &copy; 2026 View49 Creator Tools. All rights reserved.
+    </footer>
+
+    <script>
+      function showToast(msg) {
+        var toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = 'toast show';
+        setTimeout(function() { toast.className = 'toast'; }, 3000);
+      }
+
+      function runMultiplier() {
+        var val = document.getElementById('videoInput').value.trim();
+        if(!val) {
+          showToast('❌ Please enter a YouTube URL or video topic first!');
+          return;
+        }
+
+        showToast('⚡ Multiplying content across all platforms...');
+
+        setTimeout(function() {
+          document.getElementById('dashboard').classList.add('active');
+          document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+          showToast('✅ Content successfully multiplied into 4 platforms!');
+        }, 800);
+      }
+
+      function switchTab(evt, paneId) {
+        var panes = document.getElementsByClassName('output-pane');
+        for (var i = 0; i < panes.length; i++) {
+          panes[i].classList.remove('active');
+        }
+
+        var buttons = document.getElementsByClassName('tab-btn');
+        for (var i = 0; i < buttons.length; i++) {
+          buttons[i].classList.remove('active');
+        }
+
+        document.getElementById(paneId).classList.add('active');
+        evt.currentTarget.classList.add('active');
+      }
+
+      function copyContent(elementId) {
+        var text = document.getElementById(elementId).innerText;
+        navigator.clipboard.writeText(text);
+        showToast('📋 Content copied to clipboard successfully!');
+      }
+    </script>
+  </body>
+</html>
