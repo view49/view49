@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View49 Creator Suite</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background: #08090d;
+      color: #f4f4f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 6%;
+      background: rgba(8, 9, 13, 0.8);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo span { color: #ff2d2d; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-links a {
+      color: #a1a1aa;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: #fff; }
+
+    .btn-upgrade {
+      background: linear-gradient(135deg, #ff2d2d 0%, #b91c1c 100%);
+      color: #fff !important;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 18px rgba(255, 45, 45, 0.35);
+    }
+
+    /* Hero Header */
+    .hero-section {
+      text-align: center;
+      padding: 40px 20px 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .pill-badge {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #a1a1aa;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+
+    .hero-subtitle {
+      color: #71717a;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Main Container */
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+      width: 100%;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 32px 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title i { color: #ff2d2d; }
+
+    /* Grid Layout */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 992px) {
+      .tools-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .tools-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Cards */
+    .tool-card {
+      background: #0d0f17;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .tool-card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+
+    .tool-card.pro-card {
+      border-color: rgba(234, 179, 8, 0.3);
+      background: linear-gradient(180deg, rgba(234, 179, 8, 0.03) 0%, #0d0f17 100%);
+    }
+
+    .icon-box {
+      width: 38px;
+      height: 38px;
+      background: rgba(255, 45, 45, 0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ff2d2d;
+      font-size: 15px;
+      margin-bottom: 18px;
+    }
+
+    .pro-card .icon-box {
+      background: rgba(234, 179, 8, 0.1);
+      color: #eab308;
+    }
+
+    .tool-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+
+    .tool-desc {
+      font-size: 12px;
+      color: #71717a;
+      line-height: 1.5;
+      margin-bottom: 18px;
+      flex: 1;
+    }
+
+    .tool-link {
+      font-size: 12px;
+      font-weight: 700;
+      color: #ff2d2d;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pro-card .tool-link { color: #eab308; }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #3f3f46;
+      font-size: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-bolt" style="color:#ff2d2d;"></i> View<span>49</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Dashboard</a>
+      <a href="#">SEO Checker</a>
+      <a href="#">Multi Viewer</a>
+      <a href="#" class="btn-upgrade"><i class="fa-solid fa-crown"></i> Upgrade Pro</a>
+    </div>
+  </nav>
+
+  <!-- Hero Header -->
+  <header class="hero-section">
+    <div class="pill-badge">Complete Creator Workspace</div>
+    <h1 class="hero-title">View49 Creator Suite</h1>
+    <p class="hero-subtitle">Access all 16+ power tools from one centralized dashboard.</p>
+  </header>
+
+  <!-- Main Tools Grid -->
+  <main class="dashboard-container">
+
+    <!-- Section 1: YouTube Core Tools -->
+    <h2 class="section-title">
+      <i class="fa-brands fa-youtube"></i> YouTube Core Tools
+    </h2>
+    
+    <div class="tools-grid">
+      
+      <!-- Card 1 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <div class="tool-title">YouTube SEO Checker</div>
+        <div class="tool-desc">Diagnose video rankings, keywords, and channel SEO performance.</div>
+        <div class="tool-link">Check SEO &rarr;</div>
+      </a>
+
+      <!-- Card 2 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-regular fa-image"></i></div>
+        <div class="tool-title">Thumbnail Downloader</div>
+        <div class="tool-desc">Download full-HD and 4K video thumbnails instantly.</div>
+        <div class="tool-link">Download HD &rarr;</div>
+      </a>
+
+      <!-- Card 3 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-tag"></i></div>
+        <div class="tool-title">Tags & Description</div>
+        <div class="tool-desc">Extract viral tags and SEO description structures.</div>
+        <div class="tool-link">Generate Tags &rarr;</div>
+      </a>
+
+      <!-- Card 4 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-scissors"></i></div>
+        <div class="tool-title">YT Link Shortener</div>
+        <div class="tool-desc">Create short, trackable links for YouTube channels and videos.</div>
+        <div class="tool-link">Shorten Link &rarr;</div>
+      </a>
+
+      <!-- Card 5 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-border-all"></i></div>
+        <div class="tool-title">YouTube Multi-Viewer</div>
+        <div class="tool-desc">Watch and monitor multiple YouTube streams at once.</div>
+        <div class="tool-link">Open Grid &rarr;</div>
+      </a>
+
+      <!-- Card 6 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-chart-line"></i></div>
+        <div class="tool-title">Analytics Studio</div>
+        <div class="tool-desc">Track channel statistics, subscriber velocity, and growth diagnostics.</div>
+        <div class="tool-link">View Analytics &rarr;</div>
+      </a>
+
+    </div>
+
+    <!-- Section 2: Creator Utilities -->
+    <h2 class="section-title">
+      <i class="fa-solid fa-cube"></i> Creator Utilities
+    </h2>
+
+    <div class="tools-grid">
+      
+      <!-- Card 7: Script by Gemini - View49 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <div class="tool-title">Script by Gemini - View49</div>
+        <div class="tool-desc">AI script generator with auto-thumbnail ideas and retention hooks.</div>
+        <div class="tool-link">Generate Script &rarr;</div>
+      </a>
+
+      <!-- Card 8 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-link"></i></div>
+        <div class="tool-title">Link in Bio Maker</div>
+        <div class="tool-desc">Create customizable micro-landing pages for social profiles.</div>
+        <div class="tool-link">Build Page &rarr;</div>
+      </a>
+
+      <!-- Card 9 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-percent"></i></div>
+        <div class="tool-title">AI Visual Prompt Studio</div>
+        <div class="tool-desc">Design cinematic visual prompts and style architectures.</div>
+        <div class="tool-link">Launch Studio &rarr;</div>
+      </a>
+
+      <!-- Card 10 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-regular fa-lightbulb"></i></div>
+        <div class="tool-title">Content Idea Generator</div>
+        <div class="tool-desc">Generate viral video topics tailored to your channel.</div>
+        <div class="tool-link">Generate Ideas &rarr;</div>
+      </a>
+
+      <!-- Card 11 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-calculator"></i></div>
+        <div class="tool-title">Engagement Calculator</div>
+        <div class="tool-desc">Calculate like-to-view ratios and audience interaction metrics.</div>
+        <div class="tool-link">Calculate Rate &rarr;</div>
+      </a>
+
+      <!-- Card 12 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-regular fa-pen-to-square"></i></div>
+        <div class="tool-title">Image & Text Editor</div>
+        <div class="tool-desc">Annotate screenshots and add styled text overlays.</div>
+        <div class="tool-link">Open Editor &rarr;</div>
+      </a>
+
+      <!-- Card 13 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-crop-simple"></i></div>
+        <div class="tool-title">Screenshot Editor</div>
+        <div class="tool-desc">Quick crop, blur, and highlight tools for screenshots.</div>
+        <div class="tool-link">Edit Image &rarr;</div>
+      </a>
+
+      <!-- Card 14 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-code"></i></div>
+        <div class="tool-title">Screenshot to Code</div>
+        <div class="tool-desc">Convert UI mockups directly into clean HTML/CSS code.</div>
+        <div class="tool-link">Convert UI &rarr;</div>
+      </a>
+
+      <!-- Card 15 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-desktop"></i></div>
+        <div class="tool-title">Bilibili Multi-Viewer</div>
+        <div class="tool-desc">Stream multi-screen Bilibili feeds simultaneously.</div>
+        <div class="tool-link">Open Grid &rarr;</div>
+      </a>
+
+      <!-- Card 16 -->
+      <a href="#" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-qrcode"></i></div>
+        <div class="tool-title">UPI QR Generator</div>
+        <div class="tool-desc">Generate payment QR codes for creator support.</div>
+        <div class="tool-link">Get QR &rarr;</div>
+      </a>
+
+      <!-- Pro Membership Card -->
+      <a href="#" class="tool-card pro-card">
+        <div class="icon-box"><i class="fa-solid fa-crown"></i></div>
+        <div class="tool-title">Pro Membership</div>
+        <div class="tool-desc">Unlock high-speed proxies, VIP tools, and premium features.</div>
+        <div class="tool-link">Upgrade Pro &rarr;</div>
+      </a>
+
+    </div>
+
+  </main>
+
+  <footer>
+    &copy; 2026 View49 Creator Tools. All rights reserved.
+  </footer>
+
+</body>
+</html>
