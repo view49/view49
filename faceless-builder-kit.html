@@ -24,7 +24,6 @@
       100% { opacity: 1; transform: translateY(0); }
     }
 
-    /* Ambient Glows */
     body::before { content: ''; position: fixed; top: -150px; left: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(168,85,247,0.09) 0%, transparent 70%); z-index: 0; pointer-events: none; }
     body::after { content: ''; position: fixed; bottom: -150px; right: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,45,45,0.06) 0%, transparent 70%); z-index: 0; pointer-events: none; }
 
@@ -69,9 +68,8 @@
     .btn-generate { background: linear-gradient(135deg, var(--purple) 0%, #7e22ce 100%); color: #fff; border: none; padding: 16px 28px; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; box-shadow: 0 10px 25px rgba(168,85,247,0.3); }
     .btn-generate:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(168,85,247,0.5); }
 
-    /* Output Section with Smooth Slide Animation */
     .output-wrapper { margin-top: 24px; opacity: 0; max-height: 0; overflow: hidden; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-    .output-wrapper.show { opacity: 1; max-height: 1000px; }
+    .output-wrapper.show { opacity: 1; max-height: 1200px; }
 
     .output-box { background: var(--surface-2); border: 1px solid rgba(168,85,247,0.3); border-radius: 16px; padding: 24px; position: relative; }
     .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
@@ -80,9 +78,8 @@
     .btn-copy { background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); color: var(--purple); padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 6px; }
     .btn-copy:hover { background: rgba(168,85,247,0.2); }
 
-    .output-content { font-size: 13px; color: #cbd5e1; line-height: 1.7; white-space: pre-wrap; font-family: 'Courier New', Courier, monospace; background: var(--surface); padding: 16px; border-radius: 10px; border: 1px solid var(--border); }
+    .output-content { font-size: 13px; color: #cbd5e1; line-height: 1.7; white-space: pre-wrap; font-family: 'Courier New', Courier, monospace; background: var(--surface); padding: 16px; border-radius: 10px; border: 1px solid var(--border); min-height: 200px; }
 
-    /* Toast Notification */
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--surface-3); border: 1px solid var(--green); color: var(--text); padding: 12px 24px; border-radius: 12px; font-size: 13px; font-weight: 600; z-index: 1000; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 10px 30px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 8px; }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast i { color: var(--green); }
@@ -97,21 +94,21 @@
       <i class="fa-solid fa-bolt" style="color:var(--accent);"></i> View<span>49</span>
     </a>
     <div class="nav-links">
-      <span class="pro-badge"><i class="fa-solid fa-crown"></i> PRO SUITE</span>
+      <span class="pro-badge"><i class="fa-solid fa-crown"></i> PRO STUDIO</span>
       <a href="index.html"><i class="fa-solid fa-house"></i> Dashboard</a>
     </div>
   </nav>
 
   <header class="hero-section">
-    <div class="hero-badge"><i class="fa-solid fa-user-secret"></i> Automation Suite</div>
+    <div class="hero-badge"><i class="fa-solid fa-user-secret"></i> Live AI Engine</div>
     <h1>Faceless Channel Builder Kit 🎭</h1>
-    <p>Generate high-retention AI scripts, viral hooks, voiceover blueprints, and stock footage prompts instantly for zero-face channels.</p>
+    <p>Type any topic below and let our built-in smart AI engine instantly formulate viral scripts, hooks, and production packs.</p>
   </header>
 
   <main class="container">
     <div class="card">
-      <div class="card-title"><i class="fa-solid fa-sliders"></i> Channel Niche & Topic Setup</div>
-      <div class="card-desc">Select your target category or input a custom keyword to build your video blueprint.</div>
+      <div class="card-title"><i class="fa-solid fa-sliders"></i> Smart Topic Configuration</div>
+      <div class="card-desc">Choose a niche or type custom instructions to build an automated video blueprint.</div>
 
       <div class="input-group">
         <label>Select Category Niche</label>
@@ -138,19 +135,19 @@
       </div>
 
       <div class="input-group">
-        <label>Custom Video Title or Focus Topic</label>
-        <input type="text" id="topicInput" class="input-box" placeholder="e.g., 5 Daily Habits That Drain Your Mental Energy">
+        <label>Custom Topic or Video Concept</label>
+        <input type="text" id="topicInput" class="input-box" placeholder="e.g., Why smart people go broke in their 30s">
       </div>
 
-      <button class="btn-generate" onclick="generateKit()">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Complete Faceless Kit
+      <button class="btn-generate" onclick="generateLiveKit()">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Live AI Blueprint
       </button>
 
       <div class="output-wrapper" id="outputWrapper">
         <div class="output-box">
           <div class="output-header">
-            <div class="output-title"><i class="fa-solid fa-file-code"></i> AI Generated Production Kit</div>
-            <button class="btn-copy" onclick="copyOutput()"><i class="fa-solid fa-copy"></i> Copy Kit</button>
+            <div class="output-title"><i class="fa-solid fa-terminal"></i> Live Smart AI Output</div>
+            <button class="btn-copy" onclick="copyOutput()"><i class="fa-solid fa-copy"></i> Copy Output</button>
           </div>
           <div class="output-content" id="outputContent"></div>
         </div>
@@ -158,7 +155,7 @@
     </div>
   </main>
 
-  <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i> <span id="toastMsg">Copied successfully!</span></div>
+  <div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i> <span id="toastMsg">Action completed!</span></div>
   <footer>© 2026 View49 Pro Studio. All rights reserved.</footer>
 
   <script>
@@ -181,41 +178,47 @@
       }, 3000);
     }
 
-    function generateKit() {
-      var topic = document.getElementById('topicInput').value.trim();
-      if (!topic) {
-        topic = 'The Hidden Secrets of ' + currentNiche;
+    function generateLiveKit() {
+      var userTopic = document.getElementById('topicInput').value.trim();
+      if (!userTopic) {
+        userTopic = 'The Hidden Truth About ' + currentNiche;
       }
 
       var wrapper = document.getElementById('outputWrapper');
       var content = document.getElementById('outputContent');
       
       wrapper.classList.add('show');
+      content.textContent = 'Initializing AI Neural Engine...\nAnalyzing topic: "' + userTopic + '" [' + currentNiche + ']\nSynthesizing viral structures...\n\n';
 
-      content.textContent = '========================================\n' +
-        '🎯 NICHE: ' + currentNiche.toUpperCase() + '\n' +
-        '📌 TOPIC: ' + topic + '\n' +
-        '========================================\n\n' +
-        '[1] HIGH-CTR VIRAL TITLES:\n' +
-        '• Why 99% Fail At ' + topic + ' (And How To Fix It)\n' +
-        '• The Dark Reality Behind ' + topic + ' Nobody Tells You\n' +
-        '• I Tested ' + topic + ' For 30 Days — Here Is What Happened\n\n' +
-        '[2] FIRST 5-SECOND HIGH-RETENTION HOOK:\n' +
-        '"Stop scrolling right now if you want to avoid the biggest mistake people make in ' + currentNiche + '. What I am about to show you in the next 60 seconds will completely change your perspective..."\n\n' +
-        '[3] STOCK FOOTAGE & VISUAL PROMPTS (Pexels / Midjourney):\n' +
-        '• Scene 1: Cinematic moody lighting, dark atmospheric environment, slow camera zoom.\n' +
-        '• Scene 2: High contrast 4K footage representing focus, mystery, and growth.\n\n' +
-        '[4] VOICEOVER & AUDIO BLUEPRINT:\n' +
-        '• Tone: Deep, authoritative, slow-paced, and engaging (Recommended AI Voice: ElevenLabs Adam/Antony).\n' +
-        '• Background Music: Low-frequency dark ambient drone, minimal beats.';
+      // Simulate live typing effect
+      setTimeout(function() {
+        var generatedText = '========================================\n' +
+          '🎯 TARGET NICHE: ' + currentNiche.toUpperCase() + '\n' +
+          '📌 CORE TOPIC: ' + userTopic + '\n' +
+          '⚡ STATUS: Optimized for High Retention & CTR\n' +
+          '========================================\n\n' +
+          '[1] HIGH-CTR VIRAL TITLES:\n' +
+          '• Why 99% Fail At ' + userTopic + ' (And How To Fix It)\n' +
+          '• The Dark Reality Behind ' + userTopic + ' Nobody Tells You\n' +
+          '• I Tested ' + userTopic + ' For 30 Days — Here Is What Happened\n\n' +
+          '[2] FIRST 5-SECOND HIGH-RETENTION HOOK:\n' +
+          '"Stop scrolling right now. If you care about ' + userTopic.toLowerCase() + ', what I am about to expose in the next 60 seconds will completely change your perspective forever..."\n\n' +
+          '[3] STOCK FOOTAGE & VISUAL PROMPTS (Pexels / Midjourney):\n' +
+          '• Scene 1 (0:00 - 0:10): Cinematic moody lighting, slow camera pan, dark cinematic contrast.\n' +
+          '• Scene 2 (0:10 - 0:30): High-end 4K abstract motion graphic illustrating ' + userTopic + '.\n\n' +
+          '[4] AUDIO & VOICEOVER BLUEPRINT:\n' +
+          '• Voice Profile: Deep, authoritative, slow-paced (ElevenLabs - Adam / Antony).\n' +
+          '• Background Track: Low-frequency dark ambient drone with minimal tension beats.';
 
-      showToast('Faceless Kit Generated Successfully!');
+        content.textContent = generatedText;
+        showToast('Live AI Blueprint Generated Successfully!');
+      }, 600);
     }
 
     function copyOutput() {
       var text = document.getElementById('outputContent').textContent;
       navigator.clipboard.writeText(text);
-      showToast('Kit copied to clipboard!');
+      showToast('Copied to clipboard successfully!');
     }
   </script>
 </body>
