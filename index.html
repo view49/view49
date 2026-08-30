@@ -16,7 +16,12 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
     }
+
+    /* Ambient Background Glows */
+    body::before { content: ''; position: fixed; top: -150px; left: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(255,45,45,0.07) 0%, transparent 70%); z-index: 0; pointer-events: none; }
+    body::after { content: ''; position: fixed; bottom: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(168,85,247,0.05) 0%, transparent 70%); z-index: 0; pointer-events: none; }
 
     /* Navbar */
     .navbar {
@@ -24,12 +29,12 @@
       justify-content: space-between;
       align-items: center;
       padding: 18px 6%;
-      background: rgba(8, 9, 13, 0.8);
-      backdrop-filter: blur(12px);
+      background: rgba(8, 9, 13, 0.85);
+      backdrop-filter: blur(16px);
       position: sticky;
       top: 0;
       z-index: 100;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .logo {
@@ -70,19 +75,26 @@
       align-items: center;
       gap: 6px;
       box-shadow: 0 4px 18px rgba(255, 45, 45, 0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-upgrade:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(255, 45, 45, 0.5);
     }
 
     /* Hero Header */
     .hero-section {
       text-align: center;
-      padding: 40px 20px 30px;
+      padding: 45px 20px 30px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative;
+      z-index: 1;
     }
 
     .pill-badge {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: #a1a1aa;
       padding: 6px 16px;
@@ -111,6 +123,8 @@
       margin: 0 auto;
       padding: 0 20px 60px;
       width: 100%;
+      position: relative;
+      z-index: 1;
     }
 
     .section-title {
@@ -139,46 +153,82 @@
       .tools-grid { grid-template-columns: 1fr; }
     }
 
-    /* Cards Links Styling */
+    /* Cards Links Styling (Redesigned for Premium Smooth Hover Feel) */
     .tool-card {
       background: #0d0f17;
       border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 16px;
-      padding: 22px;
+      border-radius: 18px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
-      transition: all 0.25s ease;
       text-decoration: none;
       color: inherit;
+      position: relative;
+      overflow: hidden;
+      transform: translateY(0);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Subtle top light reflection line inside cards */
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
     .tool-card:hover {
-      border-color: rgba(255, 255, 255, 0.18);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      border-color: rgba(255, 45, 45, 0.35);
+      background: linear-gradient(145deg, #121522 0%, #0d0f17 100%);
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 45, 45, 0.08);
+    }
+
+    .tool-card:hover::before {
+      opacity: 1;
     }
 
     .tool-card.pro-card {
-      border-color: rgba(234, 179, 8, 0.3);
+      border-color: rgba(234, 179, 8, 0.25);
       background: linear-gradient(180deg, rgba(234, 179, 8, 0.03) 0%, #0d0f17 100%);
+    }
+    .tool-card.pro-card:hover {
+      border-color: rgba(234, 179, 8, 0.6);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7), 0 0 25px rgba(234, 179, 8, 0.12);
     }
 
     .icon-box {
-      width: 38px;
-      height: 38px;
-      background: rgba(255, 45, 45, 0.1);
-      border-radius: 10px;
+      width: 42px;
+      height: 42px;
+      background: rgba(255, 45, 45, 0.08);
+      border: 1px solid rgba(255, 45, 45, 0.12);
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #ff2d2d;
-      font-size: 15px;
+      font-size: 16px;
       margin-bottom: 18px;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s;
+    }
+
+    .tool-card:hover .icon-box {
+      transform: scale(1.1) rotate(-4deg);
+      background: rgba(255, 45, 45, 0.15);
+      border-color: rgba(255, 45, 45, 0.3);
     }
 
     .pro-card .icon-box {
-      background: rgba(234, 179, 8, 0.1);
+      background: rgba(234, 179, 8, 0.08);
+      border-color: rgba(234, 179, 8, 0.15);
       color: #eab308;
+    }
+    .pro-card:hover .icon-box {
+      background: rgba(234, 179, 8, 0.18);
+      border-color: rgba(234, 179, 8, 0.35);
     }
 
     .tool-title {
@@ -186,14 +236,27 @@
       font-weight: 700;
       margin-bottom: 6px;
       color: #fff;
+      transition: color 0.2s;
+    }
+
+    .tool-card:hover .tool-title {
+      color: #ff4d4d;
+    }
+    .pro-card:hover .tool-title {
+      color: #facc15;
     }
 
     .tool-desc {
       font-size: 12px;
       color: #71717a;
       line-height: 1.5;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
       flex: 1;
+      transition: color 0.2s;
+    }
+
+    .tool-card:hover .tool-desc {
+      color: #94a3b8;
     }
 
     .tool-link {
@@ -203,6 +266,11 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      transition: gap 0.2s ease;
+    }
+
+    .tool-card:hover .tool-link {
+      gap: 10px;
     }
 
     .pro-card .tool-link { color: #eab308; }
@@ -214,6 +282,8 @@
       font-size: 12px;
       border-top: 1px solid rgba(255, 255, 255, 0.04);
       margin-top: auto;
+      position: relative;
+      z-index: 1;
     }
   </style>
 </head>
@@ -234,7 +304,7 @@
   <header class="hero-section">
     <div class="pill-badge">Complete Creator Workspace</div>
     <h1 class="hero-title">View49 Creator Suite</h1>
-    <p class="hero-subtitle">Access all power tools from one centralized dashboard.</p>
+    <p class="hero-subtitle">Access all 20+ power tools from one centralized dashboard.</p>
   </header>
 
   <main class="dashboard-container">
@@ -253,28 +323,28 @@
         <div class="tool-link">View Trending &rarr;</div>
       </a>
 
-      <!-- 2. youtube-shorts -->
+      <!-- 2. YouTube Shorts Explorer -->
       <a href="youtube-shorts.html" class="tool-card">
-        <div class="icon-box"><i class="fa-solid fa-mobile-screen" style="color:var(--purple);"></i></div>
+        <div class="icon-box"><i class="fa-solid fa-mobile-screen"></i></div>
         <div class="tool-title">YouTube Shorts Explorer</div>
-        <div class="tool-desc">Track and explore top performing viral YouTube Shorts by region.</div>
+        <div class="tool-desc">Discover viral shorts and track real-time short-form content growth.</div>
         <div class="tool-link">Explore Shorts &rarr;</div>
       </a>
 
-      <!-- 3. youtube multi viewer -->
+      <!-- 3. YouTube Multi-Viewer -->
       <a href="youtube-multi-viewer.html" class="tool-card">
         <div class="icon-box"><i class="fa-solid fa-border-all"></i></div>
         <div class="tool-title">YouTube Multi-Viewer</div>
-        <div class="tool-desc">Watch and monitor multiple YouTube streams at once.</div>
+        <div class="tool-desc">Watch and monitor multiple YouTube streams and videos simultaneously.</div>
         <div class="tool-link">Open Grid &rarr;</div>
       </a>
 
-      <!-- 4. YouTube Analytics & Revenue Studio -->
-      <a href="analytics-studio.html" class="tool-card">
-        <div class="icon-box"><i class="fa-solid fa-chart-line"></i></div>
-        <div class="tool-title">YouTube Engagement Calculator</div>
-        <div class="tool-desc">Track channel statistics, subscriber velocity, and growth diagnostics.</div>
-        <div class="tool-link">View Analytics &rarr;</div>
+      <!-- 4. Engagement Calculator -->
+      <a href="engagement-calculator.html" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-calculator"></i></div>
+        <div class="tool-title">Engagement Calculator</div>
+        <div class="tool-desc">Calculate like-to-view ratios and audience interaction metrics.</div>
+        <div class="tool-link">Calculate Rate &rarr;</div>
       </a>
 
       <!-- 5. AI Content Multiplier -->
@@ -285,7 +355,7 @@
         <div class="tool-link">Multiply Content &rarr;</div>
       </a>
 
-      <!-- 6. youtube sec checker -->
+      <!-- 6. YouTube SEO Checker -->
       <a href="youtube-seo-checker.html" class="tool-card">
         <div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i></div>
         <div class="tool-title">YouTube SEO Checker</div>
@@ -323,6 +393,13 @@
         <div class="tool-link">Shorten Link &rarr;</div>
       </a>
 
+      <a href="analytics-studio.html" class="tool-card">
+        <div class="icon-box"><i class="fa-solid fa-chart-line"></i></div>
+        <div class="tool-title">Analytics Studio</div>
+        <div class="tool-desc">Track channel statistics, subscriber velocity, and growth diagnostics.</div>
+        <div class="tool-link">View Analytics &rarr;</div>
+      </a>
+
       <a href="shorts-auto-cutter.html" class="tool-card">
         <div class="icon-box"><i class="fa-solid fa-film"></i></div>
         <div class="tool-title">Shorts Auto-Cutter</div>
@@ -349,13 +426,6 @@
         <div class="tool-title">Content Idea Generator</div>
         <div class="tool-desc">Generate viral video topics tailored to your channel.</div>
         <div class="tool-link">Generate Ideas &rarr;</div>
-      </a>
-
-      <a href="engagement-calculator.html" class="tool-card">
-        <div class="icon-box"><i class="fa-solid fa-calculator"></i></div>
-        <div class="tool-title">Engagement Calculator</div>
-        <div class="tool-desc">Calculate like-to-view ratios and audience interaction metrics.</div>
-        <div class="tool-link">Calculate Rate &rarr;</div>
       </a>
 
       <a href="screenshot-editor.html" class="tool-card">
@@ -389,7 +459,7 @@
       <a href="upi-qr.html" class="tool-card">
         <div class="icon-box"><i class="fa-solid fa-qrcode"></i></div>
         <div class="tool-title">UPI QR Generator</div>
-        <div class="tool-desc">Payment QR codes for creator support.</div>
+        <div class="tool-desc">Generate payment QR codes for creator support.</div>
         <div class="tool-link">Get QR &rarr;</div>
       </a>
 
