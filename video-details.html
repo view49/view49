@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View49 Pro — Video Details</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    :root {
+      --bg: #08090d; --surface: #0d0f17; --surface-2: #14141f; --surface-3: #1a1a28;
+      --accent: #ff2d2d; --accent-2: #b91c1c; --text: #f4f4f5; --muted: #71717a;
+      --muted-2: #a1a1aa; --border: rgba(255,255,255,0.06); --border-hover: rgba(255,255,255,0.18);
+      --green: #00d97e; --blue: #3b82f6; --yellow: #fbbf24; --gold: #eab308; --purple: #a855f7;
+    }
+
+    body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; top: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(255,45,45,0.08) 0%, transparent 70%); z-index: 0; pointer-events: none; }
+    body::after { content: ''; position: fixed; bottom: -300px; left: -200px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(185,28,28,0.06) 0%, transparent 70%); z-index: 0; pointer-events: none; }
+
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 6%; background: rgba(8,9,13,0.85); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
+    .logo { font-size: 22px; font-weight: 800; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .logo span { color: var(--accent); }
+    .logo .pro-badge { background: linear-gradient(135deg, var(--gold), #f59e0b); color: #000; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; margin-left: 4px; }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-links a { color: var(--muted-2); text-decoration: none; font-size: 13px; font-weight: 600; transition: color 0.2s; }
+    .nav-links a:hover { color: #fff; }
+    .btn-upgrade { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%); color: #fff !important; padding: 8px 18px; border-radius: 30px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 18px rgba(255,45,45,0.35); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px 20px 60px; position: relative; z-index: 1; }
+
+    .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--muted-2); text-decoration: none; font-size: 13px; font-weight: 600; margin-bottom: 20px; transition: color 0.2s; }
+    .back-link:hover { color: var(--accent); }
+
+    /* Video Header Card */
+    .video-header { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 28px; margin-bottom: 20px; position: relative; overflow: hidden; }
+    .video-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+    .vh-top { display: flex; gap: 24px; align-items: start; flex-wrap: wrap; }
+    .vh-thumb { width: 280px; min-width: 200px; height: 158px; background: var(--surface-3); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 56px; color: var(--surface-3); flex-shrink: 0; overflow: hidden; position: relative; }
+    .vh-thumb .play-badge { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); }
+    .vh-thumb .play-badge i { width: 50px; height: 50px; background: rgba(255,45,45,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; }
+    .vh-info { flex: 1; min-width: 250px; }
+    .vh-rank { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; font-size: 13px; font-weight: 800; padding: 5px 14px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 12px rgba(255,45,45,0.4); }
+    .vh-title { font-size: 22px; font-weight: 800; line-height: 1.3; margin-bottom: 10px; }
+    .vh-channel { font-size: 14px; color: var(--muted-2); font-weight: 600; margin-bottom: 16px; }
+    .vh-channel i { color: var(--blue); font-size: 12px; }
+    .vh-meta-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .vh-meta { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+    .vh-meta i { color: var(--accent); }
+    .vh-cat { font-size: 11px; padding: 3px 10px; border-radius: 6px; font-weight: 700; }
+    .vh-cat.sports { background: rgba(0,217,126,0.1); color: var(--green); }
+    .vh-cat.tech { background: rgba(59,130,246,0.1); color: var(--blue); }
+    .vh-cat.gaming { background: rgba(168,85,247,0.1); color: var(--purple); }
+    .vh-cat.music { background: rgba(236,72,153,0.1); color: #ec4899; }
+    .vh-cat.entertainment { background: rgba(251,191,36,0.1); color: var(--yellow); }
+    .vh-cat.finance { background: rgba(0,217,126,0.1); color: var(--green); }
+    .vh-cat.food { background: rgba(255,120,50,0.1); color: #ff7832; }
+    .vh-cat.travel { background: rgba(59,130,246,0.1); color: var(--blue); }
+    .vh-cat.fitness { background: rgba(255,45,45,0.1); color: var(--accent); }
+    .vh-cat.education { background: rgba(139,92,246,0.1); color: #8b5cf6; }
+    .vh-cat.comedy { background: rgba(251,191,36,0.1); color: var(--yellow); }
+    .vh-cat.auto { background: rgba(148,163,184,0.1); color: #94a3b8; }
+    .vh-cat.nature { background: rgba(0,217,126,0.1); color: var(--green); }
+    .vh-cat.beauty { background: rgba(236,72,153,0.1); color: #ec4899; }
+
+    /* Stats Row */
+    .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+    @media (max-width: 800px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 500px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; transition: all 0.25s; position: relative; overflow: hidden; }
+    .stat-box::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+    .stat-box:hover { border-color: var(--border-hover); transform: translateY(-3px); }
+    .stat-box .val { font-size: 22px; font-weight: 800; color: var(--accent); }
+    .stat-box .lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+    .stat-box .icon { font-size: 14px; margin-bottom: 4px; }
+
+    /* Card */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden; }
+    .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0.5; }
+    .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+    .card h3 i { color: var(--accent); }
+    .card p.desc { color: var(--muted); font-size: 12px; margin-bottom: 18px; }
+
+    /* Chart */
+    .chart-container { position: relative; padding: 10px 0; }
+    .chart-svg { width: 100%; height: 280px; }
+    .chart-legend { display: flex; gap: 20px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted-2); font-weight: 600; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+
+    /* Tags */
+    .tag-list { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag-chip { background: var(--surface-2); border: 1px solid var(--border); color: var(--blue); font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 8px; transition: all 0.2s; cursor: pointer; }
+    .tag-chip:hover { border-color: var(--blue); transform: translateY(-1px); }
+    .tag-chip.hashtag { color: var(--accent); }
+    .tag-chip.hashtag:hover { border-color: var(--accent); }
+    .tag-chip.keyword { color: var(--green); }
+    .tag-chip.keyword:hover { border-color: var(--green); }
+
+    /* Description */
+    .desc-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; font-size: 13px; line-height: 1.7; color: #d4d4d8; white-space: pre-wrap; }
+    .desc-box .timestamp { color: var(--blue); font-weight: 600; }
+
+    /* Engagement bars */
+    .engagement-row { margin-bottom: 14px; }
+    .engagement-label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+    .engagement-label span:first-child { color: var(--muted-2); display: flex; align-items: center; gap: 6px; }
+    .engagement-label span:last-child { color: var(--text); font-weight: 700; }
+    .engagement-bar { width: 100%; height: 8px; background: var(--surface-3); border-radius: 4px; overflow: hidden; }
+    .engagement-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+
+    /* Section heading */
+    .section-h { font-size: 13px; font-weight: 700; color: var(--muted-2); text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 12px; display: flex; align-items: center; gap: 8px; }
+    .section-h::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* Copy button */
+    .copy-btn { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--muted-2); padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: all 0.2s; font-family: inherit; white-space: nowrap; }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.25s; font-family: inherit; display: inline-flex; align-items: center; gap: 8px; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,45,45,0.35); }
+    .btn-outline { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); color: var(--text); }
+    .btn-outline:hover { border-color: var(--accent); box-shadow: none; }
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 14px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 1000; transition: transform 0.3s; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--green); }
+
+    footer { text-align: center; padding: 28px; color: #3f3f46; font-size: 12px; border-top: 1px solid var(--border); margin-top: 20px; position: relative; z-index: 1; }
+
+    /* Timeline */
+    .timeline { display: flex; gap: 4px; margin-top: 16px; align-items: end; height: 60px; }
+    .timeline-bar { flex: 1; background: linear-gradient(180deg, var(--accent), var(--accent-2)); border-radius: 4px 4px 0 0; min-height: 4px; transition: all 0.3s; cursor: pointer; position: relative; }
+    .timeline-bar:hover { opacity: 0.8; transform: scaleY(1.05); transform-origin: bottom; }
+    .timeline-bar::after { content: attr(data-label); position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 9px; color: var(--muted); white-space: nowrap; }
+    .timeline-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 24px; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-bolt" style="color:var(--accent);"></i> View<span>49</span>
+      <span class="pro-badge">PRO</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Dashboard</a>
+      <a href="youtube-trending.html">Trending</a>
+      <a href="premium.html" class="btn-upgrade"><i class="fa-solid fa-crown"></i> Upgrade Pro</a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <a href="youtube-trending.html" class="back-link">
+      <i class="fa-solid fa-arrow-left"></i> Back to Trending
+    </a>
+
+    <div id="detailsContent"></div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <footer>© 2026 View49 Creator Suite Pro. All rights reserved.</footer>
+
+  <script>
+    function showToast(msg, type) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show ' + (type || '');
+      setTimeout(function() { t.className = 'toast ' + (type || ''); }, 3000);
+    }
+
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = '✓ Copied!';
+        setTimeout(function() { btn.textContent = '📋 Copy All'; }, 2000);
+      });
+    }
+
+    function formatViews(v) {
+      if (v >= 10000000) return (v / 10000000).toFixed(1) + ' Cr';
+      if (v >= 100000) return (v / 100000).toFixed(1) + ' L';
+      if (v >= 1000) return (v / 1000).toFixed(1) + 'K';
+      return v.toString();
+    }
+
+    function catClass(cat) {
+      var c = (cat || '').toLowerCase();
+      var map = { sports:'sports', tech:'tech', technology:'tech', gaming:'gaming', music:'music', entertainment:'entertainment', finance:'finance', food:'food', travel:'travel', fitness:'fitness', education:'education', comedy:'comedy', auto:'auto', nature:'nature', beauty:'beauty' };
+      return map[c] || 'entertainment';
+    }
+
+    function thumbIcon(cat) {
+      var c = (cat || '').toLowerCase();
+      var map = { sports:'fa-futbol', tech:'fa-microchip', technology:'fa-microchip', gaming:'fa-gamepad', music:'fa-music', entertainment:'fa-film', finance:'fa-indian-rupee-sign', food:'fa-utensils', travel:'fa-plane', fitness:'fa-dumbbell', education:'fa-graduation-cap', comedy:'fa-face-laugh', auto:'fa-car', nature:'fa-tree', beauty:'fa-spray-can' };
+      return map[c] || 'fa-video';
+    }
+
+    // ===== VIDEO DATABASE (with full analytics) =====
+    var videoDB = {
+      "IN1": {
+        id: "IN1", rank: 1, title: "India vs Pakistan Cricket Match Highlights — Last Over THRILLER!", channel: "Sports Today", views: 12500000, likes: 850000, comments: 45000, shares: 120000, duration: "12:45", category: "Sports", uploadedDays: 2,
+        tags: ["india vs pakistan", "cricket highlights", "last over", "ind vs pak", "cricket match", "sports today", "cricket 2026", "india cricket", "pakistan cricket", "last over thriller", "cricket highlights 2026", "ind vs pak highlights"],
+        keywords: ["india pakistan cricket", "cricket highlights", "last over thriller", "ind vs pak match", "cricket 2026 highlights", "india cricket team", "pakistan cricket", "sports highlights", "cricket last over", "t20 cricket"],
+        hashtags: ["#IndVsPak", "#CricketHighlights", "#LastOver", "#IndiaCricket", "#PakistanCricket", "#Cricketer", "#T20WorldCup", "#SportsToday", "#Cricket2026", "#Trending"],
+        description: "India vs Pakistan Cricket Match Highlights — Last Over THRILLER! 🔥\n\nWatch the most exciting last over between India and Pakistan. This match had everything — sixes, wickets, and a finish you won't believe!\n\n⏱️ Chapters:\n00:00 — Match Intro\n02:15 — First Innings Highlights\n06:30 — Key Wickets\n09:00 — Last Over THRILLER\n11:45 — Post Match Analysis\n\n📌 Related Videos:\n• Top 10 Cricket Moments of 2026\n• India vs Australia Full Match\n• Best Last Overs in Cricket History\n\n#IndVsPak #CricketHighlights #LastOver #IndiaCricket #PakistanCricket\n\nDon't forget to LIKE, SHARE & SUBSCRIBE! 🔔\n\n📝 About Sports Today:\nSports Today brings you the best cricket highlights, match analysis, and sports content from around the world.",
+        growth: [ { day: "Day 1", views: 3200000, likes: 180000, comments: 12000 }, { day: "Day 2", views: 7200000, likes: 420000, comments: 28000 }, { day: "Day 3", views: 9800000, likes: 620000, comments: 38000 }, { day: "Day 4", views: 11200000, likes: 750000, comments: 42000 }, { day: "Day 5", views: 12500000, likes: 850000, comments: 45000 } ]
+      },
+      "IN2": {
+        id: "IN2", rank: 2, title: "Bigg Boss 17 Full Episode Today — Big FIGHT in House!", channel: "Colors TV", views: 8900000, likes: 320000, comments: 89000, shares: 45000, duration: "44:12", category: "Entertainment", uploadedDays: 1,
+        tags: ["bigg boss 17", "bigg boss full episode", "bigg boss fight", "colors tv", "bigg boss today", "bigg boss 2026", "reality show", "salman khan", "bigg boss episode", "bigg boss latest"],
+        keywords: ["bigg boss 17", "bigg boss full episode today", "bigg boss fight", "bigg boss 2026", "colors tv bigg boss", "reality show highlights", "bigg boss latest episode", "salman khan bigg boss", "bigg boss contestants", "bigg boss elimination"],
+        hashtags: ["#BiggBoss17", "#BiggBoss", "#ColorsTV", "#BiggBossFight", "#RealityShow", "#SalmanKhan", "#BiggBoss2026", "#BiggBossToday", "#Entertainment", "#Trending"],
+        description: "Bigg Boss 17 Full Episode Today — Big FIGHT in House! 🔥\n\nToday's episode was full of drama! Watch the biggest fight of the season unfold between contestants.\n\n⏱️ Chapters:\n00:00 — Episode Start\n05:30 — Morning Task\n15:00 — Big FIGHT Breaks Out\n28:00 — Captaincy Task\n38:00 — Salman Khan's Verdict\n\n📌 Related Videos:\n• Bigg Boss 17 Yesterday Episode\n• Bigg Boss Weekend Ka Vaar\n• Bigg Boss Best Moments\n\n#BiggBoss17 #BiggBoss #ColorsTV #BiggBossFight\n\nSubscribe to Colors TV for daily episodes! 🔔",
+        growth: [ { day: "1 hr", views: 1200000, likes: 35000, comments: 12000 }, { day: "6 hrs", views: 3400000, likes: 120000, comments: 38000 }, { day: "12 hrs", views: 5800000, likes: 220000, comments: 58000 }, { day: "18 hrs", views: 7600000, likes: 280000, comments: 76000 }, { day: "24 hrs", views: 8900000, likes: 320000, comments: 89000 } ]
+      },
+      "IN3": {
+        id: "IN3", rank: 3, title: "I Bought Everything in a Village Shop for 24 Hours!", channel: "Ashish Chanchlani", views: 7200000, likes: 580000, comments: 32000, shares: 89000, duration: "18:33", category: "Comedy", uploadedDays: 3,
+        tags: ["ashish chanchlani", "village shop", "comedy video", "funny video", "indian comedy", "24 hours challenge", "buy everything", "village life", "ashish chanchlani vines", "comedy 2026"],
+        keywords: ["ashish chanchlani", "village shop challenge", "comedy video 2026", "funny indian video", "24 hours challenge", "buy everything challenge", "indian comedy youtuber", "village life india", "ashish chanchlani new video", "comedy sketches"],
+        hashtags: ["#AshishChanchlani", "#ComedyVideo", "#VillageLife", "#FunnyVideo", "#IndianComedy", "#24HoursChallenge", "#Comedy2026", "#ViralVideo", "#Trending", "#YouTubeComedy"],
+        description: "I Bought Everything in a Village Shop for 24 Hours! 🛒\n\nWent to a small village and tried to buy EVERYTHING in the shop! The shopkeeper's reaction was priceless 😂\n\n⏱️ Chapters:\n00:00 — Intro\n01:30 — Reaching the Village\n04:00 — Entering the Shop\n07:00 — Buying Everything\n12:00 — Shopkeeper's Reaction\n15:30 — Final Bill Reveal\n\n📌 Related Videos:\n• I Lived in a Village for 7 Days\n• Buying Everything in a Mall\n• Village Food Challenge\n\n#AshishChanchlani #ComedyVideo #VillageLife\n\nFollow me on Instagram @ashishchanchlani\nSubscribe for more comedy videos! 🔔",
+        growth: [ { day: "Day 1", views: 2100000, likes: 150000, comments: 9000 }, { day: "Day 2", views: 4500000, likes: 340000, comments: 20000 }, { day: "Day 3", views: 7200000, likes: 580000, comments: 32000 } ]
+      },
+      "IN4": {
+        id: "IN4", rank: 4, title: "Stock Market Crash 2026 — What Should Investors Do?", channel: "Pranjal Kamra", views: 5400000, likes: 280000, comments: 18000, shares: 65000, duration: "22:10", category: "Finance", uploadedDays: 4,
+        tags: ["stock market crash", "stock market 2026", "investing in 2026", "share market", "stock market analysis", "nifty crash", "sensex crash", "investment strategy", "stock market tips", "pranjal kamra"],
+        keywords: ["stock market crash 2026", "what to do in stock market crash", "investment strategy 2026", "nifty crash analysis", "sensex crash", "share market tips", "stock market for beginners", "pranjal kamra stock market", "investment advice", "market correction"],
+        hashtags: ["#StockMarketCrash", "#StockMarket", "#Investing", "#NiftyCrash", "#ShareMarket", "#InvestmentStrategy", "#StockMarket2026", "#FinanceTips", "#PranjalKamra", "#Trending"],
+        description: "Stock Market Crash 2026 — What Should Investors Do? 📉\n\nThe market is crashing and investors are panicking. But should you panic or is this an opportunity? In this video, I explain everything.\n\n⏱️ Chapters:\n00:00 — Market Crash Overview\n03:00 — Why is Market Falling?\n08:00 — Historical Crashes Comparison\n14:00 — What Should Investors Do?\n18:00 — Stocks to Buy in Crash\n20:00 — Final Advice\n\n📌 Related Videos:\n• Best Stocks to Buy in 2026\n• How to Start Investing with ₹1000\n• Nifty 50 Analysis\n\n#StockMarketCrash #StockMarket #Investing\n\nDisclaimer: This is educational content, not financial advice. Please consult a SEBI-registered advisor before investing.\n\nSubscribe for more finance content! 📊",
+        growth: [ { day: "Day 1", views: 1500000, likes: 70000, comments: 5000 }, { day: "Day 2", views: 2800000, likes: 150000, comments: 10000 }, { day: "Day 3", views: 4200000, likes: 230000, comments: 15000 }, { day: "Day 4", views: 5400000, likes: 280000, comments: 18000 } ]
+      },
+      "IN5": {
+        id: "IN5", rank: 5, title: "BGMI Pro Tournament Finals — Insane Clutch!", channel: "ScoutOP", views: 4800000, likes: 420000, comments: 21000, shares: 55000, duration: "28:55", category: "Gaming", uploadedDays: 2,
+        tags: ["bgmi", "bgmi tournament", "bgmi pro", "scoutop", "bgmi clutch", "pubg mobile", "bgmi finals", "esports india", "bgmi gameplay", "gaming tournament"],
+        keywords: ["bgmi pro tournament", "bgmi clutch", "scoutop bgmi", "bgmi finals 2026", "pubg mobile india", "bgmi esports", "gaming tournament india", "bgmi gameplay", "bgmi highlights", "scoutop clutch"],
+        hashtags: ["#BGMI", "#BGMITournament", "#ScoutOP", "#BGMIClutch", "#PUBGMobile", "#EsportsIndia", "#Gaming", "#BGMI2026", "#Trending", "#ProGaming"],
+        description: "BGMI Pro Tournament Finals — Insane Clutch! 🎮\n\nWatch ScoutOP pull off the most insane 1v4 clutch in the BGMI Pro Tournament Finals! This was the highlight of the entire tournament.\n\n⏱️ Chapters:\n00:00 — Match Start\n05:00 — Early Game Strategy\n12:00 — Zone Push\n18:00 — THE CLUTCH (1v4)\n24:00 — Post Match Analysis\n\n📌 Related Videos:\n• BGMI Best Clutches 2026\n• ScoutOP Best Moments\n• BGMI Tournament Highlights\n\n#BGMI #BGMITournament #ScoutOP #Gaming\n\nFollow ScoutOP on social media for more gaming content! 🎮",
+        growth: [ { day: "Day 1", views: 1800000, likes: 140000, comments: 8000 }, { day: "Day 2", views: 4800000, likes: 420000, comments: 21000 } ]
+      },
+      "IN6": {
+        id: "IN6", rank: 6, title: "New iPhone 17 Launch — Full Specs & Price in India", channel: "Technical Guruji", views: 4100000, likes: 190000, comments: 24000, shares: 38000, duration: "15:20", category: "Tech", uploadedDays: 3,
+        tags: ["iphone 17", "iphone 17 launch", "iphone 17 specs", "iphone 17 price india", "apple iphone 17", "technical guruji", "iphone 17 review", "iphone 17 features", "apple launch 2026", "iphone 17 pro"],
+        keywords: ["iphone 17 launch", "iphone 17 specs", "iphone 17 price in india", "iphone 17 review", "technical guruji iphone 17", "apple iphone 17 features", "iphone 17 pro max", "iphone 17 vs iphone 16", "apple launch event 2026", "iphone 17 camera"],
+        hashtags: ["#iPhone17", "#AppleEvent", "#TechnicalGuruji", "#iPhone17Launch", "#iPhone17Specs", "#Apple2026", "#iPhone17Price", #TechReview", "#iPhone", "#Trending"],
+        description: "New iPhone 17 Launch — Full Specs & Price in India! 📱\n\nApple has finally launched the iPhone 17! In this video, I cover everything — specs, features, price in India, and whether you should upgrade.\n\n⏱️ Chapters:\n00:00 — iPhone 17 Launch Overview\n02:00 — Design & Display\n05:00 — Camera Specs\n08:00 — Performance & Chip\n10:00 — Price in India\n12:00 — Should You Buy?\n14:00 — Final Verdict\n\n📌 Related Videos:\n• iPhone 17 Pro Max Review\n• iPhone 17 vs Android Flagship\n• Best iPhones to Buy in 2026\n\n#iPhone17 #AppleEvent #TechnicalGuruji\n\nFollow Technical Guruji for latest tech updates! 📱",
+        growth: [ { day: "Day 1", views: 1200000, likes: 50000, comments: 7000 }, { day: "Day 2", views: 2600000, likes: 120000, comments: 15000 }, { day: "Day 3", views: 4100000, likes: 190000, comments: 24000 } ]
+      },
+      "IN7": {
+        id: "IN7", rank: 7, title: "30 Day Body Transformation Challenge — Day 1", channel: "FitMuscle TV", views: 3600000, likes: 240000, comments: 15000, shares: 42000, duration: "10:45", category: "Fitness", uploadedDays: 5,
+        tags: ["30 day transformation", "body transformation", "fitness challenge", "workout plan", "fitmuscle tv", "30 day workout", "home workout", "weight loss", "fitness journey", "body transformation 30 days"],
+        keywords: ["30 day body transformation", "fitness challenge 2026", "30 day workout plan", "home workout transformation", "body transformation journey", "weight loss challenge", "fitmuscle tv workout", "30 day fitness challenge", "beginner workout plan", "transformation results"],
+        hashtags: ["#30DayTransformation", "#FitnessChallenge", "#WorkoutPlan", "#BodyTransformation", "#FitMuscleTV", "#30DayChallenge", "#FitnessJourney", "#HomeWorkout", "#WeightLoss", "#Trending"],
+        description: "30 Day Body Transformation Challenge — Day 1 💪\n\nStarting a 30 day body transformation challenge! Watch me go from day 1 to day 30 with a proper workout and diet plan.\n\n⏱️ Chapters:\n00:00 — Intro & My Current Body\n02:00 — 30 Day Plan Overview\n05:00 — Day 1 Workout (Full Body)\n08:00 — Diet Plan\n09:30 — Final Measurements\n\n📌 Related Videos:\n• 30 Day Transformation Results\n• Home Workout No Equipment\n• Diet Plan for Weight Loss\n\n#30DayTransformation #FitnessChallenge #WorkoutPlan\n\nSubscribe and follow the journey! 💪",
+        growth: [ { day: "Day 1", views: 800000, likes: 45000, comments: 3000 }, { day: "Day 2", views: 1500000, likes: 90000, comments: 6000 }, { day: "Day 3", views: 2200000, likes: 150000, comments: 9000 }, { day: "Day 4", views: 2900000, likes: 200000, comments: 12000 }, { day: "Day 5", views: 3600000, likes: 240000, comments: 15000 } ]
+      },
+      "IN8": {
+        id: "IN8", rank: 8, title: "Mumbai Street Food Tour — Best Vada Pav in the City!", channel: "Foodie Inc", views: 2900000, likes: 180000, comments: 8500, shares: 28000, duration: "16:30", category: "Food", uploadedDays: 6,
+        tags: ["mumbai street food", "vada pav", "street food tour", "mumbai food", "indian street food", "foodie inc", "best vada pav mumbai", "street food india", "mumbai vada pav", "food vlog"],
+        keywords: ["mumbai street food tour", "best vada pav in mumbai", "street food india", "mumbai food vlog", "indian street food", "vada pav recipe", "foodie inc mumbai", "street food tour 2026", "mumbai food guide", "best street food india"],
+        hashtags: ["#MumbaiStreetFood", "#VadaPav", "#StreetFood", #MumbaiFood", "#IndianStreetFood", "#FoodieInc", "#FoodVlog", "#StreetFoodTour", "#MumbaiVadaPav", "#Trending"],
+        description: "Mumbai Street Food Tour — Best Vada Pav in the City! 🍔\n\nWent on a street food tour across Mumbai to find the BEST vada pav! From Ashok Vada Pav to Shivaji Vada Pav — we tried them all!\n\n⏱️ Chapters:\n00:00 — Intro\n01:00 — Ashok Vada Pav (Dadar)\n04:00 — Shivaji Vada Pav (VT)\n07:00 — Aaram Vada Pav (CST)\n10:00 — Graduate Vada Pav (Byculla)\n13:00 — Final Verdict\n15:00 — Best Vada Pav Winner\n\n📌 Related Videos:\n• Delhi Street Food Tour\n• Best Pav Bhaji in Mumbai\n• Indian Street Food Challenge\n\n#MumbaiStreetFood #VadaPav #StreetFood\n\nSubscribe to Foodie Inc for more food adventures! 🍽️",
+        growth: [ { day: "Day 1", views: 600000, likes: 35000, comments: 1500 }, { day: "Day 2", views: 1200000, likes: 75000, comments: 3500 }, { day: "Day 3", views: 1800000, likes: 110000, comments: 5500 }, { day: "Day 4", views: 2300000, likes: 145000, comments: 7000 }, { day: "Day 5", views: 2600000, likes: 165000, comments: 8000 }, { day: "Day 6", views: 2900000, likes: 180000, comments: 8500 } ]
+      },
+      "IN9": {
+        id: "IN9", rank: 9, title: "JEE Mains 2026 — Last 30 Days Strategy to Score 99%", channel: "Unacademy", views: 2500000, likes: 145000, comments: 12000, shares: 35000, duration: "31:22", category: "Education", uploadedDays: 4,
+        tags: ["jee mains 2026", "jee preparation", "jee last 30 days", "jee strategy", "unacademy jee", "jee mains tips", "iit jee preparation", "jee study plan", "jee 99 percentile", "jee mains strategy"],
+        keywords: ["jee mains 2026 strategy", "last 30 days jee preparation", "jee mains tips 2026", "how to score 99 percentile in jee", "jee study plan", "unacademy jee preparation", "iit jee last month strategy", "jee mains important topics", "jee preparation tips", "jee time table"],
+        hashtags: ["#JEEMains2026", "#JEEPreparation", "#Unacademy", "#JEETips", "#IITJEE", "#JEE99Percentile", "#JEEStudyPlan", "#JEEMains", "#Education", "#Trending"],
+        description: "JEE Mains 2026 — Last 30 Days Strategy to Score 99%! 📚\n\nOnly 30 days left for JEE Mains? Here's my complete strategy to maximize your score in the last month.\n\n⏱️ Chapters:\n00:00 — Last 30 Days Overview\n04:00 — Subject-wise Strategy\n10:00 — Physics Important Topics\n15:00 — Chemistry Important Topics\n20:00 — Math Important Topics\n25:00 — Daily Study Plan\n28:00 — Mock Test Strategy\n30:00 — Final Tips\n\n📌 Related Videos:\n• JEE Mains Full Revision\n• Physics Important Questions\n• JEE Previous Year Analysis\n\n#JEEMains2026 #JEEPreparation #Unacademy\n\nDownload Unacademy app for more JEE content! 📚",
+        growth: [ { day: "Day 1", views: 700000, likes: 40000, comments: 3000 }, { day: "Day 2", views: 1500000, likes: 85000, comments: 6000 }, { day: "Day 3", views: 2100000, likes: 120000, comments: 10000 }, { day: "Day 4", views: 2500000, likes: 145000, comments: 12000 } ]
+      },
+      "IN10": {
+        id: "IN10", rank: 10, title: "BTS Concert India 2026 — Full Performance Live!", channel: "BTS Official", views: 2100000, likes: 380000, comments: 22000, shares: 48000, duration: "1:12:40", category: "Music", uploadedDays: 3,
+        tags: ["bts concert india", "bts live performance", "bts 2026", "bts full concert", "bts india", "bts concert mumbai", "bts dynamite", "bts butter", "bts live", "kpop concert india"],
+        keywords: ["bts concert india 2026", "bts live performance", "bts full concert", "bts mumbai concert", "bts dynamite live", "bts butter performance", "kpop concert india", "bts india tour", "bts live stream", "bts concert highlights"],
+        hashtags: ["#BTS", "#BTSConcertIndia", "#BTSLive", "#BTS2026", "#BTSArmy", "#KPopIndia", "#BTSMumbai", "#Dynamite", "#BTSPerformance", "#Trending"],
+        description: "BTS Concert India 2026 — Full Performance Live! 🎤\n\nBTS performed live in India for the first time! Watch the full concert with performances of Dynamite, Butter, DNA and more!\n\n⏱️ Chapters:\n00:00 — Concert Opening\n05:00 — Dynamite Performance\n15:00 — Butter Performance\n25:00 — DNA Performance\n35:00 — Boy With Luv\n45:00 — Special Message to Indian ARMY\n50:00 — Mic Drop Performance\n1:00:00 — Encore & Outro\n\n📌 Related Videos:\n• BTS Behind the Scenes India\n• BTS Best Performances 2026\n• K-Pop Concert Highlights\n\n#BTS #BTSConcertIndia #BTSArmy\n\nSubscribe to BTS Official for more content! 💜",
+        growth: [ { day: "Day 1", views: 600000, likes: 100000, comments: 6000 }, { day: "Day 2", views: 1400000, likes: 250000, comments: 14000 }, { day: "Day 3", views: 2100000, likes: 380000, comments: 22000 } ]
+      }
+    };
+
+    // ===== RENDER DETAILS =====
+    function renderDetails() {
+      var params = new URLSearchParams(window.location.search);
+      var vid = params.get('v');
+      var video = videoDB[vid];
+      if (!video) {
+        document.getElementById('detailsContent').innerHTML = '<div class="card" style="text-align:center;padding:60px;"><i class="fa-solid fa-triangle-exclamation" style="font-size:48px;color:var(--accent);margin-bottom:16px;"></i><h3 style="font-size:18px;margin-bottom:8px;">Video Not Found</h3><p style="color:var(--muted);font-size:14px;">Ye video database me nahi mila. Back to Trending pe click karke try karo.</p><div class="btn-row" style="justify-content:center;margin-top:20px;"><a href="youtube-trending.html" class="btn"><i class="fa-solid fa-arrow-left"></i> Back to Trending</a></div></div>';
+        return;
+      }
+
+      var likeRate = ((video.likes / video.views) * 100).toFixed(1);
+      var commentRate = ((video.comments / video.views) * 100).toFixed(2);
+      var shareRate = ((video.shares / video.views) * 100).toFixed(2);
+      var engRate = (((video.likes + video.comments + video.shares) / video.views) * 100).toFixed(1);
+      var avgDailyViews = Math.round(video.views / video.uploadedDays);
+
+      // Build chart SVG
+      var maxViews = Math.max.apply(null, video.growth.map(function(g) { return g.views; }));
+      var chartW = 900, chartH = 240, padL = 50, padB = 40, padT = 20, padR = 20;
+      var chartW2 = chartW - padL - padR, chartH2 = chartH - padB - padT;
+      var pts = video.growth.map(function(g, i) {
+        var x = padL + (chartW2 * (i / (video.growth.length - 1)));
+        var y = padT + chartH2 - (chartH2 * (g.views / maxViews));
+        return { x: x, y: y, data: g };
+      });
+      var linePath = pts.map(function(p, i) { return (i === 0 ? 'M' : 'L') + p.x + ' ' + p.y; }).join(' ');
+      var areaPath = linePath + ' L' + pts[pts.length-1].x + ' ' + (padT + chartH2) + ' L' + pts[0].x + ' ' + (padT + chartH2) + ' Z';
+      var svg = '<svg class="chart-svg" viewBox="0 0 ' + chartW + ' ' + chartH + '" preserveAspectRatio="xMidYMid meet">';
+      // Grid lines
+      for (var g = 0; g <= 4; g++) {
+        var gy = padT + (chartH2 * g / 4);
+        var gv = Math.round(maxViews * (1 - g / 4));
+        svg += '<line x1="' + padL + '" y1="' + gy + '" x2="' + (chartW - padR) + '" y2="' + gy + '" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>';
+        svg += '<text x="' + (padL - 8) + '" y="' + (gy + 4) + '" fill="#71717a" font-size="11" text-anchor="end">' + formatViews(gv) + '</text>';
+      }
+      // Area fill
+      svg += '<defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff2d2d" stop-opacity="0.3"/><stop offset="100%" stop-color="#ff2d2d" stop-opacity="0"/></linearGradient></defs>';
+      svg += '<path d="' + areaPath + '" fill="url(#areaGrad)"/>';
+      // Line
+      svg += '<path d="' + linePath + '" fill="none" stroke="#ff2d2d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
+      // Points
+      pts.forEach(function(p, i) {
+        svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="5" fill="#ff2d2d" stroke="#08090d" stroke-width="2"/>';
+        svg += '<text x="' + p.x + '" y="' + (padT + chartH2 + 25) + '" fill="#a1a1aa" font-size="11" text-anchor="middle" font-weight="600">' + p.data.day + '</text>';
+        svg += '<text x="' + p.x + '" y="' + (p.y - 15) + '" fill="#ff2d2d" font-size="11" text-anchor="middle" font-weight="700">' + formatViews(p.data.views) + '</text>';
+      });
+      svg += '</svg>';
+
+      // Build tags HTML
+      var tagsHtml = video.tags.map(function(t) { return '<span class="tag-chip" onclick="navigator.clipboard.writeText(\'' + t.replace(/'/g, "\\'") + '\')">' + t + '</span>'; }).join('');
+      var keywordsHtml = video.keywords.map(function(k) { return '<span class="tag-chip keyword" onclick="navigator.clipboard.writeText(\'' + k.replace(/'/g, "\\'") + '\')">' + k + '</span>'; }).join('');
+      var hashtagsHtml = video.hashtags.map(function(h) { return '<span class="tag-chip hashtag" onclick="navigator.clipboard.writeText(\'' + h.replace(/'/g, "\\'") + '\')">' + h + '</span>'; }).join('');
+
+      // Engagement bars
+      var engBars = [
+        { label: 'Likes', icon: 'fa-thumbs-up', value: video.likes, rate: likeRate + '%', color: '#00d97e' },
+        { label: 'Comments', icon: 'fa-comments', value: video.comments, rate: commentRate + '%', color: '#3b82f6' },
+        { label: 'Shares', icon: 'fa-share', value: video.shares, rate: shareRate + '%', color: '#a855f7' },
+        { label: 'Overall Engagement', icon: 'fa-fire', value: video.likes + video.comments + video.shares, rate: engRate + '%', color: '#ff2d2d' }
+      ];
+      var engHtml = engBars.map(function(e) {
+        var pct = Math.min(parseFloat(e.rate), 100);
+        return '<div class="engagement-row"><div class="engagement-label"><span><i class="fa-solid ' + e.icon + '" style="color:' + e.color + '"></i> ' + e.label + '</span><span>' + formatViews(e.value) + ' (' + e.rate + ')</span></div><div class="engagement-bar"><div class="engagement-fill" style="width:' + pct + '%;background:' + e.color + ';"></div></div></div>';
+      }).join('');
+
+      // Timeline mini chart
+      var timelineHtml = '<div class="timeline">';
+      video.growth.forEach(function(g) {
+        var h = (g.views / maxViews) * 100;
+        timelineHtml += '<div class="timeline-bar" style="height:' + h + '%;" data-label="' + formatViews(g.views) + '"></div>';
+      });
+      timelineHtml += '</div>';
+      var labelsHtml = '<div class="timeline-labels"><span>' + video.growth[0].day + '</span><span>' + video.growth[video.growth.length-1].day + '</span></div>';
+
+      var html = '';
+
+      // Video Header
+      html += '<div class="video-header"><div class="vh-top">';
+      html += '<div class="vh-thumb"><i class="fa-solid ' + thumbIcon(video.category) + '"></i><div class="play-badge"><i class="fa-solid fa-play"></i></div></div>';
+      html += '<div class="vh-info"><div class="vh-rank">#' + video.rank + ' Trending</div>';
+      html += '<div class="vh-title">' + video.title + '</div>';
+      html += '<div class="vh-channel"><i class="fa-solid fa-circle-check"></i> ' + video.channel + '</div>';
+      html += '<div class="vh-meta-row">';
+      html += '<span class="vh-meta"><i class="fa-solid fa-eye"></i> ' + formatViews(video.views) + ' views</span>';
+      html += '<span class="vh-meta"><i class="fa-solid fa-clock"></i> ' + video.duration + '</span>';
+      html += '<span class="vh-meta"><i class="fa-solid fa-calendar"></i> ' + video.uploadedDays + ' days ago</span>';
+      html += '<span class="vh-cat ' + catClass(video.category) + '">' + video.category + '</span>';
+      html += '</div></div></div></div>';
+
+      // Stats Grid
+      html += '<div class="stats-grid">';
+      html += '<div class="stat-box"><div class="icon"><i class="fa-solid fa-eye" style="color:var(--accent)"></i></div><div class="val">' + formatViews(video.views) + '</div><div class="lbl">Total Views</div></div>';
+      html += '<div class="stat-box"><div class="icon"><i class="fa-solid fa-thumbs-up" style="color:var(--green)"></i></div><div class="val">' + formatViews(video.likes) + '</div><div class="lbl">Likes</div></div>';
+      html += '<div class="stat-box"><div class="icon"><i class="fa-solid fa-comments" style="color:var(--blue)"></i></div><div class="val">' + formatViews(video.comments) + '</div><div class="lbl">Comments</div></div>';
+      html += '<div class="stat-box"><div class="icon"><i class="fa-solid fa-share" style="color:var(--purple)"></i></div><div class="val">' + formatViews(video.shares) + '</div><div class="lbl">Shares</div></div>';
+      html += '<div class="stat-box"><div class="icon"><i class="fa-solid fa-fire" style="color:var(--yellow)"></i></div><div class="val">' + engRate + '%</div><div class="lbl">Engagement</div></div>';
+      html += '</div>';
+
+      // Views Growth Chart
+      html += '<div class="card"><h3><i class="fa-solid fa-chart-line"></i> Views Growth Chart</h3><p class="desc">' + video.uploadedDays + ' din me views ka growth — har point pe exact views dikhta hai</p>';
+      html += '<div class="chart-container">' + svg + '</div>';
+      html += '<div class="chart-legend"><div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> Views</div><div class="legend-item"><div class="legend-dot" style="background:rgba(255,45,45,0.3)"></div> Growth Area</div></div>';
+      html += '</div>';
+
+      // Timeline
+      html += '<div class="card"><h3><i class="fa-solid fa-timeline"></i> Daily Views Timeline</h3><p class="desc">Har din ki views bar chart — hover karke exact number dekho</p>';
+      html += timelineHtml + labelsHtml + '</div>';
+
+      // Engagement Breakdown
+      html += '<div class="card"><h3><i class="fa-solid fa-fire"></i> Engagement Breakdown</h3><p class="desc">Likes, comments, shares aur overall engagement rate</p>';
+      html += engHtml + '</div>';
+
+      // Average Stats
+      html += '<div class="stats-grid">';
+      html += '<div class="stat-box"><div class="icon"><i class="fa-solid fa-gauge-high" style="color:var(--accent)"></i></div><div class="val">' + formatViews(avgDailyViews) + '</div><div class="lbl">Avg Daily Views</div></div>';
+      html += '<div class="stat-box"><div class="icon"><i class="fa-solid fa-thumbs-up" style="color:var(--green)"></i></div><div class="val">' + likeRate + '%</div><div class="lbl">Like Rate</div></div>';
+      html += '<div class="stat-box"><div class="icon"><i class="fa-solid fa-comments" style="color:var(--blue)"></i></div><div class="val">' + commentRate + '%</div><div class="lbl">Comment Rate</div></div>';
+      html += '<div class="stat-box"><div class="icon"><i class="fa-solid fa-share" style="color:var(--purple)"></i></div><div class="val">' + shareRate + '%</div><div class="lbl">Share Rate</div></div>';
+      html += '<div class="stat-box"><div class="icon"><i class="fa-solid fa-bolt" style="color:var(--yellow)"></i></div><div class="val">' + (video.views / 1000).toFixed(0) + 'K</div><div class="lbl">Views per 1K</div></div>';
+      html += '</div>';
+
+      // Keywords
+      html += '<div class="card"><h3><i class="fa-solid fa-key"></i> SEO Keywords</h3><p class="desc">Top search keywords jinse ye video rank kar raha hai — click karke copy karo</p>';
+      html += '<div class="tag-list">' + keywordsHtml + '</div>';
+      html += '<div class="btn-row"><button class="btn-outline btn" onclick="copyText(\'' + video.keywords.join(', ').replace(/'/g, "\\'") + '\', this)"><i class="fa-solid fa-copy"></i> Copy All Keywords</button></div>';
+      html += '</div>';
+
+      // Tags
+      html += '<div class="card"><h3><i class="fa-solid fa-tag"></i> Video Tags</h3><p class="desc">YouTube tags jo is video me use hue hain — click karke copy karo</p>';
+      html += '<div class="tag-list">' + tagsHtml + '</div>';
+      html += '<div class="btn-row"><button class="btn-outline btn" onclick="copyText(\'' + video.tags.join(', ').replace(/'/g, "\\'") + '\', this)"><i class="fa-solid fa-copy"></i> Copy All Tags</button></div>';
+      html += '</div>';
+
+      // Hashtags
+      html += '<div class="card"><h3><i class="fa-solid fa-hashtag"></i> Hashtags</h3><p class="desc">Recommended hashtags for similar content — click karke copy karo</p>';
+      html += '<div class="tag-list">' + hashtagsHtml + '</div>';
+      html += '<div class="btn-row"><button class="btn-outline btn" onclick="copyText(\'' + video.hashtags.join(' ').replace(/'/g, "\\'") + '\', this)"><i class="fa-solid fa-copy"></i> Copy All Hashtags</button></div>';
+      html += '</div>';
+
+      // Description
+      html += '<div class="card"><h3><i class="fa-solid fa-align-left"></i> SEO Description</h3><p class="desc">Full video description with timestamps — SEO optimized structure</p>';
+      html += '<div class="desc-box">' + video.description.replace(/⏱️/g, '⏱️').replace(/(\d{1,2}:\d{2})/g, '<span class="timestamp">$1</span>') + '</div>';
+      html += '<div class="btn-row"><button class="btn-outline btn" onclick="copyText(\'' + video.description.replace(/'/g, "\\'").replace(/\n/g, '\\n') + '\', this)"><i class="fa-solid fa-copy"></i> Copy Full Description</button>';
+      html += '<a href="https://www.youtube.com/results?search_query=' + encodeURIComponent(video.title) + '" target="_blank" class="btn"><i class="fa-brands fa-youtube"></i> Watch on YouTube</a></div>';
+      html += '</div>';
+
+      document.getElementById('detailsContent').innerHTML = html;
+      document.title = video.title + ' — View49 Analytics';
+    }
+
+    renderDetails();
+  </script>
+</body>
+</html>

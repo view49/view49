@@ -379,7 +379,8 @@
       html += '<div class="yt-grid">';
       videos.forEach(function(v, i) {
         var rankClass = i < 3 ? 'top3' : '';
-        html += '<div class="yt-video-card" onclick="window.open(\'https://www.youtube.com/results?search_query=' + encodeURIComponent(v.title) + '\', \'_blank\')">';
+        var vidId = selectedRegion + (i + 1);
+        html += '<div class="yt-video-card" onclick="window.location.href=\'video-details.html?v=' + vidId + '\'">';
         html += '<div class="yt-thumb"><span class="yt-rank-badge ' + rankClass + '">#' + (i+1) + '</span>';
         html += '<div class="thumb-bg"><i class="fa-solid ' + thumbIcon(v.category) + '"></i></div>';
         html += '<div class="play-overlay"><div class="play-icon"><i class="fa-solid fa-play"></i></div></div>';
