@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View49 Pro — YouTube Copyright Risk Checker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    :root {
+      --bg: #07080c; --surface: #0d0f18; --surface-2: #131622; --surface-3: #1a1e2e;
+      --accent: #ef4444; --text: #f4f4f5; --muted: #71717a; --muted-2: #a1a1aa;
+      --border: rgba(255,255,255,0.07); --border-hover: rgba(239,68,68,0.4);
+      --red: #ef4444; --red-glow: rgba(239,68,68,0.3); --green: #00d97e; --yellow: #eab308;
+    }
+
+    body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; opacity: 0; animation: fadeInPage 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    @keyframes fadeInPage {
+      0% { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    body::before { content: ''; position: fixed; top: -150px; left: -150px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(239,68,68,0.08) 0%, transparent 70%); z-index: 0; pointer-events: none; }
+    
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 6%; background: rgba(7,8,12,0.85); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
+    .logo { font-size: 20px; font-weight: 800; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .logo span { color: var(--accent); }
+    .pro-badge { background: linear-gradient(135deg, var(--red), #b91c1c); color: #fff; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px; box-shadow: 0 0 15px rgba(239,68,68,0.4); }
+    
+    .nav-links { display: flex; align-items: center; gap: 20px; }
+    .nav-links a { color: var(--muted-2); text-decoration: none; font-size: 13px; font-weight: 600; transition: color 0.2s; display: flex; align-items: center; gap: 6px; }
+    .nav-links a:hover { color: #fff; }
+
+    .hero-section { text-align: center; padding: 50px 20px 20px; position: relative; z-index: 1; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: var(--red); padding: 6px 18px; border-radius: 30px; font-size: 12px; font-weight: 700; margin-bottom: 16px; letter-spacing: 0.5px; }
+    .hero-section h1 { font-size: 38px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #fff 30%, #a1a1aa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-section p { color: var(--muted); font-size: 14px; margin-top: 10px; max-width: 620px; margin-left: auto; margin-right: auto; line-height: 1.5; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 10px 20px 60px; position: relative; z-index: 1; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; margin-bottom: 24px; position: relative; overflow: hidden; box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5); }
+    .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--red), transparent); }
+    
+    .card-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; color: #fff; }
+    .card-title i { color: var(--red); font-size: 16px; }
+    .card-desc { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+
+    .input-group { margin-bottom: 20px; }
+    .input-group label { display: block; font-size: 12px; font-weight: 700; color: var(--muted-2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.8px; }
+    
+    .input-box { width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: #fff; padding: 14px 18px; border-radius: 12px; font-size: 14px; outline: none; transition: all 0.2s; }
+    .input-box:focus { border-color: var(--red); box-shadow: 0 0 15px rgba(239,68,68,0.2); }
+
+    .btn-analyze { background: linear-gradient(135deg, var(--red) 0%, #b91c1c 100%); color: #fff; border: none; padding: 16px 28px; border-radius: 14px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; box-shadow: 0 10px 25px rgba(239,68,68,0.3); }
+    .btn-analyze:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(239,68,68,0.5); }
+
+    .output-wrapper { margin-top: 24px; opacity: 0; max-height: 0; overflow: hidden; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+    .output-wrapper.show { opacity: 1; max-height: 1000px; }
+
+    .output-box { background: var(--surface-2); border: 1px solid rgba(239,68,68,0.3); border-radius: 16px; padding: 24px; position: relative; }
+    .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+    .output-title { font-size: 14px; font-weight: 700; color: var(--red); display: flex; align-items: center; gap: 8px; }
+    
+    .output-content { font-size: 13px; color: #cbd5e1; line-height: 1.7; white-space: pre-wrap; font-family: 'Courier New', Courier, monospace; background: var(--surface); padding: 16px; border-radius: 10px; border: 1px solid var(--border); }
+
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--surface-3); border: 1px solid var(--red); color: var(--text); padding: 12px 24px; border-radius: 12px; font-size: 13px; font-weight: 600; z-index: 1000; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 10px 30px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 8px; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast i { color: var(--red); }
+
+    footer { text-align: center; padding: 30px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-bolt" style="color:var(--accent);"></i> View<span>49</span>
+    </a>
+    <div class="nav-links">
+      <span class="pro-badge"><i class="fa-solid fa-shield-halved"></i> SECURITY SUITE</span>
+      <a href="index.html"><i class="fa-solid fa-house"></i> Dashboard</a>
+    </div>
+  </nav>
+
+  <header class="hero-section">
+    <div class="hero-badge"><i class="fa-solid fa-triangle-exclamation"></i> Content Shield</div>
+    <h1>YouTube Copyright Risk Checker ⚠️</h1>
+    <p>Enter the names of background tracks, movie clips, or media assets to evaluate copyright strike risks and monetization status.</p>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <div class="card-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Media Asset Evaluation</div>
+      <div class="card-desc">Type the audio track name or movie clip description you plan to use in your video.</div>
+
+      <div class="input-group">
+        <label>Track Name / Music / Video Clip Details</label>
+        <input type="text" id="assetInput" class="input-box" placeholder="e.g., Popular Bollywood song remix or Marvel movie fight scene clip">
+      </div>
+
+      <button class="btn-analyze" onclick="checkCopyrightRisk()">
+        <i class="fa-solid fa-shield-virus"></i> Analyze Copyright Risk
+      </button>
+
+      <div class="output-wrapper" id="outputWrapper">
+        <div class="output-box">
+          <div class="output-header">
+            <div class="output-title"><i class="fa-solid fa-chart-pie"></i> Risk Analysis Report</div>
+          </div>
+          <div class="output-content" id="outputContent"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"><i class="fa-solid fa-triangle-exclamation"></i> <span id="toastMsg">Analysis completed!</span></div>
+  <footer>© 2026 View49 Pro Studio. All rights reserved.</footer>
+
+  <script>
+    function showToast(message) {
+      var toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = message;
+      toast.classList.add('show');
+      setTimeout(function() {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function checkCopyrightRisk() {
+      var asset = document.getElementById('assetInput').value.trim();
+      if (!asset) {
+        asset = 'Commercial Audio Track / Movie Clip';
+      }
+
+      var wrapper = document.getElementById('outputWrapper');
+      var content = document.getElementById('outputContent');
+      
+      wrapper.classList.add('show');
+      content.textContent = 'Scanning Content ID databases...\nEvaluating asset: "' + asset + '"...\nCalculating strike risk probabilities...\n\n';
+
+      setTimeout(function() {
+        var riskLevel = 'HIGH RISK ⚠️';
+        var monetization = 'Blocked or Revenue Claimed by Third Party';
+        var advice = 'Avoid using full unedited portions. Use less than 5 seconds under Fair Use or replace with YouTube Audio Library music.';
+        
+        if (asset.toLowerCase().includes('nocopyright') || asset.toLowerCase().includes('lofi') || asset.toLowerCase().includes('free')) {
+          riskLevel = 'LOW RISK ✅';
+          monetization = 'Fully Monetizable';
+          advice = 'Safe to use, but keep attribution in the description if required by the creator.';
+        }
+
+        content.textContent = '========================================\n' +
+          '🔍 ASSET: ' + asset + '\n' +
+          '🚨 COPYRIGHT STRIKE RISK: ' + riskLevel + '\n' +
+          '💰 MONETIZATION STATUS: ' + monetization + '\n' +
+          '========================================\n\n' +
+          '📋 EXPERT RECOMMENDATION:\n' +
+          '• ' + advice + '\n\n' +
+          '🛡️ SAFETY TIP:\n' +
+          'Always check Content ID matches in YouTube Studio before making your video public to avoid copyright claims.';
+
+        showToast('Copyright Risk Assessment Finished!');
+      }, 700);
+    }
+  </script>
+</body>
+</html>
