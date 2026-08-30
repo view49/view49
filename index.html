@@ -14,7 +14,7 @@
       --bg: #07080c; --surface: #0d0f18; --surface-2: #131622; --surface-3: #1a1e2e;
       --accent: #ff2d2d; --text: #f4f4f5; --muted: #71717a; --muted-2: #a1a1aa;
       --border: rgba(255,255,255,0.07); --border-hover: rgba(168,85,247,0.4);
-      --purple: #a855f7; --green: #00d97e; --red: #ef4444;
+      --purple: #a855f7; --green: #00d97e; --red: #ef4444; --blue: #3b82f6; --amber: #f59e0b;
     }
 
     body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
@@ -28,19 +28,18 @@
     .hero h1 { font-size: 34px; font-weight: 800; color: #fff; margin-bottom: 10px; }
     .hero p { color: var(--muted); font-size: 14px; }
 
-    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px 60px; }
-    .section-title { font-size: 16px; font-weight: 700; color: #fff; margin: 30px 0 16px; display: flex; align-items: center; gap: 8px; }
-    .section-title i { color: var(--purple); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 60px; }
+    .section-title { font-size: 16px; font-weight: 700; color: #fff; margin: 35px 0 16px; display: flex; align-items: center; gap: 8px; border-left: 3px solid var(--purple); padding-left: 10px; }
 
-    .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+    .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
 
     .tool-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; text-decoration: none; color: inherit; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; position: relative; overflow: hidden; }
     .tool-card:hover { transform: translateY(-3px); border-color: var(--border-hover); box-shadow: 0 15px 30px rgba(0,0,0,0.4); background: var(--surface-2); }
     
     .icon-box { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 16px; border: 1px solid; }
-    .tool-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .tool-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
     .tool-desc { font-size: 13px; color: var(--muted); line-height: 1.5; flex-grow: 1; margin-bottom: 16px; }
-    .tool-link { font-size: 13px; font-weight: 700; color: var(--purple); display: flex; align-items: center; gap: 6px; }
+    .tool-link { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
 
     footer { text-align: center; padding: 30px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); margin-top: 40px; }
   </style>
@@ -58,78 +57,108 @@
 
   <header class="hero">
     <h1>View49 Creator Studio</h1>
-    <p>Advanced AI tools and automation utilities built for professional creators.</p>
+    <p>Advanced AI tools, automation utilities, and optimization suites built for professional creators.</p>
   </header>
 
   <main class="container">
     
-    <!-- Creator Utilities Section -->
-    <div class="section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Creator Utilities</div>
+    <!-- Creator Utilities & Automation -->
+    <div class="section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Creator Utilities & Automation</div>
     <div class="tools-grid">
       
-      <!-- Faceless Channel Builder Kit (New) -->
+      <!-- 1. Faceless Channel Builder Kit (NEW) -->
       <a href="faceless-builder-kit.html" class="tool-card" style="border-color: rgba(168,85,247,0.3); background: linear-gradient(180deg, rgba(168,85,247,0.04) 0%, #0d0f17 100%);">
         <div class="icon-box" style="background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.2); color: var(--purple);">
           <i class="fa-solid fa-user-secret"></i>
         </div>
-        <div class="tool-title" style="display: flex; align-items: center; justify-content: space-between;">
+        <div class="tool-title">
           Faceless Channel Builder Kit
           <span style="font-size: 9px; background: var(--purple); color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 800;">LIVE AI</span>
         </div>
-        <div class="tool-desc">Faceless YouTube channel shuru karne walo ke liye—scripts, hooks, stock footage sources, aur production packs bina chehra dikhaye.</div>
-        <div class="tool-link">Launch Kit &rarr;</div>
+        <div class="tool-desc">Generate instant scripts, viral titles, hooks, and production kits for faceless channels without showing your face.</div>
+        <div class="tool-link" style="color: var(--purple);">Launch Kit &rarr;</div>
       </a>
 
-      <!-- Old Tool Card 1 -->
+      <!-- 2. AI Script Generator -->
       <a href="#" class="tool-card">
-        <div class="icon-box" style="background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); color: #3b82f6;">
+        <div class="icon-box" style="background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); color: var(--blue);">
           <i class="fa-solid fa-pen-nib"></i>
         </div>
         <div class="tool-title">AI Script Generator</div>
         <div class="tool-desc">Generate engaging long-form and short-form video scripts optimized for audience retention and watch time.</div>
-        <div class="tool-link" style="color: #3b82f6;">Open Tool &rarr;</div>
+        <div class="tool-link" style="color: var(--blue);">Open Tool &rarr;</div>
       </a>
 
-      <!-- Old Tool Card 2 -->
+      <!-- 3. Thumbnail Concept Studio -->
       <a href="#" class="tool-card">
-        <div class="icon-box" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.2); color: #10b981;">
+        <div class="icon-box" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.2); color: var(--green);">
           <i class="fa-solid fa-image"></i>
         </div>
         <div class="tool-title">Thumbnail Concept Studio</div>
         <div class="tool-desc">Create high-CTR thumbnail layouts, color psychology hooks, and text hierarchy ideas instantly.</div>
-        <div class="tool-link" style="color: #10b981;">Open Tool &rarr;</div>
+        <div class="tool-link" style="color: var(--green);">Open Tool &rarr;</div>
+      </a>
+
+      <!-- 4. Hook & Intro Architect -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(236,72,153,0.1); border-color: rgba(236,72,153,0.2); color: #ec4899;">
+          <i class="fa-solid fa-anchor"></i>
+        </div>
+        <div class="tool-title">Hook & Intro Architect</div>
+        <div class="tool-desc">Build killer first 5-second video hooks that drop bounce rates and spike average view duration.</div>
+        <div class="tool-link" style="color: #ec4899;">Open Tool &rarr;</div>
+      </a>
+
+      <!-- 5. Voiceover & Audio Planner -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.2); color: #8b5cf6;">
+          <i class="fa-solid fa-microphone-lines"></i>
+        </div>
+        <div class="tool-title">Voiceover & Audio Planner</div>
+        <div class="tool-desc">Structure pacing, tone of voice, and background SFX cues for immersive cinematic storytelling.</div>
+        <div class="tool-link" style="color: #8b5cf6;">Open Tool &rarr;</div>
+      </a>
+
+      <!-- 6. Description & Chapter Builder -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.2); color: var(--amber);">
+          <i class="fa-solid fa-list-ul"></i>
+        </div>
+        <div class="tool-title">Description & Chapter Builder</div>
+        <div class="tool-desc">Craft SEO-rich video descriptions, timestamp chapters, and social media cross-promotion snippets.</div>
+        <div class="tool-link" style="color: var(--amber);">Open Tool &rarr;</div>
       </a>
 
     </div>
 
-    <!-- YouTube Core Tools Section -->
-    <div class="section-title"><i class="fa-solid fa-video"></i> YouTube Core Tools</div>
+    <!-- YouTube Core & SEO Tools -->
+    <div class="section-title"><i class="fa-solid fa-video"></i> YouTube Core & SEO Tools</div>
     <div class="tools-grid">
       
-      <!-- YouTube Copyright Risk Checker (New) -->
+      <!-- 7. YouTube Copyright Risk Checker (NEW) -->
       <a href="copyright-risk-checker.html" class="tool-card" style="border-color: rgba(239,68,68,0.3); background: linear-gradient(180deg, rgba(239,68,68,0.04) 0%, #0d0f17 100%);">
         <div class="icon-box" style="background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.2); color: var(--red);">
           <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
-        <div class="tool-title" style="display: flex; align-items: center; justify-content: space-between;">
+        <div class="tool-title">
           YouTube Copyright Risk Checker
           <span style="font-size: 9px; background: var(--red); color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 800;">NEW ⚠️</span>
         </div>
-        <div class="tool-desc">Video me use hone wale music/clips daalo—batayega copyright strike ka kitna risk hai aur kahan monetization issue aa sakta hai.</div>
+        <div class="tool-desc">Analyze music tracks and video clips to predict copyright strike risks and potential monetization issues.</div>
         <div class="tool-link" style="color: var(--red);">Check Risk &rarr;</div>
       </a>
 
-      <!-- Old Tool Card 3 -->
+      <!-- 8. Tag & Keyword Extractor -->
       <a href="#" class="tool-card">
-        <div class="icon-box" style="background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.2); color: #f59e0b;">
+        <div class="icon-box" style="background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.2); color: var(--amber);">
           <i class="fa-solid fa-tags"></i>
         </div>
         <div class="tool-title">Tag & Keyword Extractor</div>
         <div class="tool-desc">Extract high-ranking tags, SEO keywords, and metadata from any public YouTube video link.</div>
-        <div class="tool-link" style="color: #f59e0b;">Open Tool &rarr;</div>
+        <div class="tool-link" style="color: var(--amber);">Open Tool &rarr;</div>
       </a>
 
-      <!-- Old Tool Card 4 -->
+      <!-- 9. Channel Growth Analytics -->
       <a href="#" class="tool-card">
         <div class="icon-box" style="background: rgba(236,72,153,0.1); border-color: rgba(236,72,153,0.2); color: #ec4899;">
           <i class="fa-solid fa-chart-line"></i>
@@ -137,6 +166,112 @@
         <div class="tool-title">Channel Growth Analytics</div>
         <div class="tool-desc">Track performance projections, subscriber milestones, and upload consistency metrics effortlessly.</div>
         <div class="tool-link" style="color: #ec4899;">Open Tool &rarr;</div>
+      </a>
+
+      <!-- 10. Title CTR Optimizer -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); color: var(--blue);">
+          <i class="fa-solid fa-heading"></i>
+        </div>
+        <div class="tool-title">Title CTR Optimizer</div>
+        <div class="tool-desc">Test title variations against psychological triggers to maximize click-through rates.</div>
+        <div class="tool-link" style="color: var(--blue);">Open Tool &rarr;</div>
+      </a>
+
+      <!-- 11. Playlist SEO Structurer -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.2); color: var(--green);">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <div class="tool-title">Playlist SEO Structurer</div>
+        <div class="tool-desc">Organize video series into binge-worthy playlists optimized for session duration.</div>
+        <div class="tool-link" style="color: var(--green);">Open Tool &rarr;</div>
+      </a>
+
+      <!-- 12. Competitor Audit Suite -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.2); color: var(--purple);">
+          <i class="fa-solid fa-binoculars"></i>
+        </div>
+        <div class="tool-title">Competitor Audit Suite</div>
+        <div class="tool-desc">Spy on top niche channels to uncover content gaps and winning video formulas.</div>
+        <div class="tool-link" style="color: var(--purple);">Open Tool &rarr;</div>
+      </a>
+
+    </div>
+
+    <!-- Advanced Monetization & Strategy -->
+    <div class="section-title"><i class="fa-solid fa-sack-dollar"></i> Monetization & Strategy Suite</div>
+    <div class="tools-grid">
+      
+      <!-- 13. Sponsorship Pitch Deck Writer -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.2); color: var(--green);">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+        </div>
+        <div class="tool-title">Sponsorship Pitch Deck Writer</div>
+        <div class="tool-desc">Create professional brand deal pitch emails and media kits that convert sponsors.</div>
+        <div class="tool-link" style="color: var(--green);">Open Tool &rarr;</div>
+      </a>
+
+      <!-- 14. CPM & Revenue Estimator -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.2); color: var(--amber);">
+          <i class="fa-solid fa-calculator"></i>
+        </div>
+        <div class="tool-title">CPM & Revenue Estimator</div>
+        <div class="tool-desc">Calculate projected earnings based on country tier, niche, and view counts.</div>
+        <div class="tool-link" style="color: var(--amber);">Open Tool &rarr;</div>
+      </a>
+
+      <!-- 15. Merch & Product Funnel Builder -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(236,72,153,0.1); border-color: rgba(236,72,153,0.2); color: #ec4899;">
+          <i class="fa-solid fa-store"></i>
+        </div>
+        <div class="tool-title">Merch & Product Funnel Builder</div>
+        <div class="tool-desc">Plan digital products, merch lines, and community membership tiers.</div>
+        <div class="tool-link" style="color: #ec4899;">Open Tool &rarr;</div>
+      </a>
+
+      <!-- 16. Community Post Scheduler -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); color: var(--blue);">
+          <i class="fa-solid fa-comments"></i>
+        </div>
+        <div class="tool-title">Community Post Scheduler</div>
+        <div class="tool-desc">Draft high-engagement polls, image teasers, and community update posts.</div>
+        <div class="tool-link" style="color: var(--blue);">Open Tool &rarr;</div>
+      </a>
+
+      <!-- 17. Shorts Multi-Platform Repurposer -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.2); color: var(--purple);">
+          <i class="fa-solid fa-mobile-screen"></i>
+        </div>
+        <div class="tool-title">Shorts Multi-Platform Repurposer</div>
+        <div class="tool-desc">Optimize vertical video captions and hooks for YouTube Shorts, Reels, and TikTok.</div>
+        <div class="tool-link" style="color: var(--purple);">Open Tool &rarr;</div>
+      </a>
+
+      <!-- 18. Channel Health & Audit Diagnostic -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.2); color: var(--red);">
+          <i class="fa-solid fa-stethoscope"></i>
+        </div>
+        <div class="tool-title">Channel Health & Audit Diagnostic</div>
+        <div class="tool-desc">Run a full diagnostic check on your channel layout, branding, and optimization gaps.</div>
+        <div class="tool-link" style="color: var(--red);">Open Tool &rarr;</div>
+      </a>
+
+      <!-- 19. AI Thumbnail Color Grader Matrix -->
+      <a href="#" class="tool-card">
+        <div class="icon-box" style="background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.2); color: #8b5cf6;">
+          <i class="fa-solid fa-palette"></i>
+        </div>
+        <div class="tool-title">Thumbnail Color Grader Matrix</div>
+        <div class="tool-desc">Analyze contrast ratios and saturation palettes to make thumbnails pop in mobile feeds.</div>
+        <div class="tool-link" style="color: #8b5cf6;">Open Tool &rarr;</div>
       </a>
 
     </div>
