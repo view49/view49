@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View49 Pro — Video Details</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    :root {
+      --bg: #08090d; --surface: #0d0f17; --surface-2: #14141f; --surface-3: #1a1a28;
+      --accent: #ff2d2d; --accent-2: #b91c1c; --text: #f4f4f5; --muted: #71717a;
+      --muted-2: #a1a1aa; --border: rgba(255,255,255,0.06); --border-hover: rgba(255,255,255,0.18);
+      --green: #00d97e; --blue: #3b82f6; --yellow: #fbbf24; --gold: #eab308; --purple: #a855f7;
+    }
+
+    body { background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; top: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(255,45,45,0.08) 0%, transparent 70%); z-index: 0; pointer-events: none; }
+    body::after { content: ''; position: fixed; bottom: -300px; left: -200px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(185,28,28,0.06) 0%, transparent 70%); z-index: 0; pointer-events: none; }
+
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 6%; background: rgba(8,9,13,0.85); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); }
+    .logo { font-size: 22px; font-weight: 800; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .logo span { color: var(--accent); }
+    .logo .pro-badge { background: linear-gradient(135deg, var(--gold), #f59e0b); color: #000; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 4px; margin-left: 4px; }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-links a { color: var(--muted-2); text-decoration: none; font-size: 13px; font-weight: 600; transition: color 0.2s; }
+    .nav-links a:hover { color: #fff; }
+    .btn-upgrade { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%); color: #fff !important; padding: 8px 18px; border-radius: 30px; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 18px rgba(255,45,45,0.35); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px 20px 60px; position: relative; z-index: 1; }
+
+    .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--muted-2); text-decoration: none; font-size: 13px; font-weight: 600; margin-bottom: 20px; transition: color 0.2s; }
+    .back-link:hover { color: var(--accent); }
+
+    .video-header { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 28px; margin-bottom: 20px; position: relative; overflow: hidden; }
+    .video-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+    .vh-top { display: flex; gap: 24px; align-items: start; flex-wrap: wrap; }
+    .vh-thumb { width: 280px; min-width: 200px; height: 158px; background: var(--surface-3); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 56px; color: var(--surface-3); flex-shrink: 0; overflow: hidden; position: relative; }
+    .vh-thumb .play-badge { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); cursor: pointer; }
+    .vh-thumb .play-badge i { width: 50px; height: 50px; background: rgba(255,45,45,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; }
+    .vh-info { flex: 1; min-width: 250px; }
+    .vh-rank { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; font-size: 13px; font-weight: 800; padding: 5px 14px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 12px rgba(255,45,45,0.4); }
+    .vh-title { font-size: 22px; font-weight: 800; line-height: 1.3; margin-bottom: 10px; }
+    .vh-channel { font-size: 14px; color: var(--muted-2); font-weight: 600; margin-bottom: 16px; }
+    .vh-channel i { color: var(--blue); font-size: 12px; }
+    .vh-meta-row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .vh-meta { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+    .vh-meta i { color: var(--accent); }
+    .vh-cat { font-size: 11px; padding: 3px 10px; border-radius: 6px; font-weight: 700; background: rgba(255,45,45,0.1); color: var(--accent); }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+    @media (max-width: 800px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 500px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; transition: all 0.25s; position: relative; overflow: hidden; }
+    .stat-box::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+    .stat-box:hover { border-color: var(--border-hover); transform: translateY(-3px); }
+    .stat-box .val { font-size: 22px; font-weight: 800; color: var(--accent); }
+    .stat-box .lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-top: 4px; letter-spacing: 0.5px; }
+    .stat-box .icon { font-size: 14px; margin-bottom: 4px; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden; }
+    .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0.5; }
+    .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+    .card h3 i { color: var(--accent); }
+    .card p.desc { color: var(--muted); font-size: 12px; margin-bottom: 18px; }
+
+    .chart-container { position: relative; padding: 10px 0; }
+    .chart-svg { width: 100%; height: 280px; }
+    .chart-legend { display: flex; gap: 20px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted-2); font-weight: 600; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+
+    .tag-list { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag-chip { background: var(--surface-2); border: 1px solid var(--border); color: var(--blue); font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 8px; transition: all 0.2s; cursor: pointer; }
+    .tag-chip:hover { border-color: var(--blue); transform: translateY(-1px); }
+    .tag-chip.hashtag { color: var(--accent); }
+    .tag-chip.keyword { color: var(--green); }
+
+    .desc-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; font-size: 13px; line-height: 1.7; color: #d4d4d8; white-space: pre-wrap; }
+    .desc-box .timestamp { color: var(--blue); font-weight: 600; }
+
+    .engagement-row { margin-bottom: 14px; }
+    .engagement-label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+    .engagement-label span:first-child { color: var(--muted-2); display: flex; align-items: center; gap: 6px; }
+    .engagement-bar { width: 100%; height: 8px; background: var(--surface-3); border-radius: 4px; overflow: hidden; }
+    .engagement-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+
+    .btn { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%); color: #fff; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.25s; font-family: inherit; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,45,45,0.35); }
+    .btn-outline { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); color: var(--text); }
+    .btn-outline:hover { border-color: var(--accent); box-shadow: none; }
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 14px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 1000; transition: transform 0.3s; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--green); }
+
+    footer { text-align: center; padding: 28px; color: #3f3f46; font-size: 12px; border-top: 1px solid var(--border); margin-top: 20px; position: relative; z-index: 1; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-bolt" style="color:var(--accent);"></i> View<span>49</span>
+      <span class="pro-badge">PRO</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html"><i class="fa-solid fa-house"></i> Dashboard</a>
+      <a href="youtube-trending.html">Trending</a>
+      <a href="premium.html" class="btn-upgrade"><i class="fa-solid fa-crown"></i> Upgrade Pro</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <a href="youtube-trending.html" class="back-link">
+      <i class="fa-solid fa-arrow-left"></i> Back to Trending
+    </a>
+    <div id="detailsContent"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <footer>© 2026 View49 Creator Suite Pro. All rights reserved.</footer>
+
+  <script>
+    const YOUTUBE_API_KEY = localStorage.getItem('view49_youtube_api_key') || 'PASTE_YOUR_YOUTUBE_API_KEY_HERE';
+
+    function showToast(msg, type) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show ' + (type || '');
+      setTimeout(function() { t.className = 'toast ' + (type || ''); }, 3000);
+    }
+
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(function() {
+        var old = btn.innerHTML;
+        btn.innerHTML = '✓ Copied!';
+        setTimeout(function() { btn.innerHTML = old; }, 1800);
+      });
+    }
+
+    function formatViews(v) {
+      v = Number(v) || 0;
+      if (v >= 10000000) return (v / 10000000).toFixed(1) + ' Cr';
+      if (v >= 100000) return (v / 100000).toFixed(1) + ' L';
+      if (v >= 1000) return (v / 1000).toFixed(1) + 'K';
+      return v.toString();
+    }
+
+    function formatNumber(v) {
+      return Number(v || 0).toLocaleString('en-IN');
+    }
+
+    function thumbIcon(cat) {
+      var c = (cat || '').toLowerCase();
+      var map = { sports:'fa-futbol', tech:'fa-microchip', gaming:'fa-gamepad', music:'fa-music', entertainment:'fa-film', finance:'fa-indian-rupee-sign', food:'fa-utensils', travel:'fa-plane', fitness:'fa-dumbbell', education:'fa-graduation-cap', comedy:'fa-face-laugh', auto:'fa-car', nature:'fa-tree', beauty:'fa-spray-can' };
+      return map[c] || 'fa-video';
+    }
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, function(c) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+      });
+    }
+
+    function apiUrl(endpoint, params) {
+      var q = new URLSearchParams(params);
+      q.set('key', YOUTUBE_API_KEY);
+      return 'https://www.googleapis.com/youtube/v3/' + endpoint + '?' + q.toString();
+    }
+
+    function isoDurationToText(iso) {
+      var m = String(iso || '').match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+      if (!m) return '—';
+      var h = Number(m[1] || 0), min = Number(m[2] || 0), sec = Number(m[3] || 0);
+      return h ? h + ':' + String(min).padStart(2,'0') + ':' + String(sec).padStart(2,'0')
+               : min + ':' + String(sec).padStart(2,'0');
+    }
+
+    function ageText(publishedAt) {
+      var ms = Math.max(0, Date.now() - new Date(publishedAt).getTime());
+      var hours = ms / 3600000;
+      var days = Math.floor(hours / 24);
+      if (days === 0) return Math.max(1, Math.floor(hours)) + ' hours ago';
+      return days + ' day' + (days === 1 ? '' : 's') + ' ago';
+    }
+
+    function getAgeHours(publishedAt) {
+      return Math.max(1, (Date.now() - new Date(publishedAt).getTime()) / 3600000);
+    }
+
+    function getHashtags(title, description) {
+      var text = (title || '') + ' ' + (description || '');
+      var found = text.match(/#[\p{L}\p{N}_-]+/gu) || [];
+      return Array.from(new Set(found)).slice(0, 30);
+    }
+
+    function extractKeywords(title, description, tags) {
+      var source = (tags && tags.length ? tags.join(' ') : '') + ' ' + (title || '') + ' ' + (description || '');
+      var stop = new Set(('the and for with this that from are you your video videos watch subscribe official full how what why when this is a an of to in on at by or as be it i me my our new latest today more best').split(/\s+/));
+      var words = source.toLowerCase()
+        .replace(/#[\p{L}\p{N}_-]+/gu, ' ')
+        .replace(/[^\p{L}\p{N}\s-]/gu, ' ')
+        .split(/\s+/)
+        .filter(function(w){ return w.length >= 3 && !stop.has(w) && !/^\d+$/.test(w); });
+
+      var counts = {};
+      words.forEach(function(w){ counts[w] = (counts[w] || 0) + 1; });
+
+      var phrases = [];
+      var titleWords = (title || '').toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu,' ').split(/\s+/).filter(function(w){return w.length>=3;});
+      for (var i=0; i<titleWords.length-1; i++) {
+        var a=titleWords[i], b=titleWords[i+1];
+        if (!stop.has(a) && !stop.has(b)) phrases.push(a + ' ' + b);
+      }
+
+      var rankedWords = Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];}).slice(0, 15);
+      var rankedPhrases = Array.from(new Set(phrases)).slice(0, 8);
+      return Array.from(new Set(rankedPhrases.concat(rankedWords))).slice(0, 20);
+    }
+
+    function getHistory(video) {
+      try {
+        return JSON.parse(localStorage.getItem('view49_history_' + video.id) || '[]');
+      } catch(e) { return []; }
+    }
+
+    function saveSnapshot(video) {
+      try {
+        var key = 'view49_history_' + video.id;
+        var history = getHistory(video);
+        var now = Date.now();
+        var last = history.length ? history[history.length - 1] : null;
+
+        if (!last || now - last.t >= 60 * 60 * 1000) {
+          history.push({ t: now, views: video.views, likes: video.likes, comments: video.comments });
+        } else {
+          history[history.length - 1] = { t: now, views: video.views, likes: video.likes, comments: video.comments };
+        }
+
+        if (history.length > 100) history = history.slice(-100);
+        localStorage.setItem(key, JSON.stringify(history));
+        localStorage.setItem('view49_last_video_' + video.id, JSON.stringify(video));
+      } catch(e) {}
+    }
+
+    function formatSnapshotTime(ts) {
+      var d = new Date(ts);
+      return d.toLocaleDateString('en-IN', {day:'2-digit',month:'short'}) + ' ' +
+             d.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'});
+    }
+
+    function buildGrowthChart(video, history) {
+      var points = history.slice(-30);
+      if (!points.length) points = [{t:Date.now(), views:video.views, likes:video.likes, comments:video.comments}];
+
+      var maxViews = Math.max.apply(null, points.map(function(g){return g.views;}));
+      var minViews = Math.min.apply(null, points.map(function(g){return g.views;}));
+      if (maxViews === minViews) maxViews = minViews + 1;
+
+      var chartW=900, chartH=270, padL=60, padB=55, padT=20, padR=25;
+      var innerW=chartW-padL-padR, innerH=chartH-padT-padB;
+      var pts=points.map(function(g,i){
+        var x=points.length===1 ? padL+innerW/2 : padL+innerW*(i/(points.length-1));
+        var y=padT+innerH-(innerH*((g.views-minViews)/(maxViews-minViews)));
+        return {x:x,y:y,data:g};
+      });
+
+      var path=pts.map(function(p,i){return (i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1);}).join(' ');
+      var base=padT+innerH;
+      var area=path+' L'+pts[pts.length-1].x+' '+base+' L'+pts[0].x+' '+base+' Z';
+
+      var svg='<svg class="chart-svg" viewBox="0 0 '+chartW+' '+chartH+'" preserveAspectRatio="xMidYMid meet">';
+      for(var g=0;g<=4;g++){
+        var gy=padT+innerH*g/4;
+        var gv=Math.round(maxViews-(maxViews-minViews)*g/4);
+        svg+='<line x1="'+padL+'" y1="'+gy+'" x2="'+(chartW-padR)+'" y2="'+gy+'" stroke="rgba(255,255,255,.06)" />';
+        svg+='<text x="'+(padL-9)+'" y="'+(gy+4)+'" fill="#71717a" font-size="11" text-anchor="end">'+formatViews(gv)+'</text>';
+      }
+
+      svg+='<defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff2d2d" stop-opacity=".30"/><stop offset="100%" stop-color="#ff2d2d" stop-opacity="0"/></linearGradient></defs>';
+      svg+='<path d="'+area+'" fill="url(#areaGrad)"/>';
+      svg+='<path d="'+path+'" fill="none" stroke="#ff2d2d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
+
+      pts.forEach(function(p){
+        svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="5" fill="#ff2d2d" stroke="#08090d" stroke-width="2"/>';
+        svg+='<text x="'+p.x+'" y="'+(base+23)+'" fill="#a1a1aa" font-size="10" text-anchor="middle">'+escapeHtml(formatSnapshotTime(p.data.t))+'</text>';
+        svg+='<text x="'+p.x+'" y="'+(p.y-12)+'" fill="#ff2d2d" font-size="10" text-anchor="middle" font-weight="700">'+formatViews(p.data.views)+'</text>';
+      });
+      svg+='</svg>';
+
+      return svg;
+    }
+
+    async function fetchVideo(videoId) {
+      var url=apiUrl('videos',{
+        part:'snippet,statistics,contentDetails',
+        id:videoId
+      });
+      var res=await fetch(url);
+      var data=await res.json();
+      if(!res.ok || data.error) throw new Error(data.error && data.error.message ? data.error.message : 'YouTube API request failed');
+      if(!data.items || !data.items.length) throw new Error('Video nahi mila ya unavailable hai.');
+
+      var item=data.items[0], s=item.snippet||{}, st=item.statistics||{}, cd=item.contentDetails||{};
+      return {
+        id:item.id,
+        title:s.title||'Untitled',
+        channel:s.channelTitle||'Unknown channel',
+        views:Number(st.viewCount||0),
+        likes:Number(st.likeCount||0),
+        comments:Number(st.commentCount||0),
+        duration:isoDurationToText(cd.duration),
+        publishedAt:s.publishedAt,
+        tags:s.tags||[],
+        description:s.description||'',
+        hashtags:getHashtags(s.title,s.description),
+        keywords:extractKeywords(s.title,s.description,s.tags||[]),
+        thumbnail:s.thumbnails && (s.thumbnails.high||s.thumbnails.medium||s.thumbnails.default)
+          ? (s.thumbnails.high||s.thumbnails.medium||s.thumbnails.default).url : ''
+      };
+    }
+
+    async function renderDetails() {
+      var params=new URLSearchParams(window.location.search);
+      var vid=params.get('v');
+      var root=document.getElementById('detailsContent');
+
+      if(!vid){
+        root.innerHTML='<div class="card" style="text-align:center;padding:60px;"><h3>Video ID missing</h3><p style="color:var(--muted);margin-top:8px;">Trending page se video open karo.</p></div>';
+        return;
+      }
+
+      if(!YOUTUBE_API_KEY || YOUTUBE_API_KEY==='PASTE_YOUR_YOUTUBE_API_KEY_HERE'){
+        root.innerHTML='<div class="card" style="padding:35px;"><h3><i class="fa-solid fa-key"></i> YouTube API Key Required</h3><p style="color:var(--muted);margin-top:10px;">Trending page par API key save karo, phir video details open karo.</p><div class="btn-row"><a href="youtube-trending.html" class="btn"><i class="fa-solid fa-arrow-left"></i> Go to Trending</a></div></div>';
+        return;
+      }
+
+      root.innerHTML='<div class="card" style="text-align:center;padding:65px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:38px;color:var(--accent);"></i><p style="margin-top:15px;color:var(--muted-2);">YouTube se complete video analytics aa rahi hai...</p></div>';
+
+      try{
+        var video=await fetchVideo(vid);
+        saveSnapshot(video);
+        var history=getHistory(video);
+
+        var ageHours=getAgeHours(video.publishedAt);
+        var ageDays=Math.max(1,ageHours/24);
+        var avgDaily=video.views/ageDays;
+        var avgHourly=video.views/ageHours;
+        var likeRate=video.views?((video.likes/video.views)*100).toFixed(2):'0.00';
+        var commentRate=video.views?((video.comments/video.views)*100).toFixed(2):'0.00';
+        var engRate=video.views?(((video.likes+video.comments)/video.views)*100).toFixed(2):'0.00';
+
+        var velocity='First snapshot';
+        if(history.length>=2){
+          var a=history[history.length-2], b=history[history.length-1];
+          var dt=Math.max(1,(b.t-a.t)/3600000);
+          var dv=b.views-a.views;
+          velocity=formatViews(Math.max(0,dv/dt))+'/hr';
+        }
+
+        var tags=video.tags.length?video.tags:extractKeywords(video.title,video.description,[]);
+        var hashtags=video.hashtags.length?video.hashtags:['#YouTube','#Trending','#Viral'];
+        var keywords=video.keywords;
+
+        var tagsHtml=tags.map(function(t){return '<span class="tag-chip" onclick="copyOne(this,\''+escapeHtml(t).replace(/'/g,"\\'")+'\')">'+escapeHtml(t)+'</span>';}).join('');
+        var keywordsHtml=keywords.map(function(k){return '<span class="tag-chip keyword" onclick="copyOne(this,\''+escapeHtml(k).replace(/'/g,"\\'")+'\')">'+escapeHtml(k)+'</span>';}).join('');
+        var hashtagsHtml=hashtags.map(function(h){return '<span class="tag-chip hashtag" onclick="copyOne(this,\''+escapeHtml(h).replace(/'/g,"\\'")+'\')">'+escapeHtml(h)+'</span>';}).join('');
+
+        var historyNote=history.length>=2
+          ? 'Collected '+history.length+' snapshots ke basis par growth.'
+          : 'Abhi first snapshot hai. Baad me refresh karne par real growth history collect hogi.';
+
+        var html='';
+        html+='<div class="video-header"><div class="vh-top">';
+        html+='<div class="vh-thumb">'+(video.thumbnail?'<img src="'+escapeHtml(video.thumbnail)+'" style="width:100%;height:100%;object-fit:cover;" alt="">':'<i class="fa-solid fa-video"></i>')+'<div class="play-badge" onclick="window.open(\'https://www.youtube.com/watch?v='+encodeURIComponent(video.id)+'\',\'_blank\')"><i class="fa-solid fa-play"></i></div></div>';
+        html+='<div class="vh-info"><div class="vh-rank"><i class="fa-solid fa-chart-line"></i> LIVE VIDEO ANALYTICS</div>';
+        html+='<div class="vh-title">'+escapeHtml(video.title)+'</div>';
+        html+='<div class="vh-channel"><i class="fa-solid fa-circle-check"></i> '+escapeHtml(video.channel)+'</div>';
+        html+='<div class="vh-meta-row"><span class="vh-meta"><i class="fa-solid fa-eye"></i> '+formatViews(video.views)+' views</span>';
+        html+='<span class="vh-meta"><i class="fa-solid fa-clock"></i> '+escapeHtml(video.duration)+'</span>';
+        html+='<span class="vh-meta"><i class="fa-solid fa-calendar"></i> '+escapeHtml(ageText(video.publishedAt))+'</span>';
+        html+='<span class="vh-cat">YouTube</span></div></div></div></div>';
+
+        html+='<div class="stats-grid">';
+        html+='<div class="stat-box"><div class="icon"><i class="fa-solid fa-eye" style="color:var(--accent)"></i></div><div class="val">'+formatViews(video.views)+'</div><div class="lbl">Current Views</div></div>';
+        html+='<div class="stat-box"><div class="icon"><i class="fa-solid fa-thumbs-up" style="color:var(--green)"></i></div><div class="val">'+formatViews(video.likes)+'</div><div class="lbl">Likes</div></div>';
+        html+='<div class="stat-box"><div class="icon"><i class="fa-solid fa-comments" style="color:var(--blue)"></i></div><div class="val">'+formatViews(video.comments)+'</div><div class="lbl">Comments</div></div>';
+        html+='<div class="stat-box"><div class="icon"><i class="fa-solid fa-gauge-high" style="color:var(--yellow)"></i></div><div class="val">'+formatViews(avgDaily)+'</div><div class="lbl">Avg Views / Day</div></div>';
+        html+='<div class="stat-box"><div class="icon"><i class="fa-solid fa-bolt" style="color:var(--purple)"></i></div><div class="val">'+velocity+'</div><div class="lbl">Recent Velocity</div></div>';
+        html+='</div>';
+
+        html+='<div class="card"><h3><i class="fa-solid fa-chart-line"></i> Views Growth & Velocity</h3>';
+        html+='<p class="desc">'+escapeHtml(historyNote)+'</p>';
+        html+='<div class="chart-container">'+buildGrowthChart(video,history)+'</div>';
+        html+='</div>';
+
+        html+='<div class="card"><h3><i class="fa-solid fa-key"></i> SEO Keywords</h3><div class="tag-list">'+keywordsHtml+'</div><div class="btn-row"><button class="btn-outline btn" onclick="copyText(\''+escapeHtml(keywords.join(', ')).replace(/'/g,"\\'")+'\',this)"><i class="fa-solid fa-copy"></i> Copy All Keywords</button></div></div>';
+
+        html+='<div class="card"><h3><i class="fa-solid fa-tag"></i> Video Tags</h3><div class="tag-list">'+tagsHtml+'</div><div class="btn-row"><button class="btn-outline btn" onclick="copyText(\''+escapeHtml(tags.join(', ')).replace(/'/g,"\\'")+'\',this)"><i class="fa-solid fa-copy"></i> Copy All Tags</button></div></div>';
+
+        html+='<div class="card"><h3><i class="fa-solid fa-hashtag"></i> Hashtags</h3><div class="tag-list">'+hashtagsHtml+'</div><div class="btn-row"><button class="btn-outline btn" onclick="copyText(\''+escapeHtml(hashtags.join(' ')).replace(/'/g,"\\'")+'\',this)"><i class="fa-solid fa-copy"></i> Copy All Hashtags</button></div></div>';
+
+        html+='<div class="card"><h3><i class="fa-solid fa-align-left"></i> Description</h3>';
+        html+='<div class="desc-box">'+escapeHtml(video.description).replace(/(\d{1,2}:\d{2})/g,'<span class="timestamp">$1</span>')+'</div>';
+        html+='<div class="btn-row"><button class="btn-outline btn" onclick="copyText('+JSON.stringify(video.description)+',this)"><i class="fa-solid fa-copy"></i> Copy Description</button>';
+        html+='<a href="https://www.youtube.com/watch?v='+encodeURIComponent(video.id)+'" target="_blank" class="btn"><i class="fa-brands fa-youtube"></i> Watch on YouTube</a></div></div>';
+
+        root.innerHTML=html;
+        document.title=video.title+' — View49 Analytics';
+      }catch(err){
+        root.innerHTML='<div class="card" style="padding:35px;"><h3 style="color:var(--accent);"><i class="fa-solid fa-triangle-exclamation"></i> Unable to load video</h3><p style="color:var(--muted-2);margin-top:10px;">'+escapeHtml(err.message)+'</p><div class="btn-row"><a href="youtube-trending.html" class="btn"><i class="fa-solid fa-arrow-left"></i> Back to Trending</a></div></div>';
+      }
+    }
+
+    function copyOne(el,text) {
+      navigator.clipboard.writeText(text).then(function(){
+        var old=el.textContent;
+        el.textContent='✓ '+old;
+        setTimeout(function(){el.textContent=old;},1200);
+      });
+    }
+
+    renderDetails();
+  </script>
+</body>
+</html>
