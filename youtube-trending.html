@@ -215,7 +215,7 @@
 
     <div class="card">
       <h3><i class="fa-brands fa-youtube" style="color:#ff0000;"></i> YouTube Trending Explorer <span class="pro-tag">PRO</span></h3>
-      <p class="desc">Region select karo aur "Load" dabao — YouTube par abhi kya trending hai woh videos rank, views, channel aur category ke saath dikhega</p>
+      <p class="desc">Region select karo aur "Load" dabao — YouTube ka live most-popular data rank, views, thumbnail aur channel ke saath dikhega</p>
 
       <div class="input-group">
         <label>Select Region / Country</label>
@@ -235,9 +235,14 @@
         <button class="btn" onclick="loadYtTrending()"><i class="fa-solid fa-fire"></i> Load Trending Videos</button>
         <button class="btn btn-outline" onclick="document.getElementById('ytTrendResults').innerHTML=''; document.getElementById('ytTrendStats').style.display='none';">Clear</button>
       </div>
+      <div style="margin-top:14px;color:var(--muted);font-size:11px;line-height:1.6;">
+        <i class="fa-solid fa-circle-info"></i>
+        Real trending data ke liye YouTube Data API v3 key chahiye. First click <b>Load Trending Videos</b>; agar key missing hai to isi page par setup box aa jayega.
+        Details page me API se title, description, tags, hashtags aur current statistics milenge. View-growth chart aapke collected snapshots se banega.
+      </div>
     </div>
 
-    <div class="stats-grid" id="ytTrendStats" style="display:none;">
+    <div class="stats-grid" id="ytTrendStats style="display:none;">
       <div class="stat-box"><div class="val" id="ytTotal">0</div><div class="lbl">Trending Videos</div></div>
       <div class="stat-box"><div class="val" id="ytTotalViews">0</div><div class="lbl">Total Views</div></div>
       <div class="stat-box"><div class="val" id="ytTopViews">0</div><div class="lbl">Most Viewed</div></div>
@@ -252,7 +257,23 @@
   <footer>© 2026 View49 Creator Suite Pro. All rights reserved.</footer>
 
   <script>
+    // ============================================================
+    // VIEW49 PRO — REAL YOUTUBE TRENDING
+    // Uses YouTube Data API v3. Add your API key below.
+    // Restrict the key to your domain + YouTube Data API in Google Cloud.
+    // ============================================================
+    const YOUTUBE_API_KEY = localStorage.getItem('view49_youtube_api_key') || 'PASTE_YOUR_YOUTUBE_API_KEY_HERE';
     var selectedRegion = 'IN';
+
+    var regionNames = {
+      IN: 'India', US: 'USA', GB: 'UK', CA: 'Canada',
+      AU: 'Australia', JP: 'Japan', KR: 'Korea', BR: 'Brazil'
+    };
+
+    var regionFlags = {
+      IN:'🇮🇳', US:'🇺🇸', GB:'🇬🇧', CA:'🇨🇦',
+      AU:'🇦🇺', JP:'🇯🇵', KR:'🇰🇷', BR:'🇧🇷'
+    };
 
     function selectRegion(code, el) {
       selectedRegion = code;
@@ -264,10 +285,11 @@
       var t = document.getElementById('toast');
       t.textContent = msg;
       t.className = 'toast show ' + (type || '');
-      setTimeout(function() { t.className = 'toast ' + (type || ''); }, 3000);
+      setTimeout(function() { t.className = 'toast ' + (type || ''); }, 3500);
     }
 
     function formatViews(v) {
+      v = Number(v) || 0;
       if (v >= 10000000) return (v / 10000000).toFixed(1) + ' Cr';
       if (v >= 100000) return (v / 100000).toFixed(1) + ' L';
       if (v >= 1000) return (v / 1000).toFixed(1) + 'K';
@@ -276,124 +298,188 @@
 
     function catClass(cat) {
       var c = (cat || '').toLowerCase();
-      var map = { sports:'sports', tech:'tech', technology:'tech', gaming:'gaming', music:'music', entertainment:'entertainment', finance:'finance', food:'food', travel:'travel', fitness:'fitness', education:'education', comedy:'comedy', auto:'auto', nature:'nature', beauty:'beauty' };
+      var map = { sports:'sports', tech:'tech', technology:'tech', gaming:'gaming', music:'music',
+        entertainment:'entertainment', finance:'finance', food:'food', travel:'travel',
+        fitness:'fitness', education:'education', comedy:'comedy', auto:'auto', nature:'nature', beauty:'beauty' };
       return map[c] || 'entertainment';
     }
 
     function thumbIcon(cat) {
       var c = (cat || '').toLowerCase();
-      var map = { sports:'fa-futbol', tech:'fa-microchip', technology:'fa-microchip', gaming:'fa-gamepad', music:'fa-music', entertainment:'fa-film', finance:'fa-indian-rupee-sign', food:'fa-utensils', travel:'fa-plane', fitness:'fa-dumbbell', education:'fa-graduation-cap', comedy:'fa-face-laugh', auto:'fa-car', nature:'fa-tree', beauty:'fa-spray-can' };
+      var map = { sports:'fa-futbol', tech:'fa-microchip', technology:'fa-microchip', gaming:'fa-gamepad',
+        music:'fa-music', entertainment:'fa-film', finance:'fa-indian-rupee-sign', food:'fa-utensils',
+        travel:'fa-plane', fitness:'fa-dumbbell', education:'fa-graduation-cap', comedy:'fa-face-laugh',
+        auto:'fa-car', nature:'fa-tree', beauty:'fa-spray-can' };
       return map[c] || 'fa-video';
     }
 
-    var ytTrendingData = {
-      IN: [
-        { title: "India vs Pakistan Cricket Match Highlights — Last Over THRILLER!", channel: "Sports Today", views: 12500000, duration: "12:45", category: "Sports" },
-        { title: "Bigg Boss 17 Full Episode Today — Big FIGHT in House!", channel: "Colors TV", views: 8900000, duration: "44:12", category: "Entertainment" },
-        { title: "I Bought Everything in a Village Shop for 24 Hours!", channel: "Ashish Chanchlani", views: 7200000, duration: "18:33", category: "Comedy" },
-        { title: "Stock Market Crash 2026 — What Should Investors Do?", channel: "Pranjal Kamra", views: 5400000, duration: "22:10", category: "Finance" },
-        { title: "BGMI Pro Tournament Finals — Insane Clutch!", channel: "ScoutOP", views: 4800000, duration: "28:55", category: "Gaming" },
-        { title: "New iPhone 17 Launch — Full Specs & Price in India", channel: "Technical Guruji", views: 4100000, duration: "15:20", category: "Tech" },
-        { title: "30 Day Body Transformation Challenge — Day 1", channel: "FitMuscle TV", views: 3600000, duration: "10:45", category: "Fitness" },
-        { title: "Mumbai Street Food Tour — Best Vada Pav in the City!", channel: "Foodie Inc", views: 2900000, duration: "16:30", category: "Food" },
-        { title: "JEE Mains 2026 — Last 30 Days Strategy to Score 99%", channel: "Unacademy", views: 2500000, duration: "31:22", category: "Education" },
-        { title: "BTS Concert India 2026 — Full Performance Live!", channel: "BTS Official", views: 2100000, duration: "1:12:40", category: "Music" }
-      ],
-      US: [
-        { title: "MrBeast Gives Away $1,000,000 to Random People!", channel: "MrBeast", views: 45000000, duration: "16:22", category: "Entertainment" },
-        { title: "iPhone 17 Pro Max Review — Is It Worth It?", channel: "Marques Brownlee", views: 12000000, duration: "14:55", category: "Tech" },
-        { title: "NVIDIA RTX 5090 — The Ultimate GPU Benchmark Test", channel: "Linus Tech Tips", views: 8900000, duration: "22:10", category: "Tech" },
-        { title: "Super Bowl 2026 Halftime Show — Full Performance", channel: "NFL", views: 7500000, duration: "13:45", category: "Sports" },
-        { title: "I Survived 50 Hours in Antarctica!", channel: "MrBeast", views: 6200000, duration: "18:33", category: "Entertainment" },
-        { title: "Tesla Model Y 2026 — Full Self-Driving Demo", channel: "Tesla", views: 5400000, duration: "20:15", category: "Auto" },
-        { title: "ChatGPT 5 vs Gemini 2 — Which AI Is Smarter?", channel: "AI Explained", views: 4100000, duration: "17:22", category: "Tech" },
-        { title: "GTA 6 Gameplay Leaked — First Look!", channel: "Gaming World", views: 3800000, duration: "10:44", category: "Gaming" },
-        { title: "How I Built a $100K/Month Passive Income Stream", channel: "Ali Abdaal", views: 3200000, duration: "25:30", category: "Finance" },
-        { title: "Drake vs Kendrick Lamar — The Full Story Explained", channel: "HipHop DX", views: 2800000, duration: "19:18", category: "Music" }
-      ],
-      GB: [
-        { title: "Premier League Match of the Week — Full Highlights", channel: "Premier League", views: 8900000, duration: "11:22", category: "Sports" },
-        { title: "London to Scotland Road Trip — 7 Days Adventure!", channel: "Travel UK", views: 3400000, duration: "24:15", category: "Travel" },
-        { title: "British Bake Off 2026 — The Most STUNNING Cake!", channel: "BBC", views: 2800000, duration: "55:30", category: "Entertainment" },
-        { title: "Manchester United vs Liverpool — Tactical Breakdown", channel: "Football Daily", views: 2200000, duration: "14:40", category: "Sports" },
-        { title: "I Tried Every British Pub Food in One Day", channel: "Food Vlogs UK", views: 1900000, duration: "18:55", category: "Food" },
-        { title: "London Property Market 2026 — Buy or Wait?", channel: "Money UK", views: 1500000, duration: "21:10", category: "Finance" },
-        { title: "F1 British Grand Prix 2026 — Full Race Highlights", channel: "Formula 1", views: 1300000, duration: "8:45", category: "Sports" },
-        { title: "The Crown Season 7 — Official Trailer Breakdown", channel: "Netflix UK", views: 1100000, duration: "12:22", category: "Entertainment" }
-      ],
-      CA: [
-        { title: "NHL Stanley Cup Finals 2026 — Game 7 OT THRILLER!", channel: "NHL", views: 6800000, duration: "14:22", category: "Sports" },
-        { title: "Toronto to Vancouver Road Trip — 14 Days Across Canada!", channel: "Travel Canada", views: 3200000, duration: "28:45", category: "Travel" },
-        { title: "Canadian Winter Survival Challenge — 50 Below Zero!", channel: "Nature CA", views: 2400000, duration: "20:10", category: "Nature" },
-        { title: "Toronto Real Estate Market 2026 — Crash Coming?", channel: "Finance CA", views: 1800000, duration: "18:33", category: "Finance" },
-        { title: "Best Poutine in Canada — I Tried 20 Places!", channel: "Food CA", views: 1400000, duration: "16:40", category: "Food" },
-        { title: "Northern Lights in Yukon — Most Epic Footage!", channel: "Nature CA", views: 1100000, duration: "10:55", category: "Travel" }
-      ],
-      AU: [
-        { title: "Australia vs England Cricket — Ashes 2026 Highlights!", channel: "Cricket AU", views: 9200000, duration: "13:22", category: "Sports" },
-        { title: "Great Barrier Reef Diving — Most Beautiful Underwater!", channel: "Travel AU", views: 4500000, duration: "22:15", category: "Travel" },
-        { title: "Sydney to Melbourne Road Trip — 5 Days Adventure!", channel: "Travel AU", views: 3100000, duration: "25:40", category: "Travel" },
-        { title: "Aussie BBQ Championship 2026 — Insense Meat!", channel: "Food AU", views: 2200000, duration: "19:55", category: "Food" },
-        { title: "Australian Wildlife — Close Encounter with Spiders!", channel: "Wildlife AU", views: 1800000, duration: "15:30", category: "Nature" },
-        { title: "Sydney Property Market 2026 — Investment Guide", channel: "Finance AU", views: 1200000, duration: "21:10", category: "Finance" }
-      ],
-      JP: [
-        { title: "Tokyo Night Walk — Most Beautiful City at Night 4K!", channel: "Tokyo Walk", views: 8500000, duration: "45:22", category: "Travel" },
-        { title: "Anime Awards 2026 — Best Anime of the Year Revealed!", channel: "Anime News", views: 6200000, duration: "28:15", category: "Entertainment" },
-        { title: "Japan Street Food Tour — Osaka's Best Ramen!", channel: "Food Japan", views: 4800000, duration: "20:33", category: "Food" },
-        { title: "Mount Fuji Hiking — Complete Guide 2026", channel: "Travel Japan", views: 3400000, duration: "24:45", category: "Travel" },
-        { title: "Tokyo Auto Salon 2026 — Best Modified Cars!", channel: "Auto Japan", views: 2800000, duration: "18:20", category: "Auto" },
-        { title: "Pokemon GO Japan Event — Legendary Raid!", channel: "Gaming JP", views: 2200000, duration: "15:10", category: "Gaming" }
-      ],
-      KR: [
-        { title: "BTS Comeback 2026 — Full MV + Behind the Scenes!", channel: "BTS Official", views: 38000000, duration: "8:45", category: "Music" },
-        { title: "K-Drama 2026 — Best New Dramas This Year!", channel: "KDRAMA", views: 7500000, duration: "22:30", category: "Entertainment" },
-        { title: "Seoul Street Food — Trying Korean BBQ in Myeongdong!", channel: "Food Korea", views: 5200000, duration: "19:45", category: "Food" },
-        { title: "K-Pop Concert 2026 — Full Live Performance!", channel: "KCON", views: 4100000, duration: "1:25:30", category: "Music" },
-        { title: "Korean Skincare Routine 2026 — Glass Skin Secret!", channel: "Beauty KR", views: 3200000, duration: "16:22", category: "Beauty" },
-        { title: "Seoul to Busan Train Journey — KTX Experience!", channel: "Travel KR", views: 2100000, duration: "14:50", category: "Travel" }
-      ],
-      BR: [
-        { title: "Brasil vs Argentina — Copa America 2026 FINAL!", channel: "Futebol BR", views: 15000000, duration: "13:22", category: "Sports" },
-        { title: "Rio de Janeiro Carnival 2026 — Full Parade HD!", channel: "Carnaval BR", views: 9800000, duration: "55:45", category: "Entertainment" },
-        { title: "Amazon Rainforest Expedition — 7 Days Survival!", channel: "Nature BR", views: 4200000, duration: "32:10", category: "Nature" },
-        { title: "Brazilian Street Food — Best Pão de Queijo in São Paulo!", channel: "Food BR", views: 3100000, duration: "18:33", category: "Food" },
-        { title: "São Paulo City Tour — Biggest City in Brazil!", channel: "Travel BR", views: 2200000, duration: "21:15", category: "Travel" },
-        { title: "Brazil Stock Market 2026 — Investindo em Ações", channel: "Finance BR", views: 1500000, duration: "24:40", category: "Finance" }
-      ]
-    };
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, function(c) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+      });
+    }
 
-    var regionNames = { IN: 'India', US: 'USA', GB: 'UK', CA: 'Canada', AU: 'Australia', JP: 'Japan', KR: 'Korea', BR: 'Brazil' };
+    function isoDurationToText(iso) {
+      var m = String(iso || '').match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+      if (!m) return '—';
+      var h = Number(m[1] || 0), min = Number(m[2] || 0), sec = Number(m[3] || 0);
+      return h ? h + ':' + String(min).padStart(2,'0') + ':' + String(sec).padStart(2,'0')
+               : min + ':' + String(sec).padStart(2,'0');
+    }
 
-    function loadYtTrending() {
-      var videos = ytTrendingData[selectedRegion] || ytTrendingData.IN;
-      videos.sort(function(a, b) { return b.views - a.views; });
+    function timeAgo(dateString) {
+      var diff = Math.max(0, Date.now() - new Date(dateString).getTime());
+      var mins = Math.floor(diff / 60000);
+      if (mins < 60) return mins + ' min ago';
+      var hrs = Math.floor(mins / 60);
+      if (hrs < 24) return hrs + ' hr ago';
+      var days = Math.floor(hrs / 24);
+      if (days < 30) return days + ' day' + (days === 1 ? '' : 's') + ' ago';
+      var months = Math.floor(days / 30);
+      return months + ' month' + (months === 1 ? '' : 's') + ' ago';
+    }
+
+    function apiUrl(endpoint, params) {
+      var q = new URLSearchParams(params);
+      q.set('key', YOUTUBE_API_KEY);
+      return 'https://www.googleapis.com/youtube/v3/' + endpoint + '?' + q.toString();
+    }
+
+    async function loadYtTrending() {
+      if (!YOUTUBE_API_KEY || YOUTUBE_API_KEY === 'PASTE_YOUR_YOUTUBE_API_KEY_HERE') {
+        showToast('⚠️ Pehle YouTube API key add karo. Neeche setup guide hai.', '');
+        renderApiKeyBox();
+        return;
+      }
+
+      var result = document.getElementById('ytTrendResults');
+      result.innerHTML = '<div class="card" style="text-align:center;padding:55px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:35px;color:#ff2d2d;"></i><p style="margin-top:14px;color:#a1a1aa;">Real YouTube trending videos load ho rahe hain...</p></div>';
+
+      try {
+        var url = apiUrl('videos', {
+          part: 'snippet,statistics,contentDetails',
+          chart: 'mostPopular',
+          regionCode: selectedRegion,
+          maxResults: '50'
+        });
+
+        var res = await fetch(url);
+        var data = await res.json();
+
+        if (!res.ok || data.error) {
+          throw new Error(data.error && data.error.message ? data.error.message : 'YouTube API request failed');
+        }
+
+        var videos = (data.items || []).map(function(item, index) {
+          var s = item.snippet || {};
+          var st = item.statistics || {};
+          var cd = item.contentDetails || {};
+          return {
+            id: item.id,
+            rank: index + 1,
+            title: s.title || 'Untitled',
+            channel: s.channelTitle || 'Unknown channel',
+            views: Number(st.viewCount || 0),
+            likes: Number(st.likeCount || 0),
+            comments: Number(st.commentCount || 0),
+            duration: isoDurationToText(cd.duration),
+            category: s.categoryId || 'Entertainment',
+            publishedAt: s.publishedAt,
+            thumbnail: s.thumbnails && (s.thumbnails.high || s.thumbnails.medium || s.thumbnails.default)
+              ? (s.thumbnails.high || s.thumbnails.medium || s.thumbnails.default).url : '',
+            description: s.description || '',
+            tags: s.tags || []
+          };
+        });
+
+        // Persist the current snapshot so the details page can build a real growth history.
+        videos.forEach(saveTrendSnapshot);
+
+        renderTrending(videos);
+      } catch (err) {
+        result.innerHTML = '<div class="card" style="padding:35px;">' +
+          '<h3 style="color:#ff2d2d;"><i class="fa-solid fa-triangle-exclamation"></i> YouTube API Error</h3>' +
+          '<p style="color:#a1a1aa;margin-top:10px;">' + escapeHtml(err.message) + '</p>' +
+          '<div style="margin-top:18px;color:#71717a;font-size:12px;line-height:1.7;">' +
+          'Check: API key valid hai, YouTube Data API v3 enabled hai, aur API key restrictions sahi hain.' +
+          '</div></div>';
+      }
+    }
+
+    function saveTrendSnapshot(v) {
+      try {
+        var key = 'view49_history_' + v.id;
+        var old = JSON.parse(localStorage.getItem(key) || '[]');
+        old.push({ t: Date.now(), views: v.views, likes: v.likes, comments: v.comments });
+        var cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
+        old = old.filter(function(x) { return x.t >= cutoff; });
+        // Keep snapshots small and useful.
+        if (old.length > 100) old = old.slice(-100);
+        localStorage.setItem(key, JSON.stringify(old));
+        localStorage.setItem('view49_last_video_' + v.id, JSON.stringify(v));
+      } catch(e) {}
+    }
+
+    function renderApiKeyBox() {
+      var box = document.getElementById('ytTrendResults');
+      box.innerHTML =
+        '<div class="card" style="padding:28px;">' +
+        '<h3><i class="fa-solid fa-key"></i> YouTube API Key Setup</h3>' +
+        '<p class="desc">Key sirf browser me save hogi. Production me Google Cloud se HTTP referrer restriction zaroor lagana.</p>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
+        '<input id="apiKeyInput" type="password" placeholder="AIza..." style="flex:1;min-width:260px;background:#14141f;border:1px solid rgba(255,255,255,.1);color:#fff;padding:13px 14px;border-radius:10px;">' +
+        '<button class="btn" onclick="saveApiKey()"><i class="fa-solid fa-save"></i> Save API Key</button>' +
+        '</div></div>';
+    }
+
+    function saveApiKey() {
+      var key = document.getElementById('apiKeyInput').value.trim();
+      if (!key) return showToast('API key empty hai.', '');
+      localStorage.setItem('view49_youtube_api_key', key);
+      showToast('✅ API key saved!', 'success');
+      loadYtTrending();
+    }
+
+    function renderTrending(videos) {
       var totalViews = videos.reduce(function(s, v) { return s + v.views; }, 0);
       var uniqueChannels = new Set(videos.map(function(v) { return v.channel; })).size;
+
       document.getElementById('ytTrendStats').style.display = 'grid';
       document.getElementById('ytTotal').textContent = videos.length;
       document.getElementById('ytTotalViews').textContent = formatViews(totalViews);
-      document.getElementById('ytTopViews').textContent = formatViews(videos[0].views);
+      document.getElementById('ytTopViews').textContent = videos.length ? formatViews(videos[0].views) : '0';
       document.getElementById('ytChannels').textContent = uniqueChannels;
-      var html = '<div class="section-h"><i class="fa-solid fa-fire"></i> 🔥 Trending in ' + regionNames[selectedRegion] + '</div>';
+
+      var html = '<div class="section-h"><i class="fa-solid fa-fire"></i> 🔥 Live Trending in ' + regionNames[selectedRegion] + '</div>';
       html += '<div class="yt-grid">';
+
       videos.forEach(function(v, i) {
         var rankClass = i < 3 ? 'top3' : '';
-        var vidId = selectedRegion + (i + 1);
-        html += '<div class="yt-video-card" onclick="window.location.href=\'video-details.html?v=' + vidId + '\'">';
-        html += '<div class="yt-thumb"><span class="yt-rank-badge ' + rankClass + '">#' + (i+1) + '</span>';
-        html += '<div class="thumb-bg"><i class="fa-solid ' + thumbIcon(v.category) + '"></i></div>';
+        html += '<div class="yt-video-card" onclick="openVideoDetails(\'' + v.id + '\')">';
+        html += '<div class="yt-thumb">';
+        html += '<span class="yt-rank-badge ' + rankClass + '">#' + (i+1) + '</span>';
+        if (v.thumbnail) html += '<img src="' + escapeHtml(v.thumbnail) + '" alt="" style="width:100%;height:100%;object-fit:cover;">';
+        else html += '<div class="thumb-bg"><i class="fa-solid ' + thumbIcon(v.category) + '"></i></div>';
         html += '<div class="play-overlay"><div class="play-icon"><i class="fa-solid fa-play"></i></div></div>';
-        html += '<span class="yt-duration">' + v.duration + '</span></div>';
-        html += '<div class="yt-info"><div class="yt-title">' + v.title + '</div>';
-        html += '<div class="yt-channel"><i class="fa-solid fa-circle-check" style="color:var(--blue);font-size:10px;"></i> ' + v.channel + '</div>';
+        html += '<span class="yt-duration">' + escapeHtml(v.duration) + '</span></div>';
+        html += '<div class="yt-info"><div class="yt-title">' + escapeHtml(v.title) + '</div>';
+        html += '<div class="yt-channel"><i class="fa-solid fa-circle-check" style="color:var(--blue);font-size:10px;"></i> ' + escapeHtml(v.channel) + '</div>';
         html += '<div class="yt-stats"><span><i class="fa-solid fa-eye"></i> ' + formatViews(v.views) + ' views</span>';
-        html += '<span class="yt-cat ' + catClass(v.category) + '">' + v.category + '</span></div>';
-        html += '</div></div>';
+        html += '<span>' + escapeHtml(timeAgo(v.publishedAt)) + '</span></div></div></div>';
       });
+
       html += '</div>';
       document.getElementById('ytTrendResults').innerHTML = html;
-      showToast('✅ Trending videos loaded for ' + regionNames[selectedRegion] + '!', 'success');
+      showToast('✅ Real YouTube trending loaded — ' + regionNames[selectedRegion], 'success');
+    }
+
+    function openVideoDetails(videoId) {
+      window.location.href = 'video-details.html?v=' + encodeURIComponent(videoId);
+    }
+
+    // If an API key was already saved, don't auto-call the API until the user clicks Load.
+    if (YOUTUBE_API_KEY && YOUTUBE_API_KEY !== 'PASTE_YOUR_YOUTUBE_API_KEY_HERE') {
+      // key is ready
     }
   </script>
 </body>
