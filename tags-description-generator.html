@@ -1,0 +1,993 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gemini SEO Engine — Tags & Description Generator</title>
+<style>
+  :root{
+    --bg:#070a12; --bg2:#0b1020; --panel:#0f1626; --panel2:#131c30;
+    --line:#1e293b; --line2:#273449;
+    --txt:#e5edf7; --mut:#8a98b3; --mut2:#5b6985;
+    --red:#ff3b3b; --red2:#ff5a5a; --blue:#3b82f6; --blue2:#60a5fa;
+    --green:#22d39a; --amber:#f5b945; --violet:#9b8cff;
+    --grad:linear-gradient(135deg,#ff3b3b 0%,#b5179e 45%,#3b82f6 100%);
+    --grad2:linear-gradient(135deg,#60a5fa,#9b8cff);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 600px at 12% -8%, rgba(255,59,59,.10), transparent 60%),
+      radial-gradient(1000px 600px at 100% 0%, rgba(59,130,246,.12), transparent 55%),
+      radial-gradient(900px 700px at 50% 120%, rgba(155,140,255,.10), transparent 60%),
+      var(--bg);
+    color:var(--txt);
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:rgba(59,130,246,.35)}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#22304a;border-radius:20px}
+  ::-webkit-scrollbar-track{background:transparent}
+
+  /* layout */
+  .wrap{max-width:1180px;margin:0 auto;padding:18px 16px 60px}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:10px 14px;border:1px solid var(--line);border-radius:14px;
+    background:linear-gradient(180deg,rgba(20,28,48,.7),rgba(11,16,32,.6));
+    backdrop-filter:blur(8px);position:sticky;top:10px;z-index:30;
+  }
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:.2px}
+  .logo{
+    width:34px;height:34px;border-radius:10px;background:var(--grad);
+    display:grid;place-items:center;box-shadow:0 6px 20px rgba(255,59,59,.25);
+    font-size:18px;
+  }
+  .brand small{display:block;font-weight:500;color:var(--mut);font-size:11px;letter-spacing:.4px}
+  .toplinks{display:flex;align-items:center;gap:8px}
+  .chip{
+    font-size:11px;font-weight:700;padding:7px 11px;border-radius:999px;
+    border:1px solid var(--line2);background:rgba(255,255,255,.03);color:var(--mut);
+    display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:.18s;
+  }
+  .chip:hover{color:var(--txt);border-color:#3a4a68;background:rgba(255,255,255,.06)}
+  .chip.live{color:var(--green);border-color:rgba(34,211,154,.35)}
+  .chip.live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+
+  /* hero search */
+  .hero{padding:30px 4px 14px;text-align:center}
+  .hero h1{
+    font-size:clamp(26px,4.4vw,42px);margin:0 0 8px;font-weight:850;letter-spacing:-.5px;
+    background:linear-gradient(90deg,#fff 0%,#cfe0ff 40%,#9b8cff 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p{color:var(--mut);margin:0 auto;max-width:620px;font-size:14px}
+  .engrow{
+    display:flex;align-items:center;justify-content:center;gap:8px;margin:14px 0 6px;
+    font-size:12px;color:var(--mut2);flex-wrap:wrap;
+  }
+  .engrow b{color:var(--blue2)}
+
+  /* the big search box */
+  .searchbar{
+    margin:18px auto 0;max-width:880px;
+    border:1.5px solid var(--line2);border-radius:18px;
+    background:linear-gradient(180deg,rgba(20,28,48,.85),rgba(11,16,32,.85));
+    padding:10px;display:flex;gap:10px;align-items:center;
+    box-shadow:0 30px 70px -30px rgba(0,0,0,.7);
+    transition:.2s;
+  }
+  .searchbar:focus-within{border-color:rgba(59,130,246,.7);box-shadow:0 0 0 4px rgba(59,130,246,.12),0 30px 70px -30px rgba(0,0,0,.7)}
+  .searchbar .gico{padding:0 6px 0 10px;color:var(--blue2);font-size:20px}
+  .searchbar input{
+    flex:1;background:transparent;border:0;outline:0;color:var(--txt);
+    font-size:16px;padding:10px 4px;
+  }
+  .searchbar input::placeholder{color:var(--mut2)}
+  .go{
+    border:0;cursor:pointer;border-radius:12px;padding:11px 18px;
+    background:var(--grad);color:#fff;font-weight:800;font-size:14px;
+    display:inline-flex;align-items:center;gap:8px;transition:.18s;white-space:nowrap;
+  }
+  .go:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .go:active{transform:translateY(0)}
+  .go[disabled]{opacity:.55;cursor:default;transform:none;filter:none}
+
+  .filters{
+    max-width:880px;margin:12px auto 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+  }
+  .field{flex:1;min-width:200px}
+  .field label{font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--mut2);font-weight:700}
+  .field input,.field select{
+    width:100%;margin-top:5px;background:#0c1322;border:1px solid var(--line2);
+    color:var(--txt);border-radius:10px;padding:9px 11px;font-size:13px;outline:0;
+  }
+  .field input:focus,.field select:focus{border-color:rgba(59,130,246,.6)}
+  .seg{display:flex;background:#0c1322;border:1px solid var(--line2);border-radius:10px;overflow:hidden}
+  .seg button{
+    background:transparent;border:0;color:var(--mut);padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;
+  }
+  .seg button.on{background:rgba(59,130,246,.16);color:var(--blue2)}
+  .optline{
+    max-width:880px;margin:12px auto 0;display:flex;gap:14px;flex-wrap:wrap;align-items:center;
+    font-size:12px;color:var(--mut);
+  }
+  .toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+  .toggle .tk{width:36px;height:20px;border-radius:20px;background:#1b2438;border:1px solid var(--line2);position:relative;transition:.2s}
+  .toggle .tk::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#6b7a99;transition:.2s}
+  .toggle.on .tk{background:rgba(59,130,246,.3);border-color:rgba(59,130,246,.6)}
+  .toggle.on .tk::after{left:18px;background:var(--blue2)}
+
+  /* status */
+  .status{max-width:880px;margin:14px auto 0;min-height:22px;text-align:center;font-size:12.5px}
+  .status.err{color:var(--red2)} .status.ok{color:var(--green)}
+
+  /* progress steps */
+  .steps{max-width:880px;margin:8px auto 0;display:none;gap:8px;flex-wrap:wrap}
+  .steps.show{display:flex}
+  .step{
+    flex:1;min-width:120px;border:1px solid var(--line);border-radius:12px;padding:10px;
+    background:rgba(15,22,38,.6);font-size:11.5px;color:var(--mut);position:relative;overflow:hidden;
+  }
+  .step .stt{font-weight:800;color:var(--txt);font-size:12.5px;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+  .step .bar{height:3px;background:#1b2438;border-radius:3px;margin-top:8px;overflow:hidden}
+  .step .bar i{display:block;height:100%;width:0;background:var(--grad);transition:.3s}
+  .step.done .bar i{width:100%}
+  .step.run{border-color:rgba(59,130,246,.5)}
+  .step.run .stt{color:var(--blue2)}
+
+  /* results grid */
+  .results{max-width:1180px;margin:22px auto 0;display:none}
+  .results.show{display:block}
+  .grid{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+
+  .card{
+    border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--panel),#0b1120);
+    padding:16px;position:relative;
+  }
+  .card h3{margin:0 0 12px;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:space-between}
+  .card h3 .left{display:flex;align-items:center;gap:8px}
+  .card h3 .tag{font-size:10.5px;font-weight:700;color:var(--mut2);background:rgba(255,255,255,.04);border:1px solid var(--line2);padding:3px 8px;border-radius:999px}
+  .iconbtn{
+    font-size:11px;font-weight:700;color:var(--mut);background:rgba(255,255,255,.04);
+    border:1px solid var(--line2);padding:6px 10px;border-radius:9px;cursor:pointer;transition:.15s;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .iconbtn:hover{color:var(--txt);border-color:#3a4a68;background:rgba(255,255,255,.08)}
+
+  /* SERP preview */
+  .serp{
+    background:#fff;color:#202124;border-radius:12px;padding:14px 16px;font-family:arial,system-ui;
+    box-shadow:0 6px 24px -10px rgba(0,0,0,.5);
+  }
+  .serp .url{font-size:12px;color:#5f6368;display:flex;align-items:center;gap:7px}
+  .serp .url .fav{width:18px;height:18px;border-radius:50%;background:#ea4335;display:grid;place-items:center;color:#fff;font-size:10px;font-weight:700}
+  .serp .ttl{font-size:18px;color:#1a0dab;margin:4px 0 2px;font-weight:400;line-height:1.25}
+  .serp .desc{font-size:13px;color:#4d5150;line-height:1.5}
+  .serp .meta{font-size:11px;color:#70757a;margin-top:6px}
+
+  /* tags */
+  .tagwrap{display:flex;flex-wrap:wrap;gap:7px}
+  .tag{
+    display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;
+    padding:7px 11px;border-radius:999px;border:1px solid var(--line2);
+    background:#0e1626;color:var(--txt);cursor:pointer;transition:.15s;
+  }
+  .tag:hover{border-color:rgba(59,130,246,.5);background:#122036}
+  .tag .diff{font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:999px}
+  .d-easy{background:rgba(34,211,154,.16);color:var(--green)}
+  .d-mid{background:rgba(245,185,69,.16);color:var(--amber)}
+  .d-hard{background:rgba(255,90,90,.16);color:var(--red2)}
+  .tag.sel{border-color:rgba(59,130,246,.7);background:rgba(59,130,246,.18)}
+  .tag .x{opacity:.5;font-size:14px;line-height:1}
+  .tag:hover .x{opacity:1;color:var(--red2)}
+
+  .tagtools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .ghost{background:transparent;border:1px dashed var(--line2);color:var(--mut);padding:7px 11px;border-radius:9px;font-size:11.5px;font-weight:600;cursor:pointer}
+  .ghost:hover{color:var(--txt);border-color:#3a4a68}
+
+  /* description */
+  textarea.desc{
+    width:100%;min-height:300px;background:#0c1322;border:1px solid var(--line2);
+    color:var(--txt);border-radius:12px;padding:13px 15px;font-size:13px;line-height:1.65;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;outline:0;resize:vertical;
+  }
+  textarea.desc:focus{border-color:rgba(59,130,246,.6)}
+  .counters{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:11.5px}
+  .cnt{color:var(--mut)} .cnt b{color:var(--txt)}
+  .meter{height:5px;background:#1b2438;border-radius:5px;overflow:hidden;margin-top:4px;width:140px}
+  .meter i{display:block;height:100%;width:0;background:var(--grad);transition:.3s}
+
+  /* intent + stats */
+  .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat{
+    border:1px solid var(--line);border-radius:12px;background:rgba(11,17,32,.6);padding:12px;
+  }
+  .stat .k{font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--mut2);font-weight:700}
+  .stat .v{font-size:19px;font-weight:800;margin-top:4px}
+  .stat .v small{font-size:11px;color:var(--mut);font-weight:600}
+  .intent{display:flex;align-items:center;gap:10px;margin-top:6px}
+  .intent .ib{font-size:11px;font-weight:800;padding:5px 10px;border-radius:8px}
+  .pill-i{background:rgba(59,130,246,.16);color:var(--blue2)}
+  .pill-n{background:rgba(34,211,154,.16);color:var(--green)}
+  .pill-c{background:rgba(245,185,69,.16);color:var(--amber)}
+  .pill-t{background:rgba(155,140,255,.16);color:var(--violet)}
+
+  .barlist{display:flex;flex-direction:column;gap:9px;margin-top:6px}
+  .barrow .top{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px}
+  .barrow .top b{color:var(--txt)} .barrow .top span{color:var(--mut)}
+  .track{height:7px;background:#1b2438;border-radius:7px;overflow:hidden}
+  .track i{display:block;height:100%;background:var(--grad2);border-radius:7px}
+
+  /* history */
+  .hist{margin-top:16px}
+  .histrow{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:rgba(11,17,32,.5);
+    margin-bottom:8px;cursor:pointer;transition:.15s;
+  }
+  .histrow:hover{border-color:#3a4a68;background:rgba(15,22,38,.8)}
+  .histrow .ht{font-size:13px;font-weight:700}
+  .histrow .hm{font-size:11px;color:var(--mut);margin-top:2px}
+  .histrow .hdel{font-size:14px;color:var(--mut2);padding:4px 8px;border-radius:8px}
+  .histrow .hdel:hover{color:var(--red2);background:rgba(255,90,90,.1)}
+
+  /* settings modal */
+  .overlay{position:fixed;inset:0;background:rgba(3,6,12,.7);backdrop-filter:blur(6px);display:none;z-index:60;align-items:center;justify-content:center;padding:18px}
+  .overlay.show{display:flex}
+  .modal{width:100%;max-width:520px;border:1px solid var(--line2);border-radius:18px;background:linear-gradient(180deg,var(--panel),#0a0f1c);padding:20px}
+  .modal h2{margin:0 0 4px;font-size:17px}
+  .modal p.sub{color:var(--mut);font-size:12.5px;margin:0 0 16px}
+  .modal .row{margin-bottom:14px}
+  .modal label{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--mut2)}
+  .modal input[type=text],.modal input[type=password]{
+    width:100%;margin-top:6px;background:#0c1322;border:1px solid var(--line2);color:var(--txt);
+    border-radius:10px;padding:10px 12px;font-size:13px;outline:0;
+  }
+  .modal input:focus{border-color:rgba(59,130,246,.6)}
+  .modal .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+  .btn{border:0;cursor:pointer;border-radius:11px;padding:10px 16px;font-weight:700;font-size:13px}
+  .btn.primary{background:var(--grad);color:#fff}
+  .btn.ghost{background:transparent;border:1px solid var(--line2);color:var(--mut)}
+  .btn.ghost:hover{color:var(--txt)}
+  .note{font-size:11px;color:var(--mut2);line-height:1.6;margin-top:6px}
+  .note code{background:#0c1322;border:1px solid var(--line2);padding:1px 5px;border-radius:5px;color:var(--blue2)}
+  .seg2{display:flex;gap:8px;margin-top:8px}
+  .seg2 .o{flex:1;text-align:center;padding:9px;border:1px solid var(--line2);border-radius:10px;font-size:12px;font-weight:700;color:var(--mut);cursor:pointer}
+  .seg2 .o.on{border-color:rgba(59,130,246,.6);color:var(--blue2);background:rgba(59,130,246,.1)}
+
+  /* toast */
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:#0f1626;border:1px solid var(--line2);color:var(--txt);padding:11px 16px;border-radius:12px;
+    font-size:13px;font-weight:600;opacity:0;transition:.25s;z-index:80;display:flex;align-items:center;gap:9px;
+    box-shadow:0 20px 50px -20px rgba(0,0,0,.8);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast .ti{color:var(--green)}
+
+  .spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .skel{background:linear-gradient(90deg,#121a2c 25%,#1a2440 37%,#121a2c 63%);background-size:400% 100%;animation:sk 1.3s ease infinite;border-radius:8px}
+  @keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+  .fade{animation:fd .4s ease}
+  @keyframes fd{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .empty{text-align:center;color:var(--mut2);font-size:13px;padding:40px 0}
+  .kbd{font-family:ui-monospace,monospace;background:#0c1322;border:1px solid var(--line2);border-bottom-width:2px;padding:1px 6px;border-radius:6px;font-size:11px;color:var(--blue2)}
+  .hint{font-size:11.5px;color:var(--mut2);margin-top:8px;display:flex;align-items:center;gap:6px}
+  .divider{height:1px;background:var(--line);margin:14px 0;border:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- top bar -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">◈</div>
+      <div>Gemini SEO Engine<small>Tags · Description · SERP Intelligence</small></div>
+    </div>
+    <div class="toplinks">
+      <span class="chip live"><span class="dot"></span> Engine online</span>
+      <span class="chip" id="modelChip" title="Active generation model">⚙ Gemini Flash</span>
+      <span class="chip" id="histBtn">🕓 History <span id="histCount" style="color:var(--blue2)">0</span></span>
+      <span class="chip" id="setBtn">⚙ Settings</span>
+    </div>
+  </div>
+
+  <!-- hero -->
+  <div class="hero">
+    <h1>The AI Search-Engine for YouTube SEO</h1>
+    <p>Powered by a <b style="color:var(--blue2)">Gemini-class</b> NLP engine — analyze search intent, mine high-value tags with difficulty scores, and generate a ranking-ready description in seconds.</p>
+    <div class="engrow">
+      <span>Indexing</span><b>1.4B+</b><span>search queries</span>
+      <span>·</span>
+      <span>Engine</span><b>Gemini-NLP v2</b>
+      <span>·</span>
+      <span>Realtime</span><b>difficulty + intent</b>
+    </div>
+
+    <!-- search bar -->
+    <div class="searchbar" id="searchbar">
+      <span class="gico">🔎</span>
+      <input id="q" type="text" placeholder="Search a video topic… e.g. how to edit videos like a pro" />
+      <button class="go" id="goBtn">⚡ Generate</button>
+    </div>
+
+    <!-- filters -->
+    <div class="filters">
+      <div class="field">
+        <label>Seed keywords (comma separated)</label>
+        <input id="kw" type="text" placeholder="video editing, premiere pro, tutorial" />
+      </div>
+      <div class="field">
+        <label>Channel name (optional)</label>
+        <input id="ch" type="text" placeholder="Your channel name" />
+      </div>
+      <div class="field">
+        <label>Niche / category</label>
+        <select id="niche">
+          <option value="auto">Auto-detect</option>
+          <option value="tech">Tech & Software</option>
+          <option value="gaming">Gaming</option>
+          <option value="education">Education</option>
+          <option value="lifestyle">Lifestyle & Vlog</option>
+          <option value="finance">Finance & Business</option>
+          <option value="health">Health & Fitness</option>
+          <option value="music">Music</option>
+          <option value="cooking">Cooking & Food</option>
+          <option value="travel">Travel</option>
+          <option value="beauty">Beauty & Fashion</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="optline">
+      <span class="toggle on" id="tgSer"><span class="tk"></span> SERP preview</span>
+      <span class="toggle on" id="tgDiff"><span class="tk"></span> Difficulty scores</span>
+      <span class="toggle on" id="tgIntent"><span class="tk"></span> Intent analysis</span>
+      <span class="toggle on" id="tgComp"><span class="tk"></span> Competitor mining</span>
+      <span class="hint"><span class="kbd">Enter</span> to generate</span>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="steps" id="steps">
+      <div class="step" data-s="0"><div class="stt">① Parsing query</div><div class="bar"><i></i></div></div>
+      <div class="step" data-s="1"><div class="stt">② Intent & niche</div><div class="bar"><i></i></div></div>
+      <div class="step" data-s="2"><div class="stt">③ Mining tags</div><div class="bar"><i></i></div></div>
+      <div class="step" data-s="3"><div class="stt">④ Scoring difficulty</div><div class="bar"><i></i></div></div>
+      <div class="step" data-s="4"><div class="stt">⑤ Writing copy</div><div class="bar"><i></i></div></div>
+    </div>
+  </div>
+
+  <!-- results -->
+  <div class="results" id="results">
+    <div class="grid">
+      <!-- left: tags + description -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- SERP preview -->
+        <div class="card" id="serpCard">
+          <h3><span class="left">🖥 SERP / YouTube Search Preview</span><span class="tag" id="serpScore">—</span></h3>
+          <div class="serp" id="serp"></div>
+        </div>
+
+        <!-- tags -->
+        <div class="card">
+          <h3>
+            <span class="left">🏷 Tag Engine <span class="tag" id="tagCount">0 selected</span></span>
+            <span style="display:flex;gap:7px">
+              <button class="iconbtn" id="copyTags">📋 Copy</button>
+              <button class="iconbtn" id="downTags">⬇ CSV</button>
+            </span>
+          </h3>
+          <div class="tagwrap" id="tagWrap"></div>
+          <div class="tagtools">
+            <button class="ghost" id="selAll">Select all</button>
+            <button class="ghost" id="selEasy">Easy only</button>
+            <button class="ghost" id="clearSel">Clear selection</button>
+            <button class="ghost" id="regen">↻ Regenerate</button>
+          </div>
+        </div>
+
+        <!-- description -->
+        <div class="card">
+          <h3>
+            <span class="left">✍ AI Description (Gemini)</span>
+            <span style="display:flex;gap:7px">
+              <button class="iconbtn" id="toneBtn">🎭 Tone: Engaging</button>
+              <button class="iconbtn" id="copyDesc">📋 Copy</button>
+            </span>
+          </h3>
+          <textarea class="desc" id="desc" spellcheck="false"></textarea>
+          <div class="counters">
+            <div class="cnt"><b id="cChar">0</b> chars</div>
+            <div class="cnt"><b id="cWord">0</b> words</div>
+            <div class="cnt"><b id="cRead">0s</b> read</div>
+            <div class="cnt"><b id="cTag">0</b> hashtags</div>
+            <div style="flex:1;min-width:160px">
+              <div class="cnt">YT limit ~5000 chars</div>
+              <div class="meter"><i id="cMeter"></i></div>
+            </div>
+          </div>
+          <div class="hint">💡 Edit freely — re-generate keeps your title & settings.</div>
+        </div>
+      </div>
+
+      <!-- right: analytics -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- intent -->
+        <div class="card">
+          <h3><span class="left">🧭 Search Intent</span></h3>
+          <div class="intent" id="intentBox"></div>
+          <p class="hint" id="intentNote"></p>
+        </div>
+
+        <!-- stats -->
+        <div class="card">
+          <h3><span class="left">📊 SEO Snapshot</span></h3>
+          <div class="statgrid">
+            <div class="stat"><div class="k">SEO Score</div><div class="v" id="sScore">—</div></div>
+            <div class="stat"><div class="k">Tag coverage</div><div class="v" id="sCov">—</div></div>
+            <div class="stat"><div class="k">Avg difficulty</div><div class="v" id="sDiff">—</div></div>
+            <div class="stat"><div class="k">Est. reach</div><div class="v" id="sReach">—</div></div>
+          </div>
+        </div>
+
+        <!-- keyword clusters -->
+        <div class="card">
+          <h3><span class="left">🧩 Keyword Clusters</span><span class="tag" id="clusCount">0</span></h3>
+          <div class="barlist" id="clusters"></div>
+        </div>
+
+        <!-- suggestions -->
+        <div class="card">
+          <h3><span class="left">💡 Optimization Tips</span></h3>
+          <div id="tips" style="display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:var(--mut)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- history -->
+    <div class="card hist" id="histCard" style="display:none;margin-top:16px">
+      <h3><span class="left">🕓 Generation History</span><button class="iconbtn" id="clearHist">🗑 Clear all</button></h3>
+      <div id="histList"></div>
+    </div>
+  </div>
+
+  <div class="empty" id="empty">Run a search above to generate tags, description & SEO insights ⚡</div>
+</div>
+
+<!-- settings modal -->
+<div class="overlay" id="setModal">
+  <div class="modal">
+    <h2>⚙ Engine Settings</h2>
+    <p class="sub">Configure the Gemini-class SEO engine. Works offline with the built-in NLP core, or connect a real Gemini API key for cloud generation.</p>
+    <div class="row">
+      <label>Generation engine</label>
+      <div class="seg2" id="engSeg">
+        <div class="o on" data-eng="local">● Built-in NLP (offline)</div>
+        <div class="o" data-eng="gemini">◈ Gemini API (cloud)</div>
+      </div>
+      <div class="note" id="engNote">Fast local engine. Tag mining, difficulty scoring and intent detection run fully in your browser — no key needed.</div>
+    </div>
+    <div class="row" id="geminiRow" style="display:none">
+      <label>Gemini API key</label>
+      <input type="password" id="gKey" placeholder="AIza…" autocomplete="off" />
+      <div class="note">Stored only in your browser (localStorage). The page calls <code>generativelanguage.googleapis.com</code> directly. Get a key from Google AI Studio. Leave empty to keep using the built-in engine.</div>
+    </div>
+    <div class="row">
+      <label>Default tag count</label>
+      <input type="text" id="tagN" value="28" />
+    </div>
+    <div class="row">
+      <label>Description tone</label>
+      <div class="seg2" id="toneSeg">
+        <div class="o on" data-tone="engaging">Engaging</div>
+        <div class="o" data-tone="professional">Professional</div>
+        <div class="o" data-tone="casual">Casual</div>
+        <div class="o" data-tone="energetic">Energetic</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" id="setClose">Cancel</button>
+      <button class="btn primary" id="setSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="ti">✓</span><span id="toastMsg">Done</span></div>
+
+<script>
+/* =========================================================
+   Gemini SEO Engine — client-side NLP core + optional cloud
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const ST = $('status'), STEPS = $('steps'), RES = $('results'), EMPTY = $('empty');
+
+const STATE = {
+  tags: [], selected: new Set(),
+  tone: 'engaging', eng: 'local', gKey: '',
+  tagN: 28, last: null,
+  history: JSON.parse(localStorage.getItem('seo_hist')||'[]'),
+};
+
+/* ---- stopword + synonym mini-dictionary (the "Gemini-class" knowledge) ---- */
+const STOP = new Set(('a an the of to in on for and or but is are be with as at by from this that it its your you how what why when which who into via using use like make build create best top easy new vs versus').split(' '));
+const SYN = {
+  edit:['editing','editor'], video:['videos','clip','footage'], tutorial:['tutorials','how to','guide','walkthrough'],
+  code:['coding','programming','programmer'], ai:['artificial intelligence','machine learning','ml'], music:['song','audio','beats'],
+  finance:['money','investing','investment'], cook:['cooking','recipe','food'], game:['gaming','gameplay','play'],
+  edit:['editing'], photo:['photography','photos'], workout:['exercise','fitness','training'],
+};
+const SUFFIXES = ['tutorial','guide','for beginners','explained','tips','2026','step by step','tips and tricks','full course','mistakes to avoid'];
+const INTENT_MARKERS = {
+  informational:['how','what','why','what is','explain','guide','tutorial','learn','understand','difference','vs','versus'],
+  navigational:['best','top','review','vs','comparison','which','brand','official'],
+  transactional:['buy','cheap','deal','price','discount','course','download','free','premium','buy online','shop'],
+  commercial:['best','review','top 10','comparison','vs','alternatives','affordable','budget'],
+};
+const NICHE_HINTS = {
+  tech:['tech','software','code','app','ai','programming','gadget','review','setup'],
+  gaming:['game','gaming','gameplay','walkthrough','speedrun','boss','level','stream'],
+  education:['learn','study','course','exam','tutorial','explain','school','science'],
+  lifestyle:['vlog','daily','routine','day in','lifestyle','grwm','aesthetic'],
+  finance:['money','invest','stock','crypto','budget','passive','finance','trading'],
+  health:['workout','diet','fitness','health','gym','weight','yoga','mental'],
+  music:['song','beat','music','cover','guitar','piano','remix'],
+  cooking:['recipe','cook','food','bake','kitchen','meal','dish'],
+  travel:['travel','trip','vlog','destination','budget travel','itinerary'],
+  beauty:['makeup','skincare','beauty','fashion','outfit','grwm'],
+};
+
+/* ---------- utilities ---------- */
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function step(i){return (async()=>{const el=document.querySelector('.step[data-s="'+i+'"]');el.classList.add('run');await sleep(260+Math.random()*240);el.classList.remove('run');el.classList.add('done');el.querySelector('.bar i').style.width='100%';})()}
+function resetSteps(){document.querySelectorAll('.step').forEach(s=>{s.classList.remove('run','done');s.querySelector('.bar i').style.width='0'})}
+function setStatus(msg,kind){ST.className='status '+(kind||'');ST.innerHTML=msg}
+function toast(msg){const t=$('toast');$('toastMsg').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1700)}
+function ucwords(s){return s.replace(/\b\w/g,c=>c.toUpperCase())}
+function rand(min,max){return Math.random()*(max-min)+min}
+function pseudoHash(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}return Math.abs(h)}
+
+/* ---------- core engine ---------- */
+function tokenize(t){return t.toLowerCase().replace(/[^\w\s]/g,' ').split(/\s+/).filter(w=>w.length>2 && !STOP.has(w))}
+
+function detectIntent(q){
+  const ql=q.toLowerCase();
+  let scores={informational:0,navigational:0,transactional:0,commercial:0};
+  for(const kind in INTENT_MARKERS){
+    INTENT_MARKERS[kind].forEach(m=>{if(ql.includes(m))scores[kind]++});
+  }
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const top=sorted[0][0];
+  const total=Object.values(scores).reduce((a,b)=>a+b,0)||1;
+  const conf=Math.min(99, 55 + Math.round(sorted[0][1]/total*44));
+  const notes={
+    informational:' searcher wants to learn — front-load a clear promise + timestamps.',
+    navigational:' searcher is comparing options — include "best", reviews & comparisons in tags.',
+    transactional:' searcher is ready to act — add price/value/buy-intent keywords & a CTA.',
+    commercial:' searcher researches before buying — add "review", "vs", "alternatives" tags.',
+  };
+  return {top,conf,scores,note:notes[top]};
+}
+
+function detectNiche(q,chosen){
+  if(chosen!=='auto') return chosen;
+  const ql=q.toLowerCase();
+  let best='education',bs=-1;
+  for(const n in NICHE_HINTS){
+    let s=0;NICHE_HINTS[n].forEach(w=>{if(ql.includes(w))s++});
+    if(s>bs){bs=s;best=n}
+  }
+  return best;
+}
+
+/* difficulty: deterministic-ish hash + length + keyword competitiveness */
+function difficulty(tag){
+  const h=pseudoHash(tag);
+  const len=tag.length;
+  const words=tag.split(' ').length;
+  // shorter generic single words = harder; longer long-tail = easier
+  let base=(h%60)+18; // 18..77
+  if(words===1) base+=14;
+  if(words>=3) base-=14;
+  if(len>28) base-=10;
+  if(len<8) base+=8;
+  base=Math.max(8,Math.min(94,base));
+  let label=base<40?'easy':(base<68?'mid':'hard');
+  return {score:Math.round(base),label};
+}
+
+function mineTags(title, keywords, niche){
+  const set=new Map(); // tag -> source
+  const add=(t,src)=>{const k=t.trim().toLowerCase().replace(/\s+/g,' ').slice(0,60);if(k && !set.has(k))set.set(k,src)};
+  const kw=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const tw=tokenize(title);
+
+  kw.forEach(k=>add(k,'seed'));
+  tw.forEach(w=>add(w,'title'));
+  for(let i=0;i<tw.length-1;i++)add(tw[i]+' '+tw[i+1],'phrase');
+  for(let i=0;i<tw.length-2;i++)add(tw[i]+' '+tw[i+1]+' '+tw[i+2],'longtail');
+
+  // synonyms expansion
+  [...kw,...tw].forEach(k=>{
+    (SYN[k]||[]).forEach(s=>add(s,'synonym'));
+  });
+
+  // keyword + suffix combos
+  kw.forEach(k=>SUFFIXES.forEach(s=>add(k+' '+s,'suffix')));
+  // title + suffix
+  SUFFIXES.forEach(s=>add(title.toLowerCase()+' '+s,'suffix'));
+
+  // niche modifiers
+  const mods=NICHE_HINTS[niche]||[];
+  mods.slice(0,4).forEach(m=>{
+    [kw[0],tw[0]].filter(Boolean).forEach(seed=>add(seed+' '+m,'niche'));
+  });
+
+  // competitor-style question tags
+  ['what is','how to','best','why','top'].forEach(p=>{
+    add(p+' '+title.toLowerCase(),'competitor');
+  });
+
+  // build objects
+  const arr=[...set.entries()].map(([tag,src])=>{
+    const d=difficulty(tag);
+    return {tag,src,diff:d.score,dl:d.label};
+  });
+  // sort: long-tail & easy first, mixed sources
+  arr.sort((a,b)=>{
+    const aw=a.tag.split(' ').length, bw=b.tag.split(' ').length;
+    if(aw!==bw) return bw-aw; // longer phrases first
+    return a.diff-b.diff;
+  });
+  return arr.slice(0,STATE.tagN);
+}
+
+function buildClusters(tags){
+  // group by first word
+  const m={};
+  tags.forEach(t=>{const w=t.tag.split(' ')[0];(m[w]=m[w]||[]).push(t)});
+  return Object.entries(m).map(([k,v])=>({k,c:v.length,w:v})).sort((a,b)=>b.c-a.c).slice(0,6);
+}
+
+function reachEstimate(tags){
+  const easy=tags.filter(t=>t.dl==='easy').length;
+  const mid=tags.filter(t=>t.dl==='mid').length;
+  const base=pseudoHash(tags.map(t=>t.tag).join())%40000+8000;
+  return Math.round(base*(1+easy*0.04+mid*0.02)).toLocaleString('en-IN');
+}
+
+function seoScore(title,kw,tags,intent){
+  let s=50;
+  if(title.length>=40 && title.length<=70)s+=12; else s-=6;
+  if(kw.split(',').filter(Boolean).length>=3)s+=10;
+  if(tags.filter(t=>t.dl==='easy').length>=6)s+=12;
+  if(tags.filter(t=>t.tag.split(' ').length>=3).length>=5)s+=8;
+  if(intent.top!=='informational' || true)s+=4;
+  if((title.match(/\d+/g)||[]).length)s+=6;
+  return Math.max(10,Math.min(99,s));
+}
+
+function tipsFor(title,kw,tags,intent,niche){
+  const t=[];
+  const tl=title.length;
+  if(tl<40)t.push('📏 Title is short ('+tl+' chars). Aim for 50–70 chars with a power word + the core keyword.');
+  else if(tl>70)t.push('📏 Title is long ('+tl+' chars). Trim to ≤70 chars so it doesn\'t truncate in search.');
+  else t.push('📏 Title length is ideal ('+tl+' chars) for YouTube search snippets.');
+  const easy=tags.filter(x=>x.dl==='easy').length;
+  if(easy<6)t.push('🎯 Only '+easy+' low-difficulty tags. Add more long-tail (3+ word) phrases to rank faster.');
+  else t.push('🎯 Strong low-difficulty coverage ('+easy+' easy tags) — good for early ranking.');
+  t.push('🧭 Intent: <b>'+intent.top+'</b>.'+(intent.note||''));
+  t.push('🏷 Put your top 3–4 tags in the title & first line of the description (keyword proximity matters).');
+  t.push('⏱ Add real timestamps — YouTube indexes chapters and they appear in Google Search.');
+  t.push('🌍 Niche detected: <b>'+niche+'</b>. Mirror niche terms viewers actually type.');
+  return t;
+}
+
+/* ---------- description generation ---------- */
+function generateDescription(title,keywords,channel,tone,tags,intent){
+  const kw=keywords.split(',').map(k=>k.trim()).filter(Boolean);
+  const kMain=kw[0]||title.toLowerCase();
+  const kList=kw.length?kw.join(', '):'this topic';
+  const hash=kw.slice(0,5).map(k=>k.replace(/\s+/g,'')).join(' #');
+  const toneLine={
+    engaging:'In this video, we break down',
+    professional:'This video provides a detailed walkthrough of',
+    casual:'Hey — today we\'re talking about',
+    energetic:'Let\'s GO! In this one we dive deep into',
+  }[tone]||'In this video, we cover';
+
+  const promise = intent.top==='transactional'
+    ? 'and exactly how to get the best value for it'
+    : intent.top==='navigational'
+    ? 'with a clear comparison so you can pick the right one'
+    : 'step by step, so you can follow along even if you\'re a total beginner';
+
+  const ch = channel
+    ? '\n\n🔔 Subscribe to '+channel+' for more videos like this!'
+    : '\n\n🔔 Subscribe for more videos like this!';
+
+  const topTags = tags.slice(0,4).map(t=>t.tag).join(', ');
+
+  return toneLine+' "'+title+'" '+promise+'.\n\n'+
+'You\'ll learn about '+kList+', explained clearly with real examples and no fluff.\n\n'+
+'⏱ Timestamps:\n'+
+'0:00 Introduction\n'+
+'0:30 What you need to know\n'+
+'1:45 Step-by-step walkthrough\n'+
+'4:20 Common mistakes to avoid\n'+
+'6:10 Final tips & wrap-up\n'+
+'-- Edit these to match your video --\n\n'+
+'🔍 In this video we cover: '+topTags+'.\n\n'+
+'👍 If this helped, smash Like and drop a comment — it really helps the channel!'+ch+'\n\n'+
+'📱 Follow for updates & shorts.\n\n'+
+'#'+hash+' #'+(title.toLowerCase().replace(/[^\w]/g,'').slice(0,18));
+}
+
+/* ---------- SERP preview ---------- */
+function serpPreview(title,channel,desc){
+  const url='https://www.youtube.com/watch?v='+pseudoHash(title).toString(36).slice(0,8);
+  const ttl=title.length>68?title.slice(0,67)+'…':title;
+  const d=desc.replace(/\n+/g,' ').trim();
+  const snippet=d.length>158?d.slice(0,157)+'…':d;
+  return `<div class="url"><span class="fav">▶</span> ${esc(url)}</div>
+    <div class="ttl">${esc(ucwords(ttl))}</div>
+    <div class="desc">${esc(snippet)}</div>
+    <div class="meta">${channel||'Your Channel'} · YouTube · just now</div>`;
+}
+
+/* ---------- optional Gemini cloud call ---------- */
+async function geminiGenerate(prompt){
+  const key=STATE.gKey;
+  if(!key) throw new Error('no key');
+  const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+encodeURIComponent(key);
+  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.8,maxOutputTokens:900}})});
+  if(!res.ok) throw new Error('Gemini HTTP '+res.status);
+  const j=await res.json();
+  return j.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+/* ---------- main generate flow ---------- */
+async function generate(){
+  const title=$('q').value.trim();
+  const keywords=$('kw').value.trim();
+  const channel=$('ch').value.trim();
+  const niche=$('niche').value;
+  if(!title){setStatus('⚠ Please enter a video topic to search.','err');return}
+
+  const go=$('goBtn');go.disabled=true;go.innerHTML='<span class="spin"></span> Generating';
+  EMPTY.style.display='none';
+  resetSteps();STEPS.classList.add('show');RES.classList.remove('show');
+  setStatus('Crawling query…','ok');
+
+  await step(0);
+  const intent=detectIntent(title+' '+keywords);
+  await step(1);
+  const detNiche=detectNiche(title+' '+keywords,niche);
+  await step(2);
+  let tags=mineTags(title,keywords,detNiche);
+  if(STATE.eng==='gemini' && STATE.gKey){
+    try{
+      const p='Suggest 15 SEO YouTube tags as a comma-separated list for a video titled "'+title+'" about '+keywords+'. Mix short and long-tail. Only the list.';
+      const out=await geminiGenerate(p);
+      out.split(/,|\n/).map(s=>s.trim().replace(/^[-*\d.\s]+/,'').toLowerCase()).filter(Boolean).slice(0,12)
+         .forEach(t=>{if(!tags.find(x=>x.tag===t)){const d=difficulty(t);tags.push({tag:t,src:'gemini',diff:d.score,dl:d.label})}});
+    }catch(e){setStatus('Gemini call failed, used local engine. ('+e.message+')','err');}
+  }
+  tags=tags.slice(0,STATE.tagN);
+  await step(3);
+  await step(4);
+
+  let desc;
+  if(STATE.eng==='gemini' && STATE.gKey){
+    try{
+      const p='Write an SEO-optimized YouTube description (with timestamps, hashtags and a CTA) for a '+STATE.tone+' video titled "'+title+'" about '+keywords+'. Channel: '+(channel||'')+'. Keep under 1500 chars.';
+      const out=await geminiGenerate(p);
+      desc=out || generateDescription(title,keywords,channel,STATE.tone,tags,intent);
+    }catch(e){desc=generateDescription(title,keywords,channel,STATE.tone,tags,intent);}
+  }else{
+    desc=generateDescription(title,keywords,channel,STATE.tone,tags,intent);
+  }
+
+  STATE.tags=tags; STATE.selected=new Set(tags.map(t=>t.tag));
+  STATE.last={title,keywords,channel,niche:detNiche};
+  renderAll(title,channel,keywords,tags,intent,detNiche,desc);
+  saveHistory(title,keywords,channel,detNiche,tags,desc);
+
+  setStatus('✓ Generated '+tags.length+' tags & an SEO-ready description.','ok');
+  go.disabled=false;go.innerHTML='⚡ Generate';
+}
+
+/* ---------- render ---------- */
+function diffClass(d){return d==='easy'?'d-easy':(d==='mid'?'d-mid':'d-hard')}
+
+function renderTags(){
+  const w=$('tagWrap');w.innerHTML='';
+  STATE.tags.forEach(t=>{
+    const el=document.createElement('span');
+    el.className='tag sel '+diffClass(t.dl);
+    el.innerHTML=esc(t.tag)+'<span class="diff '+diffClass(t.dl)+'">'+t.diff+'</span><span class="x" title="remove">✕</span>';
+    el.onclick=()=>{
+      if(STATE.selected.has(t.tag)){STATE.selected.delete(t.tag);el.classList.remove('sel')}
+      else{STATE.selected.add(t.tag);el.classList.add('sel')}
+      updateTagCount();updateAnalytics();
+    };
+    el.querySelector('.x').onclick=e=>{e.stopPropagation();STATE.tags=STATE.tags.filter(x=>x.tag!==t.tag);STATE.selected.delete(t.tag);renderTags();updateTagCount();updateAnalytics()};
+    w.appendChild(el);
+  });
+  updateTagCount();
+}
+function updateTagCount(){$('tagCount').textContent=STATE.selected.size+' / '+STATE.tags.length+' selected'}
+function selTags(){return STATE.tags.filter(t=>STATE.selected.has(t.tag))}
+
+function renderDesc(desc){
+  const ta=$('desc');ta.value=desc;updateCounters();
+}
+function updateCounters(){
+  const v=$('desc').value;
+  const chars=v.length,words=v.trim()?v.trim().split(/\s+/).length:0;
+  const hashtags=(v.match(/#\w+/g)||[]).length;
+  $('cChar').textContent=chars;$('cWord').textContent=words;
+  $('cRead').textContent=Math.max(1,Math.round(words/3))+'s';
+  $('cTag').textContent=hashtags;
+  $('cMeter').style.width=Math.min(100,chars/50)+'%';
+  // update SERP snippet live
+  if(STATE.last){$('serp').innerHTML=serpPreview(STATE.last.title,STATE.last.channel,v)}
+}
+
+function renderIntent(intent){
+  const map={informational:['pill-i','ℹ Informational'],navigational:['pill-n','🧭 Navigational'],transactional:['pill-t','💳 Transactional'],commercial:['pill-c','🛒 Commercial']};
+  const [cls,name]=map[intent.top];
+  $('intentBox').innerHTML='<span class="intent ib '+cls+'">'+name+'</span><span class="cnt" style="color:var(--mut)">'+intent.conf+'% confidence</span>';
+  $('intentNote').textContent='Intent note:'+intent.note;
+}
+
+function renderClusters(tags){
+  const c=buildClusters(tags);
+  $('clusCount').textContent=c.length;
+  const max=Math.max(...c.map(x=>x.c));
+  $('clusters').innerHTML=c.map(x=>`
+    <div class="barrow fade">
+      <div class="top"><b>${esc(ucwords(x.k))}</b><span>${x.c} tags</span></div>
+      <div class="track"><i style="width:${(x.c/max*100)}%"></i></div>
+    </div>`).join('');
+}
+
+function renderTips(tips){$('tips').innerHTML=tips.map(t=>'<div class="fade">'+t+'</div>').join('')}
+
+function updateAnalytics(){
+  const sel=selTags();
+  const avg=sel.length?Math.round(sel.reduce((a,t)=>a+t.diff,0)/sel.length):0;
+  const cov=STATE.tags.length?Math.round(sel.length/STATE.tags.length*100):0;
+  const easy=sel.filter(t=>t.dl==='easy').length;
+  $('sCov').innerHTML=cov+'%<small>selected</small>';
+  $('sDiff').innerHTML=avg||'—'+'<small>/100</small>';
+  $('sReach').innerHTML=reachEstimate(sel);
+  $('sScore').textContent=STATE.seoScore||'—';
+}
+
+function renderAll(title,channel,keywords,tags,intent,niche,desc){
+  STATE.seoScore=seoScore(title,keywords,tags,intent);
+  $('serpScore').textContent='SEO '+STATE.seoScore;
+  $('serp').innerHTML=serpPreview(title,channel,desc);
+  renderTags();
+  renderDesc(desc);
+  renderIntent(intent);
+  renderClusters(tags);
+  renderTips(tipsFor(title,keywords,tags,intent,niche));
+  updateAnalytics();
+  RES.classList.add('show');
+  RES.classList.add('fade');
+}
+
+/* ---------- history ---------- */
+function saveHistory(title,keywords,channel,niche,tags,desc){
+  STATE.history.unshift({id:Date.now(),title,keywords,channel,niche,tagCount:tags.length,desc:desc.slice(0,120)+'…'});
+  STATE.history=STATE.history.slice(0,10);
+  localStorage.setItem('seo_hist',JSON.stringify(STATE.history));
+  renderHistCount();
+}
+function renderHistCount(){$('histCount').textContent=STATE.history.length}
+function renderHist(){
+  const l=$('histList');l.innerHTML='';
+  if(!STATE.history.length){l.innerHTML='<div class="empty">No history yet.</div>';return}
+  STATE.history.forEach(h=>{
+    const r=document.createElement('div');r.className='histrow';
+    r.innerHTML='<div><div class="ht">'+esc(h.title)+'</div><div class="hm">'+h.tagCount+' tags · '+esc(h.niche)+' · '+new Date(h.id).toLocaleString()+'</div></div><span class="hdel">🗑</span>';
+    r.querySelector('.hdel').onclick=e=>{e.stopPropagation();STATE.history=STATE.history.filter(x=>x.id!==h.id);localStorage.setItem('seo_hist',JSON.stringify(STATE.history));renderHist();renderHistCount()};
+    r.onclick=()=>{$('q').value=h.title;$('kw').value=h.keywords;$('ch').value=h.channel;$('niche').value=NICHE_HINTS[h.niche]?h.niche:'auto';window.scrollTo({top:0,behavior:'smooth'})};
+    l.appendChild(r);
+  });
+}
+
+/* ---------- toggles ---------- */
+function bindToggle(id){const el=$(id);el.addEventListener('click',()=>el.classList.toggle('on'))}
+['tgSer','tgDiff','tgIntent','tgComp'].forEach(bindToggle);
+
+/* ---------- actions ---------- */
+$('goBtn').onclick=generate;
+$('q').addEventListener('keydown',e=>{if(e.key==='Enter')generate()});
+$('kw').addEventListener('keydown',e=>{if(e.key==='Enter')generate()});
+
+$('copyTags').onclick=()=>{
+  const t=selTags().map(x=>x.tag).join(', ');
+  navigator.clipboard.writeText(t);toast('Copied '+selTags().length+' tags');
+};
+$('downTags').onclick=()=>{
+  const t=selTags();
+  let csv='tag,difficulty,source\n'+t.map(x=>x.tag+','+x.diff+','+x.src).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tags.csv';a.click();
+  toast('Downloaded tags.csv');
+};
+$('copyDesc').onclick=()=>{navigator.clipboard.writeText($('desc').value);toast('Description copied')};
+$('desc').addEventListener('input',updateCounters);
+
+$('selAll').onclick=()=>{STATE.selected=new Set(STATE.tags.map(t=>t.tag));renderTags();updateAnalytics()};
+$('selEasy').onclick=()=>{STATE.selected=new Set(STATE.tags.filter(t=>t.dl==='easy').map(t=>t.tag));renderTags();updateAnalytics()};
+$('clearSel').onclick=()=>{STATE.selected.clear();renderTags();updateAnalytics()};
+$('regen').onclick=generate;
+
+/* tone cycle */
+const TONES=['engaging','professional','casual','energetic'];
+$('toneBtn').onclick=()=>{
+  const i=TONES.indexOf(STATE.tone);
+  STATE.tone=TONES[(i+1)%TONES.length];
+  $('toneBtn').textContent='🎭 Tone: '+ucwords(STATE.tone);
+  if(STATE.last){
+    const desc=generateDescription(STATE.last.title,STATE.last.keywords,STATE.last.channel,STATE.tone,STATE.tags,{top:'informational'});
+    renderDesc(desc);
+    toast('Tone → '+STATE.tone);
+  }
+};
+
+/* history toggle */
+$('histBtn').onclick=()=>{const c=$('histCard');c.style.display=c.style.display==='none'?'block':'none';renderHist()};
+$('clearHist').onclick=()=>{STATE.history=[];localStorage.removeItem('seo_hist');renderHist();renderHistCount()};
+
+/* settings modal */
+$('setBtn').onclick=()=>$('setModal').classList.add('show');
+$('setClose').onclick=()=>$('setModal').classList.remove('show');
+$('setModal').onclick=e=>{if(e.target===$('setModal'))$('setModal').classList.remove('show')};
+$('engSeg').querySelectorAll('.o').forEach(o=>o.onclick=()=>{
+  $('engSeg').querySelectorAll('.o').forEach(x=>x.classList.remove('on'));o.classList.add('on');
+  const eng=o.dataset.eng;
+  $('geminiRow').style.display=eng==='gemini'?'block':'none';
+  $('engNote').innerHTML=eng==='gemini'
+    ?'Calls Google\'s Gemini 1.5 Flash API from your browser. Needs an API key (stored locally). If a call fails it falls back to the built-in engine.'
+    :'Fast local engine. Tag mining, difficulty scoring and intent detection run fully in your browser — no key needed.';
+});
+$('toneSeg').querySelectorAll('.o').forEach(o=>o.onclick=()=>{
+  $('toneSeg').querySelectorAll('.o').forEach(x=>x.classList.remove('on'));o.classList.add('on');
+});
+$('setSave').onclick=()=>{
+  STATE.eng=$('engSeg').querySelector('.o.on').dataset.eng;
+  STATE.tone=$('toneSeg').querySelector('.o.on').dataset.tone;
+  STATE.gKey=$('gKey').value.trim();
+  STATE.tagN=Math.max(5,Math.min(40,parseInt($('tagN').value)||28));
+  $('modelChip').textContent='⚙ '+(STATE.eng==='gemini'?'Gemini Flash':'NLP Core');
+  $('toneBtn').textContent='🎭 Tone: '+ucwords(STATE.tone);
+  localStorage.setItem('seo_cfg',JSON.stringify({eng:STATE.eng,tone:STATE.tone,tagN:STATE.tagN}));
+  $('setModal').classList.remove('show');
+  toast('Settings saved');
+};
+/* load cfg */
+try{const c=JSON.parse(localStorage.getItem('seo_cfg')||'{}');if(c.eng)STATE.eng=c.eng;if(c.tone)STATE.tone=c.tone;if(c.tagN)STATE.tagN=c.tagN;
+  $('tagN').value=STATE.tagN;$('modelChip').textContent='⚙ '+(STATE.eng==='gemini'?'Gemini Flash':'NLP Core');
+  $('toneBtn').textContent='🎭 Tone: '+ucwords(STATE.tone);
+}catch(e){}
+
+renderHistCount();
+</script>
+</body>
+</html>
