@@ -1,896 +1,261 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mistral Visual Prompt & Video Studio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mistral Visual Prompt & Video Studio â View49</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  :root{
-    --bg:#070a12; --bg2:#0b1020; --panel:#0f1626; --panel2:#131c30;
-    --line:#1e293b; --line2:#273449;
-    --txt:#e5edf7; --mut:#8a98b3; --mut2:#5b6985;
-    --red:#ff3b3b; --red2:#ff5a5a; --blue:#3b82f6; --blue2:#60a5fa;
-    --green:#22d39a; --amber:#f5b945; --violet:#9b8cff; --mist:#ff7a59;
-    --grad:linear-gradient(135deg,#ff7008 0%,#ff3b3b 40%,#b5179e 75%,#3b82f6 100%);
-    --grad2:linear-gradient(135deg,#60a5fa,#9b8cff);
-    --mist-grad:linear-gradient(135deg,#ff7008,#ffaa00);
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{
-    background:
-      radial-gradient(1100px 600px at 12% -8%, rgba(255,112,8,.10), transparent 60%),
-      radial-gradient(1000px 600px at 100% 0%, rgba(59,130,246,.12), transparent 55%),
-      radial-gradient(900px 700px at 50% 120%, rgba(155,140,255,.10), transparent 60%),
-      var(--bg);
-    color:var(--txt);
-    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-    min-height:100vh;-webkit-font-smoothing:antialiased;
-  }
-  a{color:inherit;text-decoration:none}
-  ::selection{background:rgba(255,112,8,.35)}
-  ::-webkit-scrollbar{width:10px;height:10px}
-  ::-webkit-scrollbar-thumb{background:#22304a;border-radius:20px}
-  ::-webkit-scrollbar-track{background:transparent}
-
-  .wrap{max-width:1180px;margin:0 auto;padding:18px 16px 80px}
-  .topbar{
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-    padding:10px 14px;border:1px solid var(--line);border-radius:14px;
-    background:linear-gradient(180deg,rgba(20,28,48,.7),rgba(11,16,32,.6));
-    backdrop-filter:blur(8px);position:sticky;top:10px;z-index:30;
-  }
-  .brand{display:flex;align-items:center;gap:11px;font-weight:800}
-  .logo{
-    width:34px;height:34px;border-radius:10px;background:var(--mist-grad);
-    display:grid;place-items:center;box-shadow:0 6px 20px rgba(255,112,8,.3);font-size:18px;color:#1a0d00;
-  }
-  .brand small{display:block;font-weight:500;color:var(--mut);font-size:11px;letter-spacing:.4px}
-  .toplinks{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-  .chip{
-    font-size:11px;font-weight:700;padding:7px 11px;border-radius:999px;
-    border:1px solid var(--line2);background:rgba(255,255,255,.03);color:var(--mut);
-    display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:.18s;
-  }
-  .chip:hover{color:var(--txt);border-color:#3a4a68;background:rgba(255,255,255,.06)}
-  .chip.live{color:var(--green);border-color:rgba(34,211,154,.35)}
-  .chip.live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
-  .chip.mist{color:var(--mist);border-color:rgba(255,122,89,.35)}
-
-  .hero{padding:26px 4px 10px;text-align:center}
-  .hero h1{
-    font-size:clamp(26px,4.4vw,42px);margin:0 0 8px;font-weight:850;letter-spacing:-.5px;
-    background:linear-gradient(90deg,#fff 0%,#ffd9b0 35%,#ffaa00 70%,#9b8cff 100%);
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-  }
-  .hero p{color:var(--mut);margin:0 auto;max-width:660px;font-size:14px}
-  .engrow{display:flex;align-items:center;justify-content:center;gap:8px;margin:14px 0 2px;font-size:12px;color:var(--mut2);flex-wrap:wrap}
-  .engrow b{color:var(--mist)}
-
-  /* mode tabs */
-  .modes{display:flex;gap:8px;justify-content:center;margin:18px auto 0;flex-wrap:wrap}
-  .mode{
-    display:flex;align-items:center;gap:10px;padding:11px 18px;border-radius:14px;
-    border:1px solid var(--line2);background:rgba(15,22,38,.6);cursor:pointer;transition:.18s;
-    font-weight:700;font-size:13px;color:var(--mut);
-  }
-  .mode:hover{color:var(--txt);border-color:#3a4a68}
-  .mode.on{background:linear-gradient(180deg,rgba(255,112,8,.16),rgba(255,112,8,.05));border-color:rgba(255,112,8,.6);color:#ffcaa0}
-  .mode .mi{font-size:18px}
-  .mode small{display:block;font-weight:500;color:var(--mut2);font-size:10.5px}
-
-  /* panels */
-  .panel{
-    border:1px solid var(--line);border-radius:16px;
-    background:linear-gradient(180deg,var(--panel),#0b1120);padding:16px;margin-top:16px;
-  }
-  .panel h3{margin:0 0 12px;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:space-between}
-  .panel h3 .tag{font-size:10.5px;font-weight:700;color:var(--mut2);background:rgba(255,255,255,.04);border:1px solid var(--line2);padding:3px 8px;border-radius:999px}
-
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  @media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
-
-  label.fl{font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--mut2);font-weight:700;display:block;margin-bottom:5px}
-  input.in,select.in,textarea.in{
-    width:100%;background:#0c1322;border:1px solid var(--line2);color:var(--txt);
-    border-radius:10px;padding:10px 12px;font-size:13px;outline:0;transition:.15s;
-  }
-  input.in:focus,select.in:focus,textarea.in:focus{border-color:rgba(255,112,8,.55)}
-  textarea.in{resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;line-height:1.55}
-  select.in{cursor:pointer}
-  input[type=range]{width:100%;accent-color:var(--mist)}
-
-  .iconbtn{
-    font-size:11px;font-weight:700;color:var(--mut);background:rgba(255,255,255,.04);
-    border:1px solid var(--line2);padding:7px 11px;border-radius:9px;cursor:pointer;transition:.15s;
-    display:inline-flex;align-items:center;gap:6px;
-  }
-  .iconbtn:hover{color:var(--txt);border-color:#3a4a68;background:rgba(255,255,255,.08)}
-  .iconbtn.mist{color:var(--mist);border-color:rgba(255,122,89,.4)}
-  .iconbtn.mist:hover{background:rgba(255,112,8,.12);border-color:rgba(255,122,89,.7)}
-  .btn{border:0;cursor:pointer;border-radius:12px;padding:11px 16px;font-weight:800;font-size:13px;display:inline-flex;align-items:center;gap:8px;transition:.18s}
-  .btn.primary{background:var(--grad);color:#fff}
-  .btn.primary:hover{filter:brightness(1.08);transform:translateY(-1px)}
-  .btn.mist{background:var(--mist-grad);color:#1a0d00}
-  .btn.mist:hover{filter:brightness(1.08);transform:translateY(-1px)}
-  .btn.ghost{background:transparent;border:1px solid var(--line2);color:var(--mut)}
-  .btn.ghost:hover{color:var(--txt)}
-
-  .rowflex{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .seg{display:flex;background:#0c1322;border:1px solid var(--line2);border-radius:10px;overflow:hidden}
-  .seg button{background:transparent;border:0;color:var(--mut);padding:9px 12px;font-size:12px;font-weight:700;cursor:pointer}
-  .seg button.on{background:rgba(255,112,8,.16);color:var(--mist)}
-
-  .pill{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--line2);color:var(--mut)}
-  .pill.b{color:var(--blue2);border-color:rgba(59,130,246,.4)}
-  .pill.m{color:var(--mist);border-color:rgba(255,122,89,.4)}
-  .pill.g{color:var(--green);border-color:rgba(34,211,154,.4)}
-
-  .weight{display:flex;align-items:center;gap:10px;margin-top:6px}
-  .weight .wl{font-size:11px;color:var(--mut);min-width:78px}
-  .weight .wv{font-size:11px;color:var(--mist);font-weight:700;min-width:34px;text-align:right}
-
-  /* prompt output */
-  .prompout{
-    background:#0a0f1c;border:1px solid var(--line2);border-radius:12px;padding:14px 16px;
-    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.7;
-    color:#cfe0ff;white-space:pre-wrap;min-height:120px;
-  }
-  .prompout .k{color:var(--mist)} .prompout .v{color:#e5edf7} .prompout .c{color:var(--mut2)}
-
-  .counters{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--mut)}
-  .counters b{color:var(--txt)}
-
-  /* video storyboard */
-  .shots{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-  .shot{border:1px solid var(--line2);border-radius:12px;padding:12px;background:#0c1322;display:flex;gap:12px}
-  .shot .stime{font-size:11px;font-weight:800;color:var(--mist);min-width:50px}
-  .shot .sbody{flex:1}
-  .shot .sdesc{font-size:12.5px;color:var(--txt);line-height:1.55}
-  .shot .smeta{font-size:11px;color:var(--mut);margin-top:5px;display:flex;gap:10px;flex-wrap:wrap}
-  .shot .scam{color:var(--blue2)} .shot .slig{color:var(--amber)} .shot .smov{color:var(--violet)}
-
-  /* video strip */
-  .strip{display:flex;gap:6px;margin-top:12px;overflow-x:auto;padding-bottom:4px}
-  .frame{
-    min-width:120px;aspect-ratio:9/16;border-radius:10px;border:1px solid var(--line2);
-    background:linear-gradient(135deg,#16223a,#0c1322);position:relative;overflow:hidden;
-    display:grid;place-items:center;text-align:center;padding:8px;cursor:pointer;
-  }
-  .frame:hover{border-color:rgba(255,112,8,.5)}
-  .frame .ft{font-size:10px;font-weight:800;color:var(--mist);position:absolute;top:6px;left:8px}
-  .frame .fc{font-size:10px;color:var(--mut2);line-height:1.4}
-  .frame.gen{background:#0c1322}
-  .frame.gen img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-  .frame .dl{position:absolute;bottom:4px;right:4px;font-size:9px;background:rgba(0,0,0,.6);padding:2px 5px;border-radius:5px;color:var(--txt)}
-
-  /* image upload */
-  .drop{
-    border:2px dashed var(--line2);border-radius:14px;padding:26px;text-align:center;cursor:pointer;transition:.18s;
-    background:#0c1322;
-  }
-  .drop:hover,.drop.over{border-color:rgba(255,112,8,.6);background:rgba(255,112,8,.05)}
-  .drop .big{font-size:34px;margin-bottom:6px}
-  .drop .t{font-size:13px;font-weight:700;color:var(--txt)}
-  .drop .s{font-size:11.5px;color:var(--mut2);margin-top:4px}
-  .preview{margin-top:12px;display:none;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line2)}
-  .preview.show{display:block}
-  .preview img{width:100%;display:block;max-height:280px;object-fit:contain;background:#0c1322}
-  .preview .rm{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);border:0;color:#fff;padding:5px 9px;border-radius:8px;cursor:pointer;font-size:11px}
-
-  /* overlay/modal */
-  .overlay{position:fixed;inset:0;background:rgba(3,6,12,.72);backdrop-filter:blur(6px);display:none;z-index:60;align-items:center;justify-content:center;padding:18px}
-  .overlay.show{display:flex}
-  .modal{width:100%;max-width:560px;border:1px solid var(--line2);border-radius:18px;background:linear-gradient(180deg,var(--panel),#0a0f1c);padding:20px;max-height:88vh;overflow:auto}
-  .modal h2{margin:0 0 4px;font-size:17px}
-  .modal p.sub{color:var(--mut);font-size:12.5px;margin:0 0 16px}
-  .modal .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
-
-  /* toast */
-  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
-    background:#0f1626;border:1px solid var(--line2);color:var(--txt);padding:11px 16px;border-radius:12px;
-    font-size:13px;font-weight:600;opacity:0;transition:.25s;z-index:80;display:flex;align-items:center;gap:9px;
-    box-shadow:0 20px 50px -20px rgba(0,0,0,.8);
-  }
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .toast .ti{color:var(--green)} .toast .ti.m{color:var(--mist)}
-
-  .spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
-  @keyframes sp{to{transform:rotate(360deg)}}
-  .fade{animation:fd .4s ease}
-  @keyframes fd{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  .hint{font-size:11.5px;color:var(--mut2);margin-top:8px;display:flex;align-items:center;gap:6px}
-  .kbd{font-family:ui-monospace,monospace;background:#0c1322;border:1px solid var(--line2);border-bottom-width:2px;padding:1px 6px;border-radius:6px;font-size:11px;color:var(--mist)}
-  .divider{height:1px;background:var(--line);margin:14px 0;border:0}
-
-  .scratch{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-  .scratch .s{font-size:11px;color:var(--mut);background:rgba(255,255,255,.04);border:1px solid var(--line2);padding:5px 9px;border-radius:8px;cursor:pointer}
-  .scratch .s:hover{color:var(--mist);border-color:rgba(255,122,89,.4)}
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans',sans-serif}
+:root{--bg:#07080c;--surface:#0d0f18;--surface-2:#131622;--accent:#ff2d2d;--text:#f4f4f5;--muted:#71717a;--muted-2:#a1a1aa;--border:rgba(255,255,255,0.07);--red:#ef4444;--green:#00d97e;--blue:#3b82f6;--amber:#f59e0b;--purple:#a855f7;--mist:#ff7a59}
+body{background:radial-gradient(900px 500px at 100% -5%,rgba(255,112,8,.06),transparent 60%),var(--bg);color:var(--text);min-height:100vh}
+::-webkit-scrollbar{width:10px}::-webkit-scrollbar-thumb{background:#22304a;border-radius:20px}
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:18px 6%;background:rgba(7,8,12,.85);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
+.logo{font-size:20px;font-weight:800;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo span{color:var(--accent)}
+.back-btn{font-size:12px;font-weight:700;color:var(--muted);background:var(--surface-2);border:1px solid var(--border);padding:8px 14px;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:7px;transition:.2s}
+.back-btn:hover{color:#fff;border-color:var(--mist)}
+.container{max-width:1180px;margin:0 auto;padding:30px 20px 60px}
+.hero{text-align:center;margin-bottom:20px}
+.hero h1{font-size:30px;font-weight:800;margin-bottom:8px;background:linear-gradient(90deg,#fff,#ffd9b0,#ffaa00,#9b8cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--muted);font-size:14px;max-width:660px;margin:0 auto}
+.modes{display:flex;gap:8px;justify-content:center;margin:18px auto 0;flex-wrap:wrap}
+.mode{display:flex;align-items:center;gap:10px;padding:11px 18px;border-radius:14px;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:.18s;font-weight:700;font-size:13px;color:var(--muted)}
+.mode:hover{color:#fff;border-color:#3a4a68}
+.mode.on{background:linear-gradient(180deg,rgba(255,112,8,.16),rgba(255,112,8,.05));border-color:rgba(255,112,8,.6);color:#ffcaa0}
+.mode .mi{font-size:18px} .mode small{display:block;font-weight:500;color:var(--muted-2);font-size:10.5px}
+.panel{border:1px solid var(--border);border-radius:16px;background:var(--surface);padding:16px;margin-top:16px}
+.panel h3{margin:0 0 12px;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:space-between}
+.panel h3 .tag-pill2{font-size:10.5px;font-weight:700;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border);padding:3px 8px;border-radius:999px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px} .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+label.fl{font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);font-weight:700;display:block;margin-bottom:5px}
+input.in,select.in,textarea.in{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 12px;font-size:13px;outline:0;transition:.15s}
+input.in:focus,select.in:focus,textarea.in:focus{border-color:var(--mist)}
+textarea.in{resize:vertical;font-family:ui-monospace,Menlo,monospace;line-height:1.55}
+select.in{cursor:pointer} input[type=range]{width:100%;accent-color:var(--mist)}
+.iconbtn{font-size:11px;font-weight:700;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border);padding:7px 11px;border-radius:9px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.iconbtn:hover{color:#fff;border-color:#3a4a68}
+.pill{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted)}
+.pill.m{color:var(--mist);border-color:rgba(255,122,89,.4)}
+.weight{display:flex;align-items:center;gap:10px;margin-top:6px} .weight .wv{font-size:11px;color:var(--mist);font-weight:700;min-width:34px;text-align:right}
+.prompout{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.7;color:#cfe0ff;white-space:pre-wrap;min-height:120px}
+.prompout .k{color:var(--mist)}
+.counters{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--muted)} .counters b{color:var(--text)}
+.shots{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.shot{border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--surface-2);display:flex;gap:12px}
+.shot .stime{font-size:11px;font-weight:800;color:var(--mist);min-width:50px} .shot .sbody{flex:1}
+.shot .sdesc{font-size:12.5px;color:var(--text);line-height:1.55} .shot .smeta{font-size:11px;color:var(--muted);margin-top:5px;display:flex;gap:10px;flex-wrap:wrap}
+.shot .scam{color:var(--blue)} .shot .slig{color:var(--amber)} .shot .smov{color:var(--purple)}
+.strip{display:flex;gap:6px;margin-top:12px;overflow-x:auto;padding-bottom:4px}
+.frame{min-width:120px;aspect-ratio:9/16;border-radius:10px;border:1px solid var(--border);background:linear-gradient(135deg,#16223a,var(--surface));position:relative;overflow:hidden;display:grid;place-items:center;text-align:center;padding:8px;cursor:pointer}
+.frame:hover{border-color:var(--mist)} .frame .ft{font-size:10px;font-weight:800;color:var(--mist);position:absolute;top:6px;left:8px} .frame .fc{font-size:10px;color:var(--muted-2);line-height:1.4}
+.drop{border:2px dashed var(--border);border-radius:14px;padding:26px;text-align:center;cursor:pointer;transition:.18s;background:var(--surface-2)}
+.drop:hover,.drop.over{border-color:var(--mist);background:rgba(255,112,8,.05)}
+.drop .big{font-size:34px;margin-bottom:6px} .drop .t{font-size:13px;font-weight:700;color:var(--text)} .drop .s{font-size:11.5px;color:var(--muted-2);margin-top:4px}
+.preview{margin-top:12px;display:none;position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.preview.show{display:block} .preview img{width:100%;display:block;max-height:280px;object-fit:contain;background:var(--surface-2)}
+.preview .rm{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);border:0;color:#fff;padding:5px 9px;border-radius:8px;cursor:pointer;font-size:11px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:11px 16px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;transition:.25s;z-index:80;display:flex;align-items:center;gap:9px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)} .toast .ti{color:var(--green)}
+.hint{font-size:11.5px;color:var(--muted-2);margin-top:8px}
+.divider{height:1px;background:var(--border);margin:14px 0;border:0}
+.scratch{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.scratch .s{font-size:11px;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border);padding:5px 9px;border-radius:8px;cursor:pointer}
+.scratch .s:hover{color:var(--mist);border-color:rgba(255,122,89,.4)}
 </style>
 </head>
 <body>
-<div class="wrap">
-
-  <!-- topbar -->
-  <div class="topbar">
-    <div class="brand">
-      <div class="logo">◈</div>
-      <div>Mistral Visual Studio<small>Prompt · Image · 8s Video Engine</small></div>
-    </div>
-    <div class="toplinks">
-      <span class="chip live"><span class="dot"></span> Engine online</span>
-      <span class="chip mist" id="engineChip">⚙ Mistral Pixtie</span>
-      <span class="chip" id="histBtn">🕓 History <span id="histCount" style="color:var(--mist)">0</span></span>
-      <span class="chip" id="setBtn">⚙ Settings</span>
-    </div>
-  </div>
-
-  <!-- hero -->
+<nav class="navbar">
+  <a href="index.html" class="logo"><i class="fa-solid fa-bolt" style="color:var(--accent)"></i> View<span>49</span></a>
+  <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+</nav>
+<div class="container">
   <div class="hero">
     <h1>Mistral Visual Prompt & Video Studio</h1>
-    <p>A search-engine for cinematic prompts. Build structured prompts for Midjourney · DALL·E · Stable Diffusion, then turn any prompt into an <b style="color:var(--mist)">8-second video</b> — prompt-to-video and image-to-video.</p>
-    <div class="engrow">
-      <span>Engine</span><b>Mistral Pixtie v2</b>
-      <span>·</span><span>Video</span><b>8s cinematic</b>
-      <span>·</span><span>Modes</span><b>Prompt / Text→Video / Image→Video</b>
-    </div>
-
-    <!-- mode switch -->
+    <p>Build structured prompts for Midjourney Â· DALLÂ·E Â· Stable Diffusion, then turn any prompt into an <b style="color:var(--mist)">8-second video</b> â prompt-to-video and image-to-video.</p>
     <div class="modes" id="modes">
-      <div class="mode on" data-mode="prompt"><span class="mi">✨</span><div>Prompt Builder<small>structured cinematic prompt</small></div></div>
-      <div class="mode" data-mode="t2v"><span class="mi">🎬</span><div>Text → Video<small>prompt → 8s clip</small></div></div>
-      <div class="mode" data-mode="i2v"><span class="mi">🖼</span><div>Image → Video<small>animate a still</small></div></div>
+      <div class="mode on" data-mode="prompt"><span class="mi">â¨</span><div>Prompt Builder<small>structured cinematic prompt</small></div></div>
+      <div class="mode" data-mode="t2v"><span class="mi">ð¬</span><div>Text â Video<small>prompt â 8s clip</small></div></div>
+      <div class="mode" data-mode="i2v"><span class="mi">ð¼</span><div>Image â Video<small>animate a still</small></div></div>
     </div>
   </div>
 
-  <!-- ============ PROMPT BUILDER ============ -->
+  <!-- PROMPT BUILDER -->
   <div id="view-prompt" class="view">
-    <div class="panel fade">
-      <h3><span>🧱 Prompt Architecture</span><span class="tag" id="pCount">0 tokens</span></h3>
+    <div class="panel">
+      <h3><span><i class="fa-solid fa-cubes"></i> Prompt Architecture</span><span class="tag-pill2" id="pCount">0 tokens</span></h3>
       <div class="grid2">
-        <div>
-          <label class="fl">Subject</label>
-          <input id="subject" class="in" type="text" placeholder="e.g. a lone astronaut on a red desert planet" oninput="buildAll()" />
-        </div>
-        <div>
-          <label class="fl">Model preset</label>
-          <select id="model" class="in" onchange="buildAll()">
-            <option value="midjourney">Midjourney (v6, --ar --style --n)</option>
-            <option value="sdxl">Stable Diffusion XL (weights + tags)</option>
-            <option value="dalle">DALL·E 3 (natural language)</option>
-            <option value="flux">FLUX.1 (dev, natural)</option>
-            <option value="ideogram">Ideogram (typography-ready)</option>
-            <option value="generic">Generic (works anywhere)</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Style</label>
-          <select id="style" class="in" onchange="buildAll()"></select>
-        </div>
-        <div>
-          <label class="fl">Lighting</label>
-          <select id="lighting" class="in" onchange="buildAll()"></select>
-        </div>
-        <div>
-          <label class="fl">Camera / Angle</label>
-          <select id="angle" class="in" onchange="buildAll()"></select>
-        </div>
-        <div>
-          <label class="fl">Mood</label>
-          <select id="mood" class="in" onchange="buildAll()"></select>
-        </div>
-        <div>
-          <label class="fl">Color palette</label>
-          <input id="colors" class="in" type="text" placeholder="e.g. teal & orange, muted pastels" oninput="buildAll()" />
-        </div>
-        <div>
-          <label class="fl">Composition / framing</label>
-          <select id="compose" class="in" onchange="buildAll()"></select>
-        </div>
-        <div>
-          <label class="fl">Lens / camera gear</label>
-          <select id="lens" class="in" onchange="buildAll()"></select>
-        </div>
-        <div>
-          <label class="fl">Environment</label>
-          <input id="env" class="in" type="text" placeholder="e.g. dusty martian plain, distant mountains" oninput="buildAll()" />
-        </div>
+        <div><label class="fl">Subject</label><input id="subject" class="in" type="text" placeholder="e.g. a lone astronaut on a red desert planet" oninput="buildAll()"></div>
+        <div><label class="fl">Model preset</label><select id="model" class="in" onchange="buildAll()">
+          <option value="midjourney">Midjourney (v6)</option><option value="sdxl">Stable Diffusion XL</option><option value="dalle">DALLÂ·E 3</option><option value="flux">FLUX.1</option><option value="ideogram">Ideogram</option><option value="generic">Generic</option></select></div>
+        <div><label class="fl">Style</label><select id="style" class="in" onchange="buildAll()"></select></div>
+        <div><label class="fl">Lighting</label><select id="lighting" class="in" onchange="buildAll()"></select></div>
+        <div><label class="fl">Camera / Angle</label><select id="angle" class="in" onchange="buildAll()"></select></div>
+        <div><label class="fl">Mood</label><select id="mood" class="in" onchange="buildAll()"></select></div>
+        <div><label class="fl">Color palette</label><input id="colors" class="in" type="text" placeholder="e.g. teal & orange, muted pastels" oninput="buildAll()"></div>
+        <div><label class="fl">Composition</label><select id="compose" class="in" onchange="buildAll()"></select></div>
+        <div><label class="fl">Lens / gear</label><select id="lens" class="in" onchange="buildAll()"></select></div>
+        <div><label class="fl">Environment</label><input id="env" class="in" type="text" placeholder="e.g. dusty martian plain" oninput="buildAll()"></div>
       </div>
       <div class="divider"></div>
       <div class="grid2">
-        <div>
-          <label class="fl">Extra details (positive)</label>
-          <input id="extra" class="in" type="text" placeholder="8k, hyper-detailed, sharp focus, volumetric fog" oninput="buildAll()" />
-        </div>
-        <div>
-          <label class="fl">Negative prompt</label>
-          <input id="neg" class="in" type="text" placeholder="blurry, deformed, extra limbs, watermark" oninput="buildAll()" />
-        </div>
+        <div><label class="fl">Extra details (positive)</label><input id="extra" class="in" type="text" placeholder="8k, hyper-detailed, sharp focus" oninput="buildAll()"></div>
+        <div><label class="fl">Negative prompt</label><input id="neg" class="in" type="text" placeholder="blurry, deformed, extra limbs, watermark" oninput="buildAll()"></div>
       </div>
       <div class="divider"></div>
       <div class="grid3">
-        <div>
-          <label class="fl">Aspect ratio</label>
-          <select id="ar" class="in" onchange="buildAll()">
-            <option value="16:9">16:9 Landscape</option>
-            <option value="9:16">9:16 Vertical</option>
-            <option value="1:1">1:1 Square</option>
-            <option value="21:9">21:9 Cinematic</option>
-            <option value="4:3">4:3 Classic</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Quality / steps</label>
-          <select id="quality" class="in" onchange="buildAll()">
-            <option value="draft">Draft (fast)</option>
-            <option value="standard" selected>Standard</option>
-            <option value="high">High detail</option>
-            <option value="ultra">Ultra (8k, max detail)</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Seed (optional)</label>
-          <input id="seed" class="in" type="text" placeholder="auto" oninput="buildAll()" />
-        </div>
+        <div><label class="fl">Aspect ratio</label><select id="ar" class="in" onchange="buildAll()"><option>16:9</option><option>9:16</option><option>1:1</option><option>21:9</option><option>4:3</option></select></div>
+        <div><label class="fl">Quality</label><select id="quality" class="in" onchange="buildAll()"><option value="draft">Draft</option><option value="standard" selected>Standard</option><option value="high">High detail</option><option value="ultra">Ultra 8k</option></select></div>
+        <div><label class="fl">Seed</label><input id="seed" class="in" type="text" placeholder="auto" oninput="buildAll()"></div>
       </div>
       <div class="scratch">
-        <span class="s" onclick="quickFill('subject','a lone astronaut on a red desert planet')">🚀 astronaut</span>
-        <span class="s" onclick="quickFill('subject','a neon cyberpunk city street at night')">🌃 cyberpunk city</span>
-        <span class="s" onclick="quickFill('subject','a vintage motorcycle on a coastal highway')">🏍 motorcycle</span>
-        <span class="s" onclick="quickFill('subject','a majestic dragon over snowy mountains')">🐉 dragon</span>
-        <span class="s" onclick="quickFill('subject','a barista pouring latte art, cozy cafe')">☕ latte art</span>
-        <span class="s" onclick="quickFill('subject','a fashion model in a futuristic suit, studio')">👗 fashion</span>
+        <span class="s" onclick="quickFill('subject','a lone astronaut on a red desert planet')">ð astronaut</span>
+        <span class="s" onclick="quickFill('subject','a neon cyberpunk city street at night')">ð cyberpunk city</span>
+        <span class="s" onclick="quickFill('subject','a vintage motorcycle on a coastal highway')">ð motorcycle</span>
+        <span class="s" onclick="quickFill('subject','a majestic dragon over snowy mountains')">ð dragon</span>
+        <span class="s" onclick="quickFill('subject','a barista pouring latte art, cozy cafe')">â latte art</span>
       </div>
     </div>
-
-    <!-- output -->
-    <div class="panel fade">
-      <h3>
-        <span>✨ Generated Prompt <span class="pill m" id="modelPill">generic</span></span>
-        <span style="display:flex;gap:7px">
-          <button class="iconbtn mist" id="enhanceBtn">🪄 Enhance with Mistral</button>
-          <button class="iconbtn" id="copyPrompt">📋 Copy</button>
-          <button class="iconbtn" id="randomize">🎲 Randomize</button>
-        </span>
-      </h3>
+    <div class="panel">
+      <h3><span><i class="fa-solid fa-wand-magic-sparkles"></i> Generated Prompt <span class="pill m" id="modelPill">generic</span></span><span style="display:flex;gap:7px"><button class="iconbtn" id="copyPrompt"><i class="fa-solid fa-copy"></i> Copy</button><button class="iconbtn" id="randomize"><i class="fa-solid fa-dice"></i> Randomize</button></span></h3>
       <div class="prompout" id="promptOut"></div>
-      <div class="counters">
-        <div><b id="cTok">0</b> tokens (≈)</div>
-        <div><b id="cChar2">0</b> chars</div>
-        <div><b id="cPos">0</b> positive terms</div>
-        <div><b id="cNeg">0</b> negative terms</div>
-      </div>
-      <div class="hint">💡 Switch to <span class="kbd">Text → Video</span> to turn this prompt into an 8-second clip.</div>
+      <div class="counters"><div><b id="cTok">0</b> tokens</div><div><b id="cChar2">0</b> chars</div><div><b id="cPos">0</b> positive</div><div><b id="cNeg">0</b> negative</div></div>
+      <div class="hint">ð¡ Switch to <b>Text â Video</b> to turn this prompt into an 8-second clip.</div>
     </div>
   </div>
 
-  <!-- ============ TEXT TO VIDEO ============ -->
+  <!-- TEXT TO VIDEO -->
   <div id="view-t2v" class="view" style="display:none">
-    <div class="panel fade">
-      <h3><span>🎬 Text → Video · 8s Cinematic</span><span class="tag">single-shot · prompt-driven</span></h3>
+    <div class="panel">
+      <h3><span><i class="fa-solid fa-film"></i> Text â Video Â· 8s Cinematic</span><span class="tag-pill2">single-shot Â· prompt-driven</span></h3>
       <div class="grid2">
-        <div style="grid-column:1/-1">
-          <label class="fl">Video subject / scene prompt</label>
-          <textarea id="vSubject" class="in" rows="3" placeholder="A lone astronaut walking across a red desert planet, wind blowing dust, two moons in the sky" oninput="buildVideo()"></textarea>
-        </div>
-        <div>
-          <label class="fl">Style</label>
-          <select id="vStyle" class="in" onchange="buildVideo()"></select>
-        </div>
-        <div>
-          <label class="fl">Camera motion</label>
-          <select id="vCam" class="in" onchange="buildVideo()">
-            <option value="slow push-in">Slow push-in (dolly)</option>
-            <option value="slow pull-out">Slow pull-out</option>
-            <option value="panning left to right">Pan left → right</option>
-            <option value="orbiting around subject">Orbit around subject</option>
-            <option value="crane shot rising">Crane rising</option>
-            <option value="handheld walking">Handheld walking</option>
-            <option value="aerial drone flyover">Drone flyover</option>
-            <option value="static camera, subject moves">Static, subject moves</option>
-            <option value="tracking shot following subject">Tracking follow</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Lighting</label>
-          <select id="vLight" class="in" onchange="buildVideo()"></select>
-        </div>
-        <div>
-          <label class="fl">Mood</label>
-          <select id="vMood" class="in" onchange="buildVideo()"></select>
-        </div>
-        <div>
-          <label class="fl">Duration</label>
-          <select id="vDur" class="in" onchange="buildVideo()">
-            <option value="8">8 seconds</option>
-            <option value="5">5 seconds</option>
-            <option value="10">10 seconds</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">FPS</label>
-          <select id="vFps" class="in" onchange="buildVideo()">
-            <option value="24">24 fps (cinematic)</option>
-            <option value="30">30 fps</option>
-            <option value="60">60 fps (smooth)</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Resolution</label>
-          <select id="vRes" class="in" onchange="buildVideo()">
-            <option value="1080p">1080p</option>
-            <option value="720p">720p</option>
-            <option value="4k">4K (slower)</option>
-          </select>
-          <label class="fl" style="margin-top:10px">Aspect</label>
-          <select id="vAr" class="in" onchange="buildVideo()">
-            <option value="16:9">16:9 Landscape</option>
-            <option value="9:16">9:16 Vertical</option>
-            <option value="1:1">1:1 Square</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Motion intensity</label>
-          <div class="weight"><input type="range" id="vMotion" min="1" max="10" value="5" oninput="buildVideo()" /><span class="wv" id="vMotionV">5</span></div>
-          <label class="fl" style="margin-top:10px">Atmosphere / extra</label>
-          <input id="vExtra" class="in" type="text" placeholder="volumetric dust, lens flare, film grain" oninput="buildVideo()" />
-        </div>
+        <div style="grid-column:1/-1"><label class="fl">Video subject / scene prompt</label><textarea id="vSubject" class="in" rows="3" placeholder="A lone astronaut walking across a red desert planet, wind blowing dust, two moons in the sky" oninput="buildVideo()"></textarea></div>
+        <div><label class="fl">Style</label><select id="vStyle" class="in" onchange="buildVideo()"></select></div>
+        <div><label class="fl">Camera motion</label><select id="vCam" class="in" onchange="buildVideo()">
+          <option value="slow push-in">Slow push-in (dolly)</option><option value="slow pull-out">Slow pull-out</option><option value="panning left to right">Pan left â right</option><option value="orbiting around subject">Orbit around subject</option><option value="crane shot rising">Crane rising</option><option value="handheld walking">Handheld walking</option><option value="aerial drone flyover">Drone flyover</option><option value="static camera, subject moves">Static, subject moves</option><option value="tracking shot following subject">Tracking follow</option></select></div>
+        <div><label class="fl">Lighting</label><select id="vLight" class="in" onchange="buildVideo()"></select></div>
+        <div><label class="fl">Mood</label><select id="vMood" class="in" onchange="buildVideo()"></select></div>
+        <div><label class="fl">Duration</label><select id="vDur" class="in" onchange="buildVideo()"><option value="8">8 seconds</option><option value="5">5 seconds</option><option value="10">10 seconds</option></select></div>
+        <div><label class="fl">FPS</label><select id="vFps" class="in" onchange="buildVideo()"><option value="24">24 fps</option><option value="30">30 fps</option><option value="60">60 fps</option></select></div>
+        <div><label class="fl">Resolution</label><select id="vRes" class="in" onchange="buildVideo()"><option>1080p</option><option>720p</option><option>4k</option></select></div>
+        <div><label class="fl">Aspect</label><select id="vAr" class="in" onchange="buildVideo()"><option>16:9</option><option>9:16</option><option>1:1</option></select></div>
+        <div><label class="fl">Motion intensity</label><div class="weight"><input type="range" id="vMotion" min="1" max="10" value="5" oninput="buildVideo()"><span class="wv" id="vMotionV">5</span></div><label class="fl" style="margin-top:10px">Atmosphere / extra</label><input id="vExtra" class="in" type="text" placeholder="volumetric dust, lens flare, film grain" oninput="buildVideo()"></div>
       </div>
-      <div class="hint">💡 "Jesa prompt wasi video" — the generated clip follows this prompt one-to-one. Click <b>Generate keyframes</b> to ask the assistant to render still frames.</div>
+      <div class="hint">ð¡ "Jesa prompt wasi video" â the generated clip follows this prompt one-to-one.</div>
     </div>
-
-    <div class="panel fade">
-      <h3>
-        <span>🎞 Video Generation Prompt + Shotlist <span class="pill m">8s · <span id="vDurLbl">8</span>s</span></span>
-        <span style="display:flex;gap:7px">
-          <button class="iconbtn mist" id="vEnhance">🪄 Enhance</button>
-          <button class="iconbtn" id="copyVPrompt">📋 Copy prompt</button>
-          <button class="iconbtn mist" id="genFrames">⚡ Generate keyframes</button>
-        </span>
-      </h3>
+    <div class="panel">
+      <h3><span><i class="fa-solid fa-clapperboard"></i> Video Prompt + Shotlist <span class="pill m">8s Â· <span id="vDurLbl">8</span>s</span></span><span style="display:flex;gap:7px"><button class="iconbtn" id="copyVPrompt"><i class="fa-solid fa-copy"></i> Copy</button></span></h3>
       <div class="prompout" id="vPromptOut"></div>
       <div class="shots" id="shotlist"></div>
       <div class="strip" id="frameStrip"></div>
-      <div class="hint">⚡ Keyframes are rendered by the assistant using the image engine — paste the prompt into Sora / Runway / Pika / Kling / Hailuo for the final 8s clip.</div>
+      <div class="hint">â¡ Copy the prompt into Sora / Runway / Pika / Kling / Hailuo to generate the final 8s clip.</div>
     </div>
   </div>
 
-  <!-- ============ IMAGE TO VIDEO ============ -->
+  <!-- IMAGE TO VIDEO -->
   <div id="view-i2v" class="view" style="display:none">
-    <div class="panel fade">
-      <h3><span>🖼 Image → Video · Animate a still</span><span class="tag">upload + motion</span></h3>
-      <div class="drop" id="drop">
-        <div class="big">📁</div>
-        <div class="t">Drop an image or click to upload</div>
-        <div class="s">PNG / JPG / WEBP — used as the first frame of your 8s video</div>
-        <input type="file" id="fileInput" accept="image/*" style="display:none" />
-      </div>
-      <div class="preview" id="iPreview"><img id="iImg" alt="preview" /><button class="rm" id="iRemove">✕ Remove</button></div>
+    <div class="panel">
+      <h3><span><i class="fa-solid fa-image"></i> Image â Video Â· Animate a still</span><span class="tag-pill2">upload + motion</span></h3>
+      <div class="drop" id="drop"><div class="big">ð</div><div class="t">Drop an image or click to upload</div><div class="s">PNG / JPG / WEBP â used as the first frame of your 8s video</div><input type="file" id="fileInput" accept="image/*" style="display:none"></div>
+      <div class="preview" id="iPreview"><img id="iImg" alt="preview"><button class="rm" id="iRemove">â Remove</button></div>
       <div class="divider"></div>
       <div class="grid2">
-        <div style="grid-column:1/-1">
-          <label class="fl">Motion description (what should move)</label>
-          <textarea id="iMotion" class="in" rows="3" placeholder="Camera slowly pushes in, the subject's hair flows in the wind, subtle parallax in the background, warm light shifts across the face" oninput="buildI2V()"></textarea>
-        </div>
-        <div>
-          <label class="fl">Camera motion</label>
-          <select id="iCam" class="in" onchange="buildI2V()">
-            <option value="slow push-in">Slow push-in</option>
-            <option value="slow pull-out">Slow pull-out</option>
-            <option value="panning left to right">Pan left → right</option>
-            <option value="orbiting around subject">Orbit subject</option>
-            <option value="static camera">Static camera</option>
-            <option value="subtle handheld sway">Subtle handheld sway</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Motion intensity</label>
-          <div class="weight"><input type="range" id="iMotion2" min="1" max="10" value="4" oninput="buildI2V()" /><span class="wv" id="iMotion2V">4</span></div>
-        </div>
-        <div>
-          <label class="fl">Duration</label>
-          <select id="iDur" class="in" onchange="buildI2V()">
-            <option value="8">8 seconds</option>
-            <option value="5">5 seconds</option>
-            <option value="10">10 seconds</option>
-          </select>
-        </div>
-        <div>
-          <label class="fl">Aspect (match image)</label>
-          <select id="iAr" class="in" onchange="buildI2V()">
-            <option value="16:9">16:9</option>
-            <option value="9:16">9:16</option>
-            <option value="1:1">1:1</option>
-          </select>
-        </div>
+        <div style="grid-column:1/-1"><label class="fl">Motion description (what should move)</label><textarea id="iMotion" class="in" rows="3" placeholder="Camera slowly pushes in, the subject's hair flows in the wind, subtle parallax in the background" oninput="buildI2V()"></textarea></div>
+        <div><label class="fl">Camera motion</label><select id="iCam" class="in" onchange="buildI2V()"><option value="slow push-in">Slow push-in</option><option value="slow pull-out">Slow pull-out</option><option value="panning left to right">Pan left â right</option><option value="orbiting around subject">Orbit subject</option><option value="static camera">Static camera</option><option value="subtle handheld sway">Subtle handheld sway</option></select></div>
+        <div><label class="fl">Motion intensity</label><div class="weight"><input type="range" id="iMotion2" min="1" max="10" value="4" oninput="buildI2V()"><span class="wv" id="iMotion2V">4</span></div></div>
+        <div><label class="fl">Duration</label><select id="iDur" class="in" onchange="buildI2V()"><option value="8">8 seconds</option><option value="5">5 seconds</option><option value="10">10 seconds</option></select></div>
+        <div><label class="fl">Aspect</label><select id="iAr" class="in" onchange="buildI2V()"><option>16:9</option><option>9:16</option><option>1:1</option></select></div>
       </div>
     </div>
-
-    <div class="panel fade">
-      <h3>
-        <span>🎞 Image-to-Video Prompt <span class="pill m">first-frame</span></span>
-        <span style="display:flex;gap:7px">
-          <button class="iconbtn" id="copyIPrompt">📋 Copy</button>
-          <button class="iconbtn mist" id="genIFrames">⚡ Generate motion frames</button>
-        </span>
-      </h3>
+    <div class="panel">
+      <h3><span><i class="fa-solid fa-clapperboard"></i> Image-to-Video Prompt <span class="pill m">first-frame</span></span><span style="display:flex;gap:7px"><button class="iconbtn" id="copyIPrompt"><i class="fa-solid fa-copy"></i> Copy</button></span></h3>
       <div class="prompout" id="iPromptOut"></div>
       <div class="shots" id="iShotlist"></div>
       <div class="strip" id="iFrameStrip"></div>
-      <div class="hint">⚡ The assistant can render motion-augmented variations of your image using the image engine to preview the animation direction.</div>
-    </div>
-  </div>
-
-  <!-- history -->
-  <div class="panel hist" id="histCard" style="display:none">
-    <h3><span>🕓 Generation History</span><button class="iconbtn" id="clearHist">🗑 Clear all</button></h3>
-    <div id="histList"></div>
-  </div>
-</div>
-
-<!-- settings modal -->
-<div class="overlay" id="setModal">
-  <div class="modal">
-    <h2>⚙ Studio Settings</h2>
-    <p class="sub">Tune the Mistral Visual engine defaults.</p>
-    <div style="margin-bottom:14px">
-      <label class="fl">Default model preset</label>
-      <select id="setModel" class="in">
-        <option value="midjourney">Midjourney</option>
-        <option value="sdxl">Stable Diffusion XL</option>
-        <option value="dalle">DALL·E 3</option>
-        <option value="flux">FLUX.1</option>
-        <option value="ideogram">Ideogram</option>
-        <option value="generic">Generic</option>
-      </select>
-    </div>
-    <div style="margin-bottom:14px">
-      <label class="fl">Default video aspect</label>
-      <select id="setAr" class="in">
-        <option value="16:9">16:9 Landscape</option>
-        <option value="9:16">9:16 Vertical</option>
-        <option value="1:1">1:1 Square</option>
-      </select>
-    </div>
-    <div style="margin-bottom:14px">
-      <label class="fl">Default video duration</label>
-      <select id="setVDur" class="in">
-        <option value="8">8 seconds</option>
-        <option value="5">5 seconds</option>
-        <option value="10">10 seconds</option>
-      </select>
-    </div>
-    <p class="sub" style="font-size:11px">Generation happens through the assistant (image engine) when you click <b>Generate keyframes</b>. The page itself can't call external APIs from the preview sandbox — the assistant renders images and returns them in chat.</p>
-    <div class="actions">
-      <button class="btn ghost" id="setClose">Cancel</button>
-      <button class="btn primary" id="setSave">Save</button>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"><span class="ti">✓</span><span id="toastMsg">Done</span></div>
-
+<div class="toast" id="toast"><span class="ti">â</span><span id="toastMsg">Done</span></div>
 <script>
-/* ============================================================
-   Mistral Visual Prompt & Video Studio — client engine
-   ============================================================ */
 const $=id=>document.getElementById(id);
-
-/* ---- option dictionaries ---- */
-const STYLES=['','photorealistic','cinematic film still','anime style','oil painting','watercolor','3D render, octane render','cyberpunk concept art','minimalist flat design','hyperrealistic','surreal dreamscape','studio ghibli style','dark fantasy art','vaporwave aesthetic','documentary photography','low-poly 3D','gouache illustration','noir black & white'];
+const STYLES=['','photorealistic','cinematic film still','anime style','oil painting','watercolor','3D render, octane render','cyberpunk concept art','minimalist flat design','hyperrealistic','surreal dreamscape','studio ghibli style','dark fantasy art','vaporwave aesthetic','documentary photography','noir black & white'];
 const LIGHTS=['','golden hour lighting','dramatic rim lighting','soft diffused studio lighting','moody low-key lighting','neon glow lighting','natural overcast lighting','volumetric god rays','candlelight glow','blue hour twilight','harsh midday sun','backlit silhouette','bioluminescent glow'];
 const ANGLES=['','wide angle shot','close-up shot','low angle shot','high angle shot','bird\'s eye view','over-the-shoulder shot','macro shot','dutch angle','extreme close-up','medium shot','establishing wide'];
 const MOODS=['','epic and dramatic','calm and serene','mysterious and eerie','joyful and vibrant','melancholic','tense and suspenseful','whimsical and playful','nostalgic and warm','ominous and dark','hopeful and uplifting'];
 const COMPOSE=['','rule of thirds','centered composition','symmetrical','leading lines','negative space framing','golden ratio composition','foreground bokeh framing'];
 const LENSES=['','35mm lens','50mm lens f/1.8','85mm portrait lens','24mm wide lens','135mm telephoto','macro 100mm','anamorphic lens','tilt-shift lens','fisheye lens'];
-
 function fillSelect(sel,arr){arr.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v?cap(v):'None';sel.appendChild(o)})}
 function cap(s){return s.replace(/\b\w/g,c=>c.toUpperCase())}
-
-fillSelect($('style'),STYLES);fillSelect($('lighting'),LIGHTS);fillSelect($('angle'),ANGLES);
-fillSelect($('mood'),MOODS);fillSelect($('compose'),COMPOSE);fillSelect($('lens'),LENSES);
-fillSelect($('vStyle'),STYLES);fillSelect($('vLight'),LIGHTS);fillSelect($('vMood'),MOODS);
-
-/* ---- mode switching ---- */
+fillSelect($('style'),STYLES);fillSelect($('lighting'),LIGHTS);fillSelect($('angle'),ANGLES);fillSelect($('mood'),MOODS);fillSelect($('compose'),COMPOSE);fillSelect($('lens'),LENSES);fillSelect($('vStyle'),STYLES);fillSelect($('vLight'),LIGHTS);fillSelect($('vMood'),MOODS);
 let MODE='prompt';
-document.querySelectorAll('.mode').forEach(m=>m.onclick=()=>{
-  document.querySelectorAll('.mode').forEach(x=>x.classList.remove('on'));m.classList.add('on');
-  MODE=m.dataset.mode;
-  ['prompt','t2v','i2v'].forEach(v=>{$('view-'+v).style.display=v===MODE?'block':'none'});
-  if(MODE==='t2v' && !$('vSubject').value && $('subject').value)$('vSubject').value=$('subject').value;
-  buildActive();
-});
+document.querySelectorAll('.mode').forEach(m=>m.onclick=()=>{document.querySelectorAll('.mode').forEach(x=>x.classList.remove('on'));m.classList.add('on');MODE=m.dataset.mode;['prompt','t2v','i2v'].forEach(v=>{$('view-'+v).style.display=v===MODE?'block':'none'});if(MODE==='t2v'&&!$('vSubject').value&&$('subject').value)$('vSubject').value=$('subject').value;buildActive()});
 function buildActive(){if(MODE==='prompt')buildAll();else if(MODE==='t2v')buildVideo();else buildI2V()}
-
-/* ---- helpers ---- */
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
-function toast(msg,mist){const t=$('toast');$('toastMsg').textContent=msg;t.querySelector('.ti').className='ti'+(mist?' m':'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
-function rangeInit(id,vId){const el=$(id),v=$(vId);el.oninput=()=>{v.textContent=el.value};v.textContent=el.value}
-rangeInit('vMotion','vMotionV');rangeInit('iMotion2','iMotion2V');
-
-/* ============ PROMPT BUILDER ============ */
+function toast(m){const t=$('toast');$('toastMsg').textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+$('vMotion').oninput=()=>$('vMotionV').textContent=$('vMotion').value;$('vMotionV').textContent=$('vMotion').value;
+$('iMotion2').oninput=()=>$('iMotion2V').textContent=$('iMotion2').value;$('iMotion2V').textContent=$('iMotion2').value;
+const STATE={img:null,lastPrompt:'',lastVideo:'',lastI2V:''};
 function buildAll(){
   const g=id=>$(id).value.trim();
-  const subject=g('subject'),style=g('style'),light=g('lighting'),angle=g('angle'),mood=g('mood');
-  const colors=g('colors'),extra=g('extra'),neg=g('neg'),env=g('env'),compose=g('compose'),lens=g('lens');
-  const model=g('model'),ar=g('ar'),quality=g('quality'),seed=g('seed');
-
-  const parts=[];
-  if(subject)parts.push(subject);
-  if(style)parts.push(style);
-  if(env)parts.push('set in '+env);
-  if(compose)parts.push(compose);
-  if(angle)parts.push(angle);
-  if(lens)parts.push('shot on '+lens);
-  if(light)parts.push(light);
-  if(mood)parts.push(mood);
-  if(colors)parts.push(colors+' color palette');
-  const ql={draft:'fast preview',standard:'high quality',high:'hyper-detailed, 4k',ultra:'ultra-detailed, 8k, masterpiece, best quality'}[quality];
-  if(ql)parts.push(ql);
-  if(extra)parts.push(extra);
-
-  let out=parts.join(', ');
-  // model-specific wrapping
-  let suffix='';
-  if(model==='midjourney'){
-    suffix=` --ar ${ar} --style raw --v 6${seed?` --seed ${seed}`:''}`;
-  }else if(model==='sdxl'){
-    out=out+`, ${ql||'high quality'}`;
-    if(neg)out+='\n\nNegative: '+neg;
-    suffix=ar?` [aspect ${ar}]`:'';
-  }else if(model==='dalle'){
-    out='A '+out+'. '+(ar?`Aspect ratio ${ar}. `:'')+'Sharp, professional, no text artifacts.';
-  }else if(model==='flux'){
-    out=out+'. Cinematic, photoreal rendering.';
-  }else if(model==='ideogram'){
-    out=out+`. Typography-ready, clean composition${ar?`, ${ar}`:''}.`;
-  }
-  out=out+suffix;
-  if(model==='sdxl' && neg && !out.includes('Negative'))out+='\n\nNegative: '+neg;
-
+  const subject=g('subject'),style=g('style'),light=g('lighting'),angle=g('angle'),mood=g('mood'),colors=g('colors'),extra=g('extra'),neg=g('neg'),env=g('env'),compose=g('compose'),lens=g('lens'),model=g('model'),ar=g('ar'),quality=g('quality'),seed=g('seed');
+  const parts=[];if(subject)parts.push(subject);if(style)parts.push(style);if(env)parts.push('set in '+env);if(compose)parts.push(compose);if(angle)parts.push(angle);if(lens)parts.push('shot on '+lens);if(light)parts.push(light);if(mood)parts.push(mood);if(colors)parts.push(colors+' color palette');
+  const ql={draft:'fast preview',standard:'high quality',high:'hyper-detailed, 4k',ultra:'ultra-detailed, 8k, masterpiece, best quality'}[quality];if(ql)parts.push(ql);if(extra)parts.push(extra);
+  let out=parts.join(', ');let suffix='';
+  if(model==='midjourney'){suffix=' --ar '+ar+' --style raw --v 6'+(seed?' --seed '+seed:'');}
+  else if(model==='sdxl'){out=out+', '+(ql||'high quality');if(neg)out+='\n\nNegative: '+neg;suffix=ar?' [aspect '+ar+']':'';}
+  else if(model==='dalle'){out='A '+out+'. '+(ar?'Aspect ratio '+ar+'. ':'')+'Sharp, professional, no text artifacts.';}
+  else if(model==='flux'){out=out+'. Cinematic, photoreal rendering.';}
+  else if(model==='ideogram'){out=out+'. Typography-ready, clean composition'+(ar?', '+ar:'')+'.';}
+  out=out+suffix;if(model==='sdxl'&&neg&&!out.includes('Negative'))out+='\n\nNegative: '+neg;
   $('promptOut').innerHTML=highlight(out);
-  // counters
-  const posCount=parts.length;
-  const negCount=neg?neg.split(',').filter(Boolean).length:0;
-  $('cTok').textContent=Math.round(out.split(/\s+/).length*1.3);
-  $('cChar2').textContent=out.length;
-  $('cPos').textContent=posCount;
-  $('cNeg').textContent=negCount;
-  $('pCount').textContent=Math.round(out.split(/\s+/).length*1.3)+' tokens';
-  $('modelPill').textContent=model;
-  STATE.lastPrompt=out;
+  $('cTok').textContent=Math.round(out.split(/\s+/).length*1.3);$('cChar2').textContent=out.length;$('cPos').textContent=parts.length;$('cNeg').textContent=neg?neg.split(',').filter(Boolean).length:0;$('pCount').textContent=Math.round(out.split(/\s+/).length*1.3)+' tokens';$('modelPill').textContent=model;STATE.lastPrompt=out;
 }
-function highlight(s){
-  return esc(s).replace(/((?:--ar|--style|--v|--seed|--n)\s\S+)/g,'<span class="k">$1</span>')
-               .replace(/(Negative:)/g,'<span class="k">$1</span>');
-}
-
-/* ============ TEXT → VIDEO ============ */
-function buildVideo(){
-  const g=id=>$(id).value;
-  const subject=$('vSubject').value.trim();
-  if(!subject){$('vPromptOut').innerHTML='<span class="c">Enter a video subject to build the 8s prompt…</span>';$('shotlist').innerHTML='';$('frameStrip').innerHTML='';return}
-  const style=g('vStyle'),cam=g('vCam'),light=g('vLight'),mood=g('vMood'),dur=g('vDur'),fps=g('vFps'),res=g('vRes'),ar=g('vAr'),motion=$('vMotion').value,extra=g('vExtra').trim();
-
-  const parts=[subject];
-  if(style)parts.push(style);
-  if(cam)parts.push('camera: '+cam);
-  if(light)parts.push(light);
-  if(mood)parts.push(mood);
-  if(motion>=7)parts.push('dynamic motion, energetic movement');
-  else if(motion>=4)parts.push('natural realistic motion');
-  else parts.push('subtle slow motion');
-  if(extra)parts.push(extra);
-  parts.push(`${dur}s duration`,`${fps}fps`,res,`aspect ${ar}`,'cinematic color grading, smooth temporal consistency, photoreal physics, no morphing, stable identity');
-
-  const prompt=parts.join(', ');
-  $('vPromptOut').innerHTML=highlight(prompt);
-  $('vDurLbl').textContent=dur;
-
-  // shotlist — single shot style (prompt = video)
-  const segs=3;
-  const perSec=dur/segs;
-  const camLabels={0:'establish',1:'develop',2:'climax'};
-  let html='';
-  for(let i=0;i<segs;i++){
-    const t0=i*perSec, t1=(i+1)*perSec;
-    const phase=['establishing the scene','developing the motion','resolving with final composition'][i];
-    html+=`<div class="shot fade">
-      <div class="stime">${fmt(t0)}–${fmt(t1)}s</div>
-      <div class="sbody">
-        <div class="sdesc">${esc(phase)} — ${esc(subject)}. ${cap(cam)}.</div>
-        <div class="smeta">
-          <span class="scam">🎥 ${esc(cam)}</span>
-          <span class="slig">💡 ${esc(light||'natural light')}</span>
-          <span class="smov">🎞 ${motion>=7?'high':motion>=4?'medium':'low'} motion</span>
-        </div>
-      </div></div>`;
-  }
-  $('shotlist').innerHTML=html;
-
-  // frame strip (placeholder keyframes)
-  let strip='';
-  for(let i=0;i<segs;i++){
-    strip+=`<div class="frame" data-fi="${i}" onclick="frameClick(${i})">
-      <span class="ft">K${i+1} · ${fmt(i*perSec)}s</span>
-      <span class="fc">Keyframe ${i+1}<br>${['wide','mid','close'][i]}</span>
-    </div>`;
-  }
-  $('frameStrip').innerHTML=strip;
-  STATE.lastVideo=prompt; STATE.lastVideoCtx={subject,style,cam,light,mood,dur,fps,res,ar,motion,extra};
-}
+function highlight(s){return esc(s).replace(/((?:--ar|--style|--v|--seed|--n)\s\S+)/g,'<span class="k">$1</span>').replace(/(Negative:)/g,'<span class="k">$1</span>')}
 function fmt(n){return (Math.round(n*10)/10).toFixed(1).replace('.0','')}
-
-/* ============ IMAGE → VIDEO ============ */
+function buildVideo(){
+  const g=id=>$(id).value;const subject=$('vSubject').value.trim();
+  if(!subject){$('vPromptOut').innerHTML='<span style="color:var(--muted-2)">Enter a video subject to build the 8s promptâ¦</span>';$('shotlist').innerHTML='';$('frameStrip').innerHTML='';return}
+  const style=g('vStyle'),cam=g('vCam'),light=g('vLight'),mood=g('vMood'),dur=g('vDur'),fps=g('vFps'),res=g('vRes'),ar=g('vAr'),motion=$('vMotion').value,extra=g('vExtra').trim();
+  const parts=[subject];if(style)parts.push(style);if(cam)parts.push('camera: '+cam);if(light)parts.push(light);if(mood)parts.push(mood);
+  if(motion>=7)parts.push('dynamic motion, energetic movement');else if(motion>=4)parts.push('natural realistic motion');else parts.push('subtle slow motion');
+  if(extra)parts.push(extra);parts.push(dur+'s duration',fps+'fps',res,'aspect '+ar,'cinematic color grading, smooth temporal consistency, photoreal physics, no morphing, stable identity');
+  const prompt=parts.join(', ');$('vPromptOut').innerHTML=highlight(prompt);$('vDurLbl').textContent=dur;
+  const segs=3,perSec=dur/segs;let html='';const phases=['establishing the scene','developing the motion','resolving with final composition'];
+  for(let i=0;i<segs;i++){html+='<div class="shot"><div class="stime">'+fmt(i*perSec)+'â'+fmt((i+1)*perSec)+'s</div><div class="sbody"><div class="sdesc">'+esc(phases[i])+' â '+esc(subject)+'. '+cap(cam)+'.</div><div class="smeta"><span class="scam">ð¥ '+esc(cam)+'</span><span class="slig">ð¡ '+(esc(light)||'natural light')+'</span><span class="smov">ð '+(motion>=7?'high':motion>=4?'medium':'low')+' motion</span></div></div></div>'}
+  $('shotlist').innerHTML=html;let strip='';
+  for(let i=0;i<segs;i++){strip+='<div class="frame"><span class="ft">K'+(i+1)+' Â· '+fmt(i*perSec)+'s</span><span class="fc">Keyframe '+(i+1)+'<br>'+['wide','mid','close'][i]+'</span></div>'}
+  $('frameStrip').innerHTML=strip;STATE.lastVideo=prompt;
+}
 function buildI2V(){
-  const g=id=>$(id).value;
-  const motion=$('iMotion').value.trim();
-  const cam=g('iCam'),dur=g('iDur'),ar=g('iAr'),intensity=$('iMotion2').value;
-  if(!STATE.img && !motion){$('iPromptOut').innerHTML='<span class="c">Upload an image and describe the motion…</span>';return}
-  const base=STATE.img?('First frame: uploaded image ('+STATE.img.name+', '+STATE.img.w+'×'+STATE.img.h+'). '):'';
-  const parts=[base+'Animate this still into a '+dur+'-second video.'];
-  if(motion)parts.push('Motion: '+motion);
-  if(cam)parts.push('Camera: '+cam);
+  const g=id=>$(id).value;const motion=$('iMotion').value.trim();const cam=g('iCam'),dur=g('iDur'),ar=g('iAr'),intensity=$('iMotion2').value;
+  if(!STATE.img&&!motion){$('iPromptOut').innerHTML='<span style="color:var(--muted-2)">Upload an image and describe the motionâ¦</span>';return}
+  const base=STATE.img?('First frame: uploaded image ('+STATE.img.name+', '+STATE.img.w+'Ã'+STATE.img.h+'). '):'';
+  const parts=[base+'Animate this still into a '+dur+'-second video.'];if(motion)parts.push('Motion: '+motion);if(cam)parts.push('Camera: '+cam);
   parts.push(intensity>=7?'high motion intensity, dynamic':intensity>=4?'moderate motion intensity':'subtle gentle motion');
-  parts.push('preserve the original identity, lighting and color of the source image');
-  parts.push('aspect '+ar,'cinematic color grading, smooth motion, no flicker, temporal consistency');
-  const prompt=parts.join(', ');
-  $('iPromptOut').innerHTML=highlight(prompt);
-
-  // shotlist
-  const segs=3, perSec=dur/segs;
-  let html='';
-  for(let i=0;i<segs;i++){
-    const phase=['subtle start, minimal motion','motion builds as planned','final composition, motion settles'][i];
-    html+=`<div class="shot fade"><div class="stime">${fmt(i*perSec)}–${fmt((i+1)*perSec)}s</div>
-      <div class="sbody"><div class="sdesc">${esc(phase)}. ${esc(cam)}.</div>
-      <div class="smeta"><span class="scam">🎥 ${esc(cam)}</span><span class="smov">🎞 intensity ${intensity}/10</span></div></div></div>`;
-  }
-  $('iShotlist').innerHTML=html;
-
-  let strip='';
-  for(let i=0;i<segs;i++){
-    strip+=`<div class="frame" data-fi="${i}" onclick="iframeClick(${i})"><span class="ft">F${i+1} · ${fmt(i*perSec)}s</span><span class="fc">Motion<br>frame ${i+1}</span></div>`;
-  }
-  $('iFrameStrip').innerHTML=strip;
-  STATE.lastI2V=prompt; STATE.lastI2VCtx={motion,cam,dur,ar,intensity};
+  parts.push('preserve the original identity, lighting and color of the source image');parts.push('aspect '+ar,'cinematic color grading, smooth motion, no flicker, temporal consistency');
+  const prompt=parts.join(', ');$('iPromptOut').innerHTML=highlight(prompt);
+  const segs=3,perSec=dur/segs;let html='';const phases=['subtle start, minimal motion','motion builds as planned','final composition, motion settles'];
+  for(let i=0;i<segs;i++){html+='<div class="shot"><div class="stime">'+fmt(i*perSec)+'â'+fmt((i+1)*perSec)+'s</div><div class="sbody"><div class="sdesc">'+esc(phases[i])+'. '+esc(cam)+'.</div><div class="smeta"><span class="scam">ð¥ '+esc(cam)+'</span><span class="smov">ð intensity '+intensity+'/10</span></div></div></div>'}
+  $('iShotlist').innerHTML=html;let strip='';
+  for(let i=0;i<segs;i++){strip+='<div class="frame"><span class="ft">F'+(i+1)+' Â· '+fmt(i*perSec)+'s</span><span class="fc">Motion<br>frame '+(i+1)+'</span></div>'}
+  $('iFrameStrip').innerHTML=strip;STATE.lastI2V=prompt;
 }
-
-/* ============ KEYFRAME REQUEST (asks assistant) ============ */
-function frameClick(i){
-  if(STATE.frames && STATE.frames[i])return;
-  toast('Click "Generate keyframes" to ask the assistant to render frame '+(i+1),'m');
-}
-function iframeClick(i){toast('Click "Generate motion frames" to ask the assistant to render frame '+(i+1),'m')}
-
-$('genFrames').onclick=()=>{
-  if(!STATE.lastVideo){toast('Build a video prompt first','m');return}
-  toast('Asking the assistant to generate keyframes…','m');
-  // signal to the assistant via a custom event + visible note
-  showRequest('text-to-video keyframes',JSON.stringify(STATE.lastVideoCtx));
-};
-$('genIFrames').onclick=()=>{
-  if(!STATE.lastI2V){toast('Upload an image and add motion first','m');return}
-  toast('Asking the assistant to generate motion frames…','m');
-  showRequest('image-to-video motion frames',JSON.stringify({ctx:STATE.lastI2VCtx, image:STATE.img?STATE.img.name:null}));
-};
-
-/* visible "request" banner so the assistant in chat knows what to generate */
-function showRequest(kind,data){
-  const banner=document.createElement('div');
-  banner.style.cssText='position:fixed;bottom:70px;left:50%;transform:translateX(-50%);max-width:560px;width:calc(100% - 40px);background:linear-gradient(135deg,#ff7008,#ff3b3b);color:#fff;padding:12px 16px;border-radius:12px;font-size:12.5px;font-weight:700;box-shadow:0 20px 50px -20px rgba(255,112,8,.6);z-index:90;animation:fd .3s';
-  banner.innerHTML='⚡ <b>Request sent to assistant</b><br>Generate <b>'+esc(kind)+'</b>.<br><span style="opacity:.85;font-weight:500;font-size:11px">The assistant will render the keyframe images in chat using the image engine. Check the conversation.</span><br><details style="margin-top:6px;font-weight:500"><summary style="cursor:pointer">data</summary><pre style="white-space:pre-wrap;font-size:10px;margin:6px 0 0">'+esc(data)+'</pre></details>';
-  document.body.appendChild(banner);
-  setTimeout(()=>{banner.style.opacity='0';banner.style.transition='opacity .4s';setTimeout(()=>banner.remove(),400)},8000);
-}
-
-/* ============ MISTRAL ENHANCE ============ */
-$('enhanceBtn').onclick=()=>{enhancePrompt('prompt')};
-$('vEnhance').onclick=()=>{enhancePrompt('t2v')};
-function enhancePrompt(which){
-  const base=which==='t2v'?STATE.lastVideo:STATE.lastPrompt;
-  if(!base){toast('Build a prompt first','m');return}
-  toast('🪄 Asking Mistral to enhance…','m');
-  showRequest('Mistral prompt enhancement',JSON.stringify({mode:which,prompt:base}));
-}
-
-/* ============ COPY ============ */
 $('copyPrompt').onclick=()=>{navigator.clipboard.writeText(STATE.lastPrompt||'');toast('Prompt copied')};
 $('copyVPrompt').onclick=()=>{navigator.clipboard.writeText(STATE.lastVideo||'');toast('Video prompt copied')};
 $('copyIPrompt').onclick=()=>{navigator.clipboard.writeText(STATE.lastI2V||'');toast('Image-to-video prompt copied')};
-
-/* ============ RANDOMIZE ============ */
-$('randomize').onclick=()=>{
-  const r=a=>a[Math.floor(Math.random()*(a.length-1))+1];
-  $('subject').value=r(['a lone astronaut on a red desert planet','a neon cyberpunk alley in the rain','a majestic eagle over snowy peaks','a vintage cafe in paris at dawn','a futuristic sports car in a tunnel','a samurai standing in cherry blossoms']);
-  $('style').value=r(STYLES);$('lighting').value=r(LIGHTS);$('angle').value=r(ANGLES);$('mood').value=r(MOODS);
-  $('compose').value=r(COMPOSE);$('lens').value=r(LENSES);
-  $('colors').value=r(['teal and orange','muted pastels','monochrome','warm earth tones','neon pink and cyan','golden and deep blue']);
-  buildAll();toast('🎲 Randomized');
-};
-
-/* ============ QUICK FILL ============ */
+$('randomize').onclick=()=>{const r=a=>a[Math.floor(Math.random()*(a.length-1))+1];$('subject').value=r(['a lone astronaut on a red desert planet','a neon cyberpunk alley in the rain','a majestic eagle over snowy peaks','a vintage cafe in paris at dawn','a futuristic sports car in a tunnel','a samurai standing in cherry blossoms']);$('style').value=r(STYLES);$('lighting').value=r(LIGHTS);$('angle').value=r(ANGLES);$('mood').value=r(MOODS);$('compose').value=r(COMPOSE);$('lens').value=r(LENSES);$('colors').value=r(['teal and orange','muted pastels','monochrome','warm earth tones','neon pink and cyan','golden and deep blue']);buildAll();toast('ð² Randomized')};
 window.quickFill=(id,val)=>{$(id).value=val;buildAll()};
-
-/* ============ IMAGE UPLOAD ============ */
-const STATE={img:null,lastPrompt:'',lastVideo:'',lastI2V:'',lastVideoCtx:null,lastI2VCtx:null,frames:{},
-  history:JSON.parse(localStorage.getItem('vp_hist')||'[]')};
 const drop=$('drop'),fileInput=$('fileInput'),iPreview=$('iPreview'),iImg=$('iImg');
 drop.onclick=()=>fileInput.click();
 drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('over')});
 drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
 drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');if(e.dataTransfer.files[0])loadImg(e.dataTransfer.files[0])});
 fileInput.onchange=e=>{if(e.target.files[0])loadImg(e.target.files[0])};
-function loadImg(f){
-  if(!f.type.startsWith('image/')){toast('Please upload an image','m');return}
-  const reader=new FileReader();
-  reader.onload=e=>{
-    iImg.src=e.target.result;
-    iPreview.classList.add('show');
-    const im=new Image();im.onload=()=>{STATE.img={name:f.name,data:e.target.result,w:im.naturalWidth,h:im.naturalHeight};buildI2V()};
-    im.src=e.target.result;
-  };
-  reader.readAsDataURL(f);
-}
+function loadImg(f){if(!f.type.startsWith('image/')){toast('Please upload an image');return}const reader=new FileReader();reader.onload=e=>{iImg.src=e.target.result;iPreview.classList.add('show');const im=new Image();im.onload=()=>{STATE.img={name:f.name,data:e.target.result,w:im.naturalWidth,h:im.naturalHeight};buildI2V()};im.src=e.target.result};reader.readAsDataURL(f)}
 $('iRemove').onclick=()=>{STATE.img=null;iPreview.classList.remove('show');fileInput.value='';buildI2V()};
-
-/* ============ HISTORY ============ */
-$('histBtn').onclick=()=>{const c=$('histCard');c.style.display=c.style.display==='none'?'block':'none';renderHist()};
-$('clearHist').onclick=()=>{STATE.history=[];localStorage.setItem('vp_hist','[]');renderHist();updHistCount()};
-function updHistCount(){$('histCount').textContent=STATE.history.length}
-function renderHist(){
-  const l=$('histList');
-  if(!STATE.history.length){l.innerHTML='<div style="text-align:center;color:var(--mut2);padding:20px;font-size:13px">No history yet.</div>';return}
-  l.innerHTML=STATE.history.map(h=>`<div class="shot" style="cursor:pointer" onclick="loadHist(${h.id})">
-    <div class="stime">${h.type}</div><div class="sbody"><div class="sdesc">${esc(h.title)}</div>
-    <div class="smeta"><span>${new Date(h.id).toLocaleString()}</span><span class="hdel" onclick="event.stopPropagation();delHist(${h.id})">🗑</span></div></div></div>`).join('');
-}
-window.loadHist=id=>{const h=STATE.history.find(x=>x.id===id);if(!h)return;
-  if(h.type==='prompt'){$('subject').value=h.title;document.querySelector('.mode[data-mode=prompt]').click();buildAll()}
-  else if(h.type==='t2v'){$('vSubject').value=h.title;document.querySelector('.mode[data-mode=t2v]').click();buildVideo()}
-  else{$('iMotion').value=h.title;document.querySelector('.mode[data-mode=i2v]').click();buildI2V()}
-  window.scrollTo({top:0,behavior:'smooth'});
-};
-window.delHist=id=>{STATE.history=STATE.history.filter(x=>x.id!==id);localStorage.setItem('vp_hist',JSON.stringify(STATE.history));renderHist();updHistCount()};
-// autosave on builds
-let saveT;
-function autosave(){
-  clearTimeout(saveT);
-  saveT=setTimeout(()=>{
-    let type,title;
-    if(MODE==='prompt' && STATE.lastPrompt){type='prompt';title=$('subject').value}
-    else if(MODE==='t2v' && STATE.lastVideo){type='t2v';title=$('vSubject').value}
-    else if(MODE==='i2v' && STATE.lastI2V){type='i2v';title=$('iMotion').value}
-    else return;
-    if(!title)return;
-    if(STATE.history[0]&&STATE.history[0].title===title&&STATE.history[0].type===type)return;
-    STATE.history.unshift({id:Date.now(),type,title});
-    STATE.history=STATE.history.slice(0,12);
-    localStorage.setItem('vp_hist',JSON.stringify(STATE.history));
-    renderHist();updHistCount();
-  },1200);
-}
-const _buildAll=buildAll,_buildVideo=buildVideo,_buildI2V=buildI2V;
-buildAll=function(){_buildAll();autosave()};
-buildVideo=function(){_buildVideo();autosave()};
-buildI2V=function(){_buildI2V();autosave()};
-
-/* ============ SETTINGS ============ */
-$('setBtn').onclick=()=>$('setModal').classList.add('show');
-$('setClose').onclick=()=>$('setModal').classList.remove('show');
-$('setModal').onclick=e=>{if(e.target===$('setModal'))$('setModal').classList.remove('show')};
-$('setSave').onclick=()=>{
-  const m=$('setModel').value,ar=$('setAr').value,dur=$('setVDur').value;
-  $('model').value=m;$('vAr').value=ar;$('vDur').value=dur;$('iAr').value=ar;$('iDur').value=dur;
-  localStorage.setItem('vp_cfg',JSON.stringify({model:m,ar,dur}));
-  $('setModal').classList.remove('show');
-  $('engineChip').textContent='⚙ '+(m==='midjourney'?'MJ v6':m==='sdxl'?'SDXL':m==='dalle'?'DALL·E 3':m==='flux'?'FLUX.1':m==='ideogram'?'Ideogram':'Pixtie');
-  buildActive();toast('Settings saved');
-};
-try{const c=JSON.parse(localStorage.getItem('vp_cfg')||'{}');if(c.model)$('model').value=c.model;if(c.ar){$('vAr').value=c.ar;$('iAr').value=c.ar}if(c.dur){$('vDur').value=c.dur;$('iDur').value=c.dur}}catch(e){}
-
-updHistCount();
 buildAll();
 </script>
 </body>
