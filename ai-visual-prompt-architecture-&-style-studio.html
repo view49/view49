@@ -1,148 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Visual Prompt Studio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background: #0b0f19; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
-        .glow-border { background: linear-gradient(90deg, #ff0000, #3b82f6); padding: 2px; border-radius: 18px; }
-        .custom-card { background: #121826; }
-        .result-card { background: #121826; border: 1px solid #263247; border-radius: 16px; }
-        select, input[type="text"] { background: #0d1322; border: 1px solid #263247; border-radius: 10px; color: #fff; font-size: 13px; padding: 10px 12px; width: 100%; }
-        .field-label { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; display: block; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tags & Description Generator â Gemini SEO Engine | View49</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans',sans-serif}
+:root{--bg:#07080c;--surface:#0d0f18;--surface-2:#131622;--accent:#ff2d2d;--text:#f4f4f5;--muted:#71717a;--muted-2:#a1a1aa;--border:rgba(255,255,255,0.07);--red:#ef4444;--green:#00d97e;--blue:#3b82f6;--amber:#f59e0b;--purple:#a855f7}
+body{background:radial-gradient(900px 500px at 0% -5%,rgba(245,158,11,.05),transparent 60%),var(--bg);color:var(--text);min-height:100vh}
+::-webkit-scrollbar{width:10px}::-webkit-scrollbar-thumb{background:#22304a;border-radius:20px}
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:18px 6%;background:rgba(7,8,12,.85);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
+.logo{font-size:20px;font-weight:800;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo span{color:var(--accent)}
+.back-btn{font-size:12px;font-weight:700;color:var(--muted);background:var(--surface-2);border:1px solid var(--border);padding:8px 14px;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:7px;transition:.2s}
+.back-btn:hover{color:#fff;border-color:var(--amber)}
+.container{max-width:1180px;margin:0 auto;padding:30px 20px 60px}
+.hero{text-align:center;margin-bottom:22px}
+.hero h1{font-size:30px;font-weight:800;margin-bottom:8px;background:linear-gradient(90deg,#fff,#ffd9b0,#ffaa00,#9b8cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--muted);font-size:14px;max-width:680px;margin:0 auto}
+.badge-row{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.badge{font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted-2)}
+.panel{border:1px solid var(--border);border-radius:16px;background:var(--surface);padding:18px;margin-top:16px}
+.panel h3{margin:0 0 14px;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:space-between}
+.panel h3 .tag-pill2{font-size:10.5px;font-weight:700;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border);padding:3px 8px;border-radius:999px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px} .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+label.fl{font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);font-weight:700;display:block;margin-bottom:5px}
+input.in,select.in,textarea.in{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:11px 13px;font-size:13px;outline:0;transition:.15s}
+input.in:focus,select.in:focus,textarea.in:focus{border-color:var(--amber)}
+textarea.in{resize:vertical;font-family:ui-monospace,Menlo,monospace;line-height:1.55}
+select.in{cursor:pointer}
+.gen-btn{width:100%;background:linear-gradient(90deg,#f59e0b,#ff7a59);color:#1a1300;font-size:15px;font-weight:800;border:0;border-radius:12px;padding:14px;cursor:pointer;margin-top:14px;transition:.18s;display:flex;align-items:center;justify-content:center;gap:8px}
+.gen-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.gen-btn:disabled{opacity:.7;cursor:wait}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.3);border-top-color:#1a1300;border-radius:50%;animation:sp .6s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.status{font-size:12px;text-align:center;margin-top:10px;min-height:18px}
+.status.ok{color:var(--green)} .status.err{color:var(--red)}
+.hint{font-size:11.5px;color:var(--muted-2);margin-top:8px}
+.divider{height:1px;background:var(--border);margin:14px 0;border:0}
+.steps{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:center;margin-bottom:8px}
+.steps:not(.show){display:none}
+.step{font-size:10.5px;color:var(--muted);background:var(--surface-2);border:1px solid var(--border);padding:4px 9px;border-radius:8px;display:inline-flex;align-items:center;gap:5px;transition:.2s}
+.step.done{color:var(--green);border-color:rgba(0,217,126,.3)} .step.active{color:var(--amber);border-color:rgba(245,158,11,.4)}
+.results{display:none} .results.show{display:block}
+.serp{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
+.serp .url{font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px}
+.serp .fav{color:var(--red)} .serp .ttl{font-size:16px;font-weight:700;color:#9bd0ff;margin:4px 0 2px}
+.serp .desc{font-size:12.5px;color:var(--muted-2);line-height:1.5}
+.serp .meta{font-size:11px;color:var(--muted);margin-top:5px}
+.serpscore{font-size:11px;font-weight:800;color:#000;background:linear-gradient(135deg,#f59e0b,#ff7a59);padding:3px 10px;border-radius:999px}
+.intent-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.intent{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;border:1px solid var(--border)}
+.ib.pill-i{color:#3b82f6;border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.08)}
+.ib.pill-n{color:#a855f7;border-color:rgba(168,85,247,.4);background:rgba(168,85,247,.08)}
+.ib.pill-t{color:#00d97e;border-color:rgba(0,217,126,.4);background:rgba(0,217,126,.08)}
+.ib.pill-c{color:#f59e0b;border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.08)}
+.note{font-size:11.5px;color:var(--muted-2);margin-top:2px}
+.tag-wrap{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;color:var(--text);background:var(--surface-2);border:1px solid var(--border);padding:6px 10px;border-radius:999px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:6px;user-select:none}
+.tag:hover{border-color:#3a4a68} .tag.sel{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.4)}
+.tag .diff{font-size:9px;font-weight:800;padding:1px 5px;border-radius:5px;margin-left:2px}
+.tag .d-easy{background:rgba(0,217,126,.18);color:var(--green)} .tag .d-mid{background:rgba(245,158,11,.18);color:var(--amber)} .tag .d-hard{background:rgba(239,68,68,.18);color:var(--red)}
+.tag .x{color:var(--muted);font-size:10px;cursor:pointer;margin-left:2px}
+.counters{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--muted)} .counters b{color:var(--text)}
+.meter{height:6px;background:var(--surface-2);border-radius:5px;margin-top:8px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#f59e0b,#00d97e);border-radius:5px;transition:.3s}
+.iconbtn{font-size:11px;font-weight:700;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border);padding:7px 11px;border-radius:9px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.iconbtn:hover{color:#fff;border-color:#3a4a68}
+.clusters{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.barrow{} .barrow .top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.barrow .track{height:7px;background:var(--surface-2);border-radius:5px;overflow:hidden}
+.barrow i{display:block;height:100%;background:linear-gradient(90deg,#3b82f6,#a855f7);border-radius:5px}
+.analytics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+@media(max-width:560px){.analytics{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.stat b{font-size:20px;font-weight:800;display:block} .stat small{font-size:10px;color:var(--muted)}
+.stat.score b{background:linear-gradient(135deg,#f59e0b,#00d97e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tips{margin-top:10px;display:flex;flex-direction:column;gap:7px}
+.tips .fade{font-size:12.5px;color:var(--muted-2);line-height:1.55;padding:8px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px}
+.tips .fade b{color:var(--text)}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:11px 16px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;transition:.25s;z-index:80;display:flex;align-items:center;gap:9px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)} .toast .ti{color:var(--green)}
+</style>
 </head>
-<body class="min-h-screen p-4">
-
-    <div class="glow-border w-full max-w-2xl mx-auto shadow-2xl mb-6">
-        <div class="custom-card rounded-2xl p-6 md:p-8">
-            <div class="flex justify-between items-center mb-6">
-                <span class="bg-red-950/80 text-red-400 border border-red-800/50 text-xs font-bold px-4 py-2 rounded-full">● Prompt Engine 2026</span>
-                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-yellow-400 text-xs font-bold px-3 py-2 rounded-full border border-slate-700 no-underline transition-colors">📺 View49</a>
-            </div>
-
-            <div class="text-center mb-6">
-                <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3">AI Visual Prompt Studio</h1>
-                <p class="text-slate-400 text-sm max-w-2xl mx-auto">Build a structured, cinematic prompt for AI image tools like Midjourney, DALL·E, or Stable Diffusion.</p>
-            </div>
-
-            <div class="space-y-4">
-
-                <div>
-                    <label class="field-label">Subject</label>
-                    <input id="subject" type="text" placeholder="e.g. a lone astronaut, a vintage motorcycle, a cyberpunk city street" oninput="updatePrompt()" />
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="field-label">Style</label>
-                        <select id="style" onchange="updatePrompt()">
-                            <option value="">None</option>
-                            <option value="photorealistic">Photorealistic</option>
-                            <option value="cinematic film still">Cinematic Film Still</option>
-                            <option value="anime style">Anime</option>
-                            <option value="oil painting">Oil Painting</option>
-                            <option value="watercolor">Watercolor</option>
-                            <option value="3D render, octane render">3D Render</option>
-                            <option value="cyberpunk concept art">Cyberpunk Concept Art</option>
-                            <option value="minimalist flat design">Minimalist Flat Design</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="field-label">Lighting</label>
-                        <select id="lighting" onchange="updatePrompt()">
-                            <option value="">None</option>
-                            <option value="golden hour lighting">Golden Hour</option>
-                            <option value="dramatic rim lighting">Dramatic Rim Light</option>
-                            <option value="soft diffused studio lighting">Soft Studio Light</option>
-                            <option value="moody low-key lighting">Moody Low-Key</option>
-                            <option value="neon glow lighting">Neon Glow</option>
-                            <option value="natural overcast lighting">Natural Overcast</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="field-label">Camera Angle</label>
-                        <select id="angle" onchange="updatePrompt()">
-                            <option value="">None</option>
-                            <option value="wide angle shot">Wide Angle</option>
-                            <option value="close-up shot">Close-Up</option>
-                            <option value="low angle shot">Low Angle</option>
-                            <option value="bird's eye view">Bird's Eye View</option>
-                            <option value="over-the-shoulder shot">Over-the-Shoulder</option>
-                            <option value="macro shot">Macro</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="field-label">Mood</label>
-                        <select id="mood" onchange="updatePrompt()">
-                            <option value="">None</option>
-                            <option value="epic and dramatic">Epic & Dramatic</option>
-                            <option value="calm and serene">Calm & Serene</option>
-                            <option value="mysterious and eerie">Mysterious & Eerie</option>
-                            <option value="joyful and vibrant">Joyful & Vibrant</option>
-                            <option value="melancholic">Melancholic</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="field-label">Color Palette (optional)</label>
-                    <input id="colors" type="text" placeholder="e.g. teal and orange, muted pastels, monochrome" oninput="updatePrompt()" />
-                </div>
-
-                <div>
-                    <label class="field-label">Extra Details (optional)</label>
-                    <input id="extra" type="text" placeholder="e.g. 8k resolution, highly detailed, shallow depth of field" oninput="updatePrompt()" />
-                </div>
-
-            </div>
-        </div>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="logo"><i class="fa-solid fa-bolt" style="color:var(--accent)"></i> View<span>49</span></a>
+  <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+</nav>
+<div class="container">
+  <div class="hero">
+    <h1>Gemini SEO Engine</h1>
+    <p>Search-intent detection, difficulty scoring, SERP preview, tag mining & auto-written descriptions â all in one tool.</p>
+    <div class="badge-row">
+      <span class="badge"><i class="fa-solid fa-compass"></i> Intent detection</span>
+      <span class="badge"><i class="fa-solid fa-gauge-high"></i> Difficulty scoring</span>
+      <span class="badge"><i class="fa-solid fa-magnifying-glass"></i> SERP preview</span>
+      <span class="badge"><i class="fa-solid fa-tags"></i> Tag mining</span>
+      <span class="badge"><i class="fa-solid fa-chart-line"></i> Analytics</span>
     </div>
-
-    <div class="max-w-2xl mx-auto">
-        <div class="result-card p-6">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="text-white font-bold text-sm">✨ Generated Prompt</h3>
-                <button onclick="copyPrompt()" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-3 py-1.5 rounded-lg">📋 Copy</button>
-            </div>
-            <textarea id="promptOutput" rows="5" readonly class="w-full bg-[#0d1322] border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200"></textarea>
-        </div>
+  </div>
+  <div class="panel" id="inputPanel">
+    <h3><span><i class="fa-solid fa-keyboard"></i> Video Details</span><span class="tag-pill2">Gemini-powered</span></h3>
+    <div class="grid2">
+      <div style="grid-column:1/-1"><label class="fl">Video topic / title</label><input id="q" class="in" type="text" placeholder="e.g. How to Edit Videos Like a Pro in 2026"></div>
+      <div style="grid-column:1/-1"><label class="fl">Seed keywords (comma separated)</label><input id="kw" class="in" type="text" placeholder="video editing, premiere pro, tutorial, beginners"></div>
+      <div><label class="fl">Channel name</label><input id="ch" class="in" type="text" placeholder="Your channel (optional)"></div>
+      <div><label class="fl">Niche</label><select id="niche" class="in"><option value="auto">Auto-detect</option><option value="education">Education</option><option value="gaming">Gaming</option><option value="tech">Tech / Gadgets</option><option value="finance">Finance</option><option value="lifestyle">Lifestyle</option><option value="cooking">Cooking</option><option value="fitness">Fitness</option><option value="music">Music</option><option value="vlog">Vlog</option><option value="beauty">Beauty</option></select></div>
     </div>
-
+    <button class="gen-btn" id="goBtn"><i class="fa-solid fa-bolt"></i> Generate Tags & Description</button>
+    <div class="status" id="status"></div>
+    <div class="steps" id="steps">
+      <span class="step" data-s="0">ð Crawl query</span>
+      <span class="step" data-s="1">ð§­ Detect intent</span>
+      <span class="step" data-s="2">ð¯ Match niche</span>
+      <span class="step" data-s="3">ð· Mine tags</span>
+      <span class="step" data-s="4">ð Write description</span>
+    </div>
+  </div>
+  <div class="results" id="results">
+    <div class="panel">
+      <h3><span><i class="fa-solid fa-magnifying-glass-chart"></i> SERP Preview</span><span class="serpscore" id="serpScore">SEO 0</span></h3>
+      <div class="serp" id="serp"></div>
+      <div class="intent-row"><span id="intentBox"></span></div>
+      <div class="note" id="intentNote"></div>
+    </div>
+    <div class="panel">
+      <h3><span><i class="fa-solid fa-tags"></i> Suggested Tags <span class="tag-pill2" id="tagCount">0 / 0 selected</span></span><span style="display:flex;gap:7px;flex-wrap:wrap">
+        <button class="iconbtn" id="selAll"><i class="fa-solid fa-check-double"></i> All</button>
+        <button class="iconbtn" id="selEasy"><i class="fa-solid fa-circle-check"></i> Easy only</button>
+        <button class="iconbtn" id="clearSel"><i class="fa-solid fa-xmark"></i> Clear</button>
+        <button class="iconbtn" id="copyTags"><i class="fa-solid fa-copy"></i> Copy</button>
+        <button class="iconbtn" id="downTags"><i class="fa-solid fa-download"></i> CSV</button>
+      </span></h3>
+      <div class="tag-wrap" id="tagWrap"></div>
+      <div class="hint">ð¡ Click a tag to toggle. Number = difficulty score (lower = easier to rank).</div>
+    </div>
+    <div class="panel">
+      <h3><span><i class="fa-solid fa-chart-pie"></i> Tag Clusters <span class="tag-pill2" id="clusCount">0</span></span></h3>
+      <div class="clusters" id="clusters"></div>
+    </div>
+    <div class="panel">
+      <h3><span><i class="fa-solid fa-file-lines"></i> SEO Description</span><span style="display:flex;gap:7px"><button class="iconbtn" id="copyDesc"><i class="fa-solid fa-copy"></i> Copy</button><button class="iconbtn" id="toneBtn">ð­ Engaging</button><button class="iconbtn" id="regen"><i class="fa-solid fa-rotate"></i> Regenerate</button></span></h3>
+      <textarea id="desc" class="in" rows="14" placeholder="Your generated description will appear hereâ¦"></textarea>
+      <div class="counters">
+        <div><b id="cChar">0</b> chars</div>
+        <div><b id="cWord">0</b> words</div>
+        <div><b id="cRead">0s</b> read</div>
+        <div><b id="cTag">0</b> hashtags</div>
+      </div>
+      <div class="meter"><i id="cMeter"></i></div>
+      <div class="hint">ð¡ Ideal description length: 200â500 chars. Add real timestamps to unlock YouTube chapters.</div>
+    </div>
+    <div class="panel">
+      <h3><span><i class="fa-solid fa-chart-line"></i> Analytics</span></h3>
+      <div class="analytics">
+        <div class="stat"><b id="sCov">0%</b><small>selected</small></div>
+        <div class="stat"><b id="sDiff">â</b><small>avg difficulty</small></div>
+        <div class="stat"><b id="sReach">0</b><small>est. reach</small></div>
+        <div class="stat score"><b id="sScore">0</b><small>SEO score</small></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3><span><i class="fa-solid fa-lightbulb"></i> SEO Tips</span></h3>
+      <div class="tips" id="tips"></div>
+    </div>
+  </div>
+  <div id="empty" class="hint" style="text-align:center;margin-top:20px">Enter a topic above and click Generate to start.</div>
+</div>
+<div class="toast" id="toast"><span class="ti">â</span><span id="toastMsg">Done</span></div>
 <script>
-
-function updatePrompt() {
-    const subject = document.getElementById("subject").value.trim();
-    const style = document.getElementById("style").value;
-    const lighting = document.getElementById("lighting").value;
-    const angle = document.getElementById("angle").value;
-    const mood = document.getElementById("mood").value;
-    const colors = document.getElementById("colors").value.trim();
-    const extra = document.getElementById("extra").value.trim();
-
-    const parts = [];
-    if (subject) parts.push(subject);
-    if (style) parts.push(style);
-    if (angle) parts.push(angle);
-    if (lighting) parts.push(lighting);
-    if (mood) parts.push(mood);
-    if (colors) parts.push(`${colors} color palette`);
-    if (extra) parts.push(extra);
-
-    document.getElementById("promptOutput").value = parts.length ? parts.join(", ") : "";
+const $=id=>document.getElementById(id);
+const INTENT_MARKERS={informational:['what is','how to','why','guide','tutorial','explained','meaning','definition','learn','understand'],navigational:['best','top','review','comparison','vs','versus','alternative','alternatives','which'],transactional:['buy','price','cheap','discount','deal','order','purchase','cost','free','download'],commercial:['review','best','vs','comparison','specs','features','worth it','should i','pros and cons']};
+const NICHE_HINTS={education:['learn','study','course','tutorial','class','lesson','explain','education','academic'],gaming:['game','gameplay','walkthrough','play','gaming','stream','esports','boss','level'],tech:['tech','gadget','phone','laptop','review','specs','software','app','ai','device'],finance:['money','invest','finance','stock','crypto','budget','save','earn','passive income','tax'],lifestyle:['lifestyle','daily','routine','vlog','life','habit','morning','self care'],cooking:['recipe','cook','food','bake','kitchen','dish','ingredient','meal','cuisine'],fitness:['workout','gym','fitness','exercise','muscle','cardio','weight loss','training','diet'],music:['song','music','cover','remix','beat','album','track','lyrics','mv'],vlog:['vlog','day','trip','travel','diary','life','journey'],beauty:['makeup','skincare','beauty','cosmetics','routine','foundation','lipstick','glam']};
+const SUFFIXES=['tutorial','guide','tips','explained','for beginners','2026','step by step','examples','in hindi','full course'];
+const SYN={'video':['video','clip','footage','content'],'editing':['editing','post production','color grading'],'tutorial':['tutorial','lesson','walkthrough','how to'],'youtube':['youtube','channel','content creator','yt']};
+function tokenize(s){return s.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>2)}
+function pseudoHash(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h+s.charCodeAt(i))|0}return Math.abs(h)}
+function ucwords(s){return s.replace(/\b\w/g,c=>c.toUpperCase())}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function setStatus(m,t){const s=$('status');s.textContent=m;s.className='status '+(t||'')}
+function toast(m){const t=$('toast');$('toastMsg').textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+const step=(i)=>new Promise(r=>{setTimeout(()=>{const ss=document.querySelectorAll('#steps .step');ss.forEach((s,idx)=>{s.classList.remove('active');if(idx<i)s.classList.add('done');else if(idx===i)s.classList.add('active')});r()},280)});
+function resetSteps(){document.querySelectorAll('#steps .step').forEach(s=>{s.classList.remove('done','active')})}
+const STATE={tags:[],selected:new Set(),tone:'engaging',tagN:30,last:null,seoScore:0};
+function detectIntent(q){const ql=q.toLowerCase();let s={informational:0,navigational:0,transactional:0,commercial:0};for(const k in INTENT_MARKERS)INTENT_MARKERS[k].forEach(m=>{if(ql.includes(m))s[k]++});const sorted=Object.entries(s).sort((a,b)=>b[1]-a[1]);const top=sorted[0][0];const total=Object.values(s).reduce((a,b)=>a+b,0)||1;const conf=Math.min(99,55+Math.round(sorted[0][1]/total*44));const notes={informational:' searcher wants to learn â front-load a clear promise + timestamps.',navigational:' searcher is comparing options â include "best", reviews & comparisons in tags.',transactional:' searcher is ready to act â add price/value/buy-intent keywords & a CTA.',commercial:' searcher researches before buying â add "review", "vs", "alternatives" tags.'};return{top,conf,scores:s,note:notes[top]}}
+function detectNiche(q,c){if(c!=='auto')return c;const ql=q.toLowerCase();let best='education',bs=-1;for(const n in NICHE_HINTS){let sc=0;NICHE_HINTS[n].forEach(w=>{if(ql.includes(w))sc++});if(sc>bs){bs=sc;best=n}}return best}
+function difficulty(tag){const h=pseudoHash(tag);const len=tag.length;const words=tag.split(' ').length;let base=(h%60)+18;if(words===1)base+=14;if(words>=3)base-=14;if(len>28)base-=10;if(len<8)base+=8;base=Math.max(8,Math.min(94,base));return{score:Math.round(base),label:base<40?'easy':(base<68?'mid':'hard')}}
+function mineTags(title,keywords,niche){const set=new Map();const add=(t,src)=>{const k=t.trim().toLowerCase().replace(/\s+/g,' ').slice(0,60);if(k&&!set.has(k))set.set(k,src)};const kw=keywords.split(',').map(k=>k.trim()).filter(Boolean);const tw=tokenize(title);kw.forEach(k=>add(k,'seed'));tw.forEach(w=>add(w,'title'));for(let i=0;i<tw.length-1;i++)add(tw[i]+' '+tw[i+1],'phrase');for(let i=0;i<tw.length-2;i++)add(tw[i]+' '+tw[i+1]+' '+tw[i+2],'longtail');[...kw,...tw].forEach(k=>{(SYN[k]||[]).forEach(s=>add(s,'synonym'))});kw.forEach(k=>SUFFIXES.forEach(s=>add(k+' '+s,'suffix')));SUFFIXES.forEach(s=>add(title.toLowerCase()+' '+s,'suffix'));const mods=NICHE_HINTS[niche]||[];mods.slice(0,4).forEach(m=>{[kw[0],tw[0]].filter(Boolean).forEach(seed=>add(seed+' '+m,'niche'))});['what is','how to','best','why','top'].forEach(p=>add(p+' '+title.toLowerCase(),'competitor'));const arr=[...set.entries()].map(([tag,src])=>{const d=difficulty(tag);return{tag,src,diff:d.score,dl:d.label}});arr.sort((a,b)=>{const aw=a.tag.split(' ').length,bw=b.tag.split(' ').length;if(aw!==bw)return bw-aw;return a.diff-b.diff});return arr.slice(0,STATE.tagN)}
+function buildClusters(tags){const m={};tags.forEach(t=>{const w=t.tag.split(' ')[0];(m[w]=m[w]||[]).push(t)});return Object.entries(m).map(([k,v])=>({k,c:v.length,w:v})).sort((a,b)=>b.c-a.c).slice(0,6)}
+function reachEstimate(tags){const easy=tags.filter(t=>t.dl==='easy').length;const mid=tags.filter(t=>t.dl==='mid').length;const base=pseudoHash(tags.map(t=>t.tag).join())%40000+8000;return Math.round(base*(1+easy*0.04+mid*0.02)).toLocaleString('en-IN')}
+function seoScore(title,kw,tags){let s=50;if(title.length>=40&&title.length<=70)s+=12;else s-=6;if(kw.split(',').filter(Boolean).length>=3)s+=10;if(tags.filter(t=>t.dl==='easy').length>=6)s+=12;if(tags.filter(t=>t.tag.split(' ').length>=3).length>=5)s+=8;if((title.match(/\d+/g)||[]).length)s+=6;return Math.max(10,Math.min(99,s))}
+function tipsFor(title,kw,tags,intent,niche){const t=[];const tl=title.length;if(tl<40)t.push('ð Title is short ('+tl+' chars). Aim for 50â70 chars with a power word + the core keyword.');else if(tl>70)t.push('ð Title is long ('+tl+' chars). Trim to â¤70 chars.');else t.push('ð Title length is ideal ('+tl+' chars).');const easy=tags.filter(x=>x.dl==='easy').length;if(easy<6)t.push('ð¯ Only '+easy+' low-difficulty tags. Add more long-tail (3+ word) phrases.');else t.push('ð¯ Strong low-difficulty coverage ('+easy+' easy tags).');t.push('ð§­ Intent: <b>'+intent.top+'</b>.'+(intent.note||''));t.push('ð· Put your top 3â4 tags in the title & first line of the description.');t.push('â± Add real timestamps â YouTube indexes chapters and they appear in Google Search.');t.push('ð Niche detected: <b>'+niche+'</b>. Mirror niche terms viewers actually type.');return t}
+function generateDescription(title,keywords,channel,tone,tags,intent){const kw=keywords.split(',').map(k=>k.trim()).filter(Boolean);const kList=kw.length?kw.join(', '):'this topic';const hash=kw.slice(0,5).map(k=>k.replace(/\s+/g,'')).join(' #');const toneLine={engaging:'In this video, we break down',professional:'This video provides a detailed walkthrough of',casual:'Hey â today we\'re talking about',energetic:'Let\'s GO! In this one we dive deep into'}[tone]||'In this video, we cover';const promise=intent.top==='transactional'?'and exactly how to get the best value for it':intent.top==='navigational'?'with a clear comparison so you can pick the right one':'step by step, so you can follow along even if you\'re a total beginner';const ch=channel?'\n\nð Subscribe to '+channel+' for more videos like this!':'\n\nð Subscribe for more videos like this!';const topTags=tags.slice(0,4).map(t=>t.tag).join(', ');return toneLine+' "'+title+'" '+promise+'.\n\nYou\'ll learn about '+kList+', explained clearly with real examples and no fluff.\n\nâ± Timestamps:\n0:00 Introduction\n0:30 What you need to know\n1:45 Step-by-step walkthrough\n4:20 Common mistakes to avoid\n6:10 Final tips & wrap-up\n-- Edit these to match your video --\n\nð In this video we cover: '+topTags+'.\n\nð If this helped, smash Like and drop a comment â it really helps the channel!'+ch+'\n\nð± Follow for updates & shorts.\n\n#'+hash+' #'+(title.toLowerCase().replace(/[^\w]/g,'').slice(0,18))}
+function serpPreview(title,channel,desc){const url='https://www.youtube.com/watch?v='+pseudoHash(title).toString(36).slice(0,8);const ttl=title.length>68?title.slice(0,67)+'â¦':title;const d=desc.replace(/\n+/g,' ').trim();const snippet=d.length>158?d.slice(0,157)+'â¦':d;return'<div class="url"><span class="fav">â¶</span> '+esc(url)+'</div><div class="ttl">'+esc(ucwords(ttl))+'</div><div class="desc">'+esc(snippet)+'</div><div class="meta">'+esc(channel||'Your Channel')+' Â· YouTube Â· just now</div>'}
+function diffClass(d){return d==='easy'?'d-easy':(d==='mid'?'d-mid':'d-hard')}
+async function generate(){
+  const title=$('q').value.trim(),keywords=$('kw').value.trim(),channel=$('ch').value.trim(),niche=$('niche').value;
+  if(!title){setStatus('â  Please enter a video topic to search.','err');return}
+  const go=$('goBtn');go.disabled=true;go.innerHTML='<span class="spin"></span> Generating';
+  $('empty').style.display='none';resetSteps();$('steps').classList.add('show');$('results').classList.remove('show');
+  setStatus('Crawling queryâ¦','ok');
+  await step(0);const intent=detectIntent(title+' '+keywords);await step(1);const detNiche=detectNiche(title+' '+keywords,niche);await step(2);
+  const tags=mineTags(title,keywords,detNiche);await step(3);await step(4);
+  const desc=generateDescription(title,keywords,channel,STATE.tone,tags,intent);
+  STATE.tags=tags;STATE.selected=new Set(tags.map(t=>t.tag));STATE.last={title,keywords,channel,niche:detNiche};
+  STATE.seoScore=seoScore(title,keywords,tags);
+  $('serpScore').textContent='SEO '+STATE.seoScore;$('serp').innerHTML=serpPreview(title,channel,desc);
+  renderTags();$('desc').value=desc;updateCounters();
+  renderIntent(intent);renderClusters(tags);$('tips').innerHTML=tipsFor(title,keywords,tags,intent,detNiche).map(t=>'<div class="fade">'+t+'</div>').join('');
+  updateAnalytics();$('results').classList.add('show','fade');
+  setStatus('â Generated '+tags.length+' tags & an SEO-ready description.','ok');
+  go.disabled=false;go.innerHTML='<i class="fa-solid fa-bolt"></i> Generate';
 }
-
-function copyPrompt() {
-    const output = document.getElementById("promptOutput");
-    output.select();
-    navigator.clipboard.writeText(output.value);
-}
-
+function renderTags(){const w=$('tagWrap');w.innerHTML='';STATE.tags.forEach(t=>{const el=document.createElement('span');el.className='tag sel '+diffClass(t.dl);el.innerHTML=esc(t.tag)+'<span class="diff '+diffClass(t.dl)+'">'+t.diff+'</span><span class="x">â</span>';el.onclick=()=>{if(STATE.selected.has(t.tag)){STATE.selected.delete(t.tag);el.classList.remove('sel')}else{STATE.selected.add(t.tag);el.classList.add('sel')}updateTagCount();updateAnalytics()};el.querySelector('.x').onclick=e=>{e.stopPropagation();STATE.tags=STATE.tags.filter(x=>x.tag!==t.tag);STATE.selected.delete(t.tag);renderTags();updateAnalytics()};w.appendChild(el)});updateTagCount()}
+function updateTagCount(){$('tagCount').textContent=STATE.selected.size+' / '+STATE.tags.length+' selected'}
+function selTags(){return STATE.tags.filter(t=>STATE.selected.has(t.tag))}
+function updateCounters(){const v=$('desc').value;const chars=v.length,words=v.trim()?v.trim().split(/\s+/).length:0;const hashtags=(v.match(/#\w+/g)||[]).length;$('cChar').textContent=chars;$('cWord').textContent=words;$('cRead').textContent=Math.max(1,Math.round(words/3))+'s';$('cTag').textContent=hashtags;$('cMeter').style.width=Math.min(100,chars/50)+'%';if(STATE.last)$('serp').innerHTML=serpPreview(STATE.last.title,STATE.last.channel,v)}
+function renderIntent(intent){const map={informational:['pill-i','â¹ Informational'],navigational:['pill-n','ð§­ Navigational'],transactional:['pill-t','ð³ Transactional'],commercial:['pill-c','ð Commercial']};const[cls,name]=map[intent.top];$('intentBox').innerHTML='<span class="intent ib '+cls+'">'+name+'</span><span style="color:var(--muted)">'+intent.conf+'% confidence</span>';$('intentNote').textContent='Intent note:'+intent.note}
+function renderClusters(tags){const c=buildClusters(tags);$('clusCount').textContent=c.length;const max=Math.max(...c.map(x=>x.c));$('clusters').innerHTML=c.map(x=>'<div class="barrow"><div class="top"><b>'+esc(ucwords(x.k))+'</b><span>'+x.c+' tags</span></div><div class="track"><i style="width:'+(x.c/max*100)+'%"></i></div></div>').join('')}
+function updateAnalytics(){const sel=selTags();const avg=sel.length?Math.round(sel.reduce((a,t)=>a+t.diff,0)/sel.length):0;const cov=STATE.tags.length?Math.round(sel.length/STATE.tags.length*100):0;$('sCov').innerHTML=cov+'%<small>selected</small>';$('sDiff').innerHTML=(avg||'â')+'<small>/100</small>';$('sReach').innerHTML=reachEstimate(sel);$('sScore').textContent=STATE.seoScore||'â'}
+$('goBtn').onclick=generate;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')generate()});$('kw').addEventListener('keydown',e=>{if(e.key==='Enter')generate()});
+$('copyTags').onclick=()=>{navigator.clipboard.writeText(selTags().map(x=>x.tag).join(', '));toast('Copied '+selTags().length+' tags')};
+$('downTags').onclick=()=>{const t=selTags();let csv='tag,difficulty,source\n'+t.map(x=>x.tag+','+x.diff+','+x.src).join('\n');const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tags.csv';a.click();toast('Downloaded tags.csv')};
+$('copyDesc').onclick=()=>{navigator.clipboard.writeText($('desc').value);toast('Description copied')};
+$('desc').addEventListener('input',updateCounters);
+$('selAll').onclick=()=>{STATE.selected=new Set(STATE.tags.map(t=>t.tag));renderTags();updateAnalytics()};
+$('selEasy').onclick=()=>{STATE.selected=new Set(STATE.tags.filter(t=>t.dl==='easy').map(t=>t.tag));renderTags();updateAnalytics()};
+$('clearSel').onclick=()=>{STATE.selected.clear();renderTags();updateAnalytics()};
+$('regen').onclick=generate;
+const TONES=['engaging','professional','casual','energetic'];
+$('toneBtn').onclick=()=>{const i=TONES.indexOf(STATE.tone);STATE.tone=TONES[(i+1)%TONES.length];$('toneBtn').textContent='ð­ '+ucwords(STATE.tone);if(STATE.last){$('desc').value=generateDescription(STATE.last.title,STATE.last.keywords,STATE.last.channel,STATE.tone,STATE.tags,{top:'informational'});updateCounters();toast('Tone â '+STATE.tone)}};
 </script>
 </body>
 </html>
