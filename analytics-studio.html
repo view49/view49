@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Studio Auto - Smart Growth Analyzer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --border-color: #2a2a3a;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --accent-red: #ff3b30;
+            --accent-blue: #007aff;
+            --accent-green: #34c759;
+            --accent-purple: #af52de;
+            --accent-gold: #ffcc00;
+            --glow-red: 0 0 20px rgba(255, 59, 48, 0.3);
+            --glow-blue: 0 0 20px rgba(0, 122, 255, 0.3);
+            --glow-green: 0 0 20px rgba(52, 199, 89, 0.3);
+            --glow-gold: 0 0 20px rgba(255, 204, 0, 0.3);
+            --up: #00e5a0;
+            --down: #ff5470;
+            --panel: #0e0f16;
+            --panel-line: #23242f;
+            --mono: 'IBM Plex Mono', 'SF Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(ellipse at 1% 1%, rgba(255, 59, 48, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 99% 1%, rgba(0, 122, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 100%, rgba(52, 199, 89, 0.05) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 300px;
+            background: radial-gradient(ellipse, rgba(255, 59, 48, 0.15) 0%, transparent 70%);
+            filter: blur(100px);
+            z-index: 0;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-purple));
+            border-radius: 50px;
+            box-shadow: var(--glow-red);
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .logo-icon {
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, var(--accent-blue), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .input-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            color: var(--text-primary);
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus, input[type="url"]:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            box-shadow: var(--glow-blue);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 122, 255, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-icon {
+            font-size: 18px;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--accent-gold), #ffd700);
+            box-shadow: var(--glow-gold);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.4);
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            min-height: 24px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 3px solid var(--bg-secondary);
+            border-top: 3px solid var(--accent-blue);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ---- Dashboard (control-room readout) ---- */
+        .dash {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .dash-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .dash-id {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .dash-name {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .dash-date {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .dash-badge {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 100px;
+            border: 1px solid var(--panel-line);
+            background: var(--panel);
+        }
+
+        .dash-badge.up { color: var(--up); border-color: rgba(0, 229, 160, 0.35); }
+        .dash-badge.down { color: var(--down); border-color: rgba(255, 84, 112, 0.35); }
+
+        /* Hero row: one large readout + stacked secondary readouts */
+        .hero-row {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 16px;
+        }
+
+        .hero-panel {
+            background: var(--panel);
+            border: 1px solid var(--panel-line);
+            border-radius: 16px;
+            padding: 26px 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-panel .hero-eyebrow {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .hero-number {
+            font-family: var(--mono);
+            font-size: clamp(2.4rem, 6vw, 3.4rem);
+            font-weight: 700;
+            color: var(--accent-gold);
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-delta {
+            margin-top: 10px;
+            font-family: var(--mono);
+            font-size: 13px;
+        }
+
+        .hero-delta.up { color: var(--up); }
+        .hero-delta.down { color: var(--down); }
+
+        .hero-spark {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 55%;
+            height: 70%;
+            opacity: 0.9;
+        }
+
+        .secondary-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sec-panel {
+            flex: 1;
+            background: var(--panel);
+            border: 1px solid var(--panel-line);
+            border-radius: 16px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .sec-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .sec-number {
+            font-family: var(--mono);
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        .sec-number.views { color: var(--text-primary); }
+
+        /* Trend panel with real SVG line chart */
+        .trend-panel {
+            background: var(--panel);
+            border: 1px solid var(--panel-line);
+            border-radius: 16px;
+            padding: 22px 24px 12px;
+        }
+
+        .trend-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .trend-head span:first-child {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .trend-range {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .trend-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Growth rings */
+        .rings-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .ring-panel {
+            background: var(--panel);
+            border: 1px solid var(--panel-line);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .ring-svg {
+            flex-shrink: 0;
+            transform: rotate(-90deg);
+        }
+
+        .ring-text .ring-pct {
+            font-family: var(--mono);
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .ring-text .ring-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* Projection timeline */
+        .timeline-panel {
+            background: var(--panel);
+            border: 1px solid var(--panel-line);
+            border-radius: 16px;
+            padding: 24px 24px 30px;
+        }
+
+        .timeline-head {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 34px;
+        }
+
+        .timeline-track {
+            position: relative;
+            height: 2px;
+            background: var(--panel-line);
+            margin: 0 6px;
+        }
+
+        .tl-point {
+            position: absolute;
+            top: 0;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 90px;
+        }
+
+        .tl-dot {
+            display: block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            margin: 0 auto 10px;
+            box-shadow: var(--glow-blue);
+        }
+
+        .tl-point:first-child .tl-dot {
+            background: var(--accent-gold);
+            box-shadow: var(--glow-gold);
+        }
+
+        .tl-val {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .tl-lbl {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        @media (max-width: 640px) {
+            .hero-row { grid-template-columns: 1fr; }
+            .secondary-stack { flex-direction: row; }
+            .tl-point { width: 60px; }
+        }
+
+        .disclaimer {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .feature-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(0, 122, 255, 0.1);
+            border: 1px solid rgba(0, 122, 255, 0.3);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .manual-toggle {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .manual-toggle button {
+            background: none;
+            border: none;
+            color: var(--accent-blue);
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 13px;
+        }
+
+        .manual-toggle button:hover {
+            color: var(--accent-gold);
+        }
+
+        .manual-form {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bar-label {
+                width: 80px;
+                font-size: 12px;
+            }
+
+            .bar-value {
+                width: 80px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🚀</span>
+                    <span class="logo-text">Analytics Studio Auto</span>
+                </div>
+                <h1>Smart Growth Analyzer</h1>
+                <p class="subtitle">Paste your YouTube channel URL below and let our AI automatically fetch and analyze your growth metrics!</p>
+                <span class="feature-badge">✨ Auto-Detect Technology</span>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <label class="input-label">YouTube Data API Key <span style="text-transform:none; font-weight:400; color:var(--text-secondary);">(optional — leave blank for demo mode)</span></label>
+                <input id="apiKey" type="text" placeholder="AIzaSy... (get one free from console.cloud.google.com)" />
+            </div>
+            <div class="input-group">
+                <label class="input-label">Channel URL</label>
+                <input id="channelUrl" type="url" placeholder="https://www.youtube.com/@YourChannel" />
+            </div>
+            <button class="btn" onclick="fetchChannelData()">
+                <span class="btn-icon">🔍</span>
+                <span>Analyze Channel</span>
+            </button>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>Fetching your channel data...</div>
+            </div>
+            <div id="statusMessage" class="status"></div>
+            
+            <div class="manual-toggle">
+                <p>Prefer manual entry? <button onclick="toggleManualForm()">Click here</button></p>
+            </div>
+            
+            <div class="manual-form" id="manualForm">
+                <div class="input-group">
+                    <label class="input-label">Starting Point</label>
+                    <input id="startSubs" type="number" placeholder="Subscribers" />
+                    <input id="startViews" type="number" placeholder="Total Views" />
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Current Point</label>
+                    <input id="endSubs" type="number" placeholder="Subscribers" />
+                    <input id="endViews" type="number" placeholder="Total Views" />
+                </div>
+                <input id="daysBetween" type="number" placeholder="Days between these two points (e.g., 30)" />
+                <button class="btn btn-secondary" onclick="calculateManual()">
+                    <span class="btn-icon">📈</span>
+                    <span>Calculate Growth</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="resultArea" class="results-section"></div>
+    </div>
+
+    <script>
+        function toggleManualForm() {
+            const manualForm = document.getElementById('manualForm');
+            if (manualForm.style.display === 'block') {
+                manualForm.style.display = 'none';
+            } else {
+                manualForm.style.display = 'block';
+            }
+        }
+
+        // Pulls the channel handle / custom name / username / ID out of a pasted URL
+        function parseChannelUrl(rawUrl) {
+            let url = rawUrl.trim();
+            if (!url.startsWith("http")) url = "https://www.youtube.com/" + url.replace(/^\/*/, "");
+
+            const channelIdMatch = url.match(/\/channel\/(UC[\w-]{22})/i);
+            if (channelIdMatch) return { type: "id", value: channelIdMatch[1] };
+
+            const handleMatch = url.match(/\/@([\w.-]+)/);
+            if (handleMatch) return { type: "handle", value: handleMatch[1] };
+
+            const userMatch = url.match(/\/user\/([\w.-]+)/i);
+            if (userMatch) return { type: "username", value: userMatch[1] };
+
+            const customMatch = url.match(/\/c\/([\w.-]+)/i);
+            if (customMatch) return { type: "custom", value: customMatch[1] };
+
+            // Bare "@handle" or plain name typed without a full URL
+            const bareHandle = rawUrl.trim().match(/^@?([\w.-]+)$/);
+            if (bareHandle) return { type: "handle", value: bareHandle[1] };
+
+            return null;
+        }
+
+        async function ytApi(path, params, apiKey) {
+            const qs = new URLSearchParams({ ...params, key: apiKey }).toString();
+            const res = await fetch(`https://www.googleapis.com/youtube/v3/${path}?${qs}`);
+            const data = await res.json();
+            if (!res.ok) {
+                const msg = (data && data.error && data.error.message) || `Request failed (${res.status})`;
+                throw new Error(msg);
+            }
+            return data;
+        }
+
+        // Resolves any channel URL shape to a channel resource, trying every
+        // strategy the Data API supports and falling back to search.
+        async function resolveChannel(parsed, apiKey) {
+            const part = "snippet,statistics";
+            let data = null;
+
+            if (parsed.type === "id") {
+                data = await ytApi("channels", { part, id: parsed.value }, apiKey);
+            } else if (parsed.type === "handle") {
+                data = await ytApi("channels", { part, forHandle: "@" + parsed.value }, apiKey);
+            } else if (parsed.type === "username") {
+                data = await ytApi("channels", { part, forUsername: parsed.value }, apiKey);
+            }
+
+            if (data && data.items && data.items.length > 0) return data.items[0];
+
+            // Fallback: search by name/handle/custom-URL text and resolve the top hit
+            const searchData = await ytApi("search", { part: "snippet", type: "channel", q: parsed.value, maxResults: 1 }, apiKey);
+            if (!searchData.items || searchData.items.length === 0) return null;
+
+            const foundId = searchData.items[0].snippet.channelId || searchData.items[0].id.channelId;
+            const channelData = await ytApi("channels", { part, id: foundId }, apiKey);
+            if (!channelData.items || channelData.items.length === 0) return null;
+            return channelData.items[0];
+        }
+
+        async function fetchChannelData() {
+            const channelUrl = document.getElementById("channelUrl").value.trim();
+            const apiKey = document.getElementById("apiKey").value.trim();
+            const status = document.getElementById("statusMessage");
+            const loading = document.getElementById("loading");
+            const results = document.getElementById("resultArea");
+
+            if (!channelUrl) {
+                status.innerHTML = '<span style="color: var(--accent-red);">⚠️ Please enter a YouTube channel URL.</span>';
+                results.style.display = "none";
+                return;
+            }
+
+            loading.style.display = "block";
+            status.innerHTML = "";
+            results.style.display = "none";
+
+            // No API key entered -> demo mode (simulated numbers, always works)
+            if (!apiKey) {
+                setTimeout(() => {
+                    const demoData = generateDemoData(channelUrl);
+                    loading.style.display = "none";
+                    status.innerHTML = '<span style="color: var(--accent-gold);">ℹ️ Demo mode (no API key entered) — showing simulated numbers.</span>';
+                    displayResults(demoData);
+                }, 1200);
+                return;
+            }
+
+            // Real API mode
+            try {
+                const parsed = parseChannelUrl(channelUrl);
+                if (!parsed) {
+                    throw new Error("Couldn't understand that URL. Try a /@handle, /channel/UC... or /c/Name link.");
+                }
+
+                const channel = await resolveChannel(parsed, apiKey);
+                loading.style.display = "none";
+
+                if (!channel) {
+                    status.innerHTML = '<span style="color: var(--accent-red);">❌ Channel not found. Please check the URL, or use manual entry.</span>';
+                    results.style.display = "none";
+                    return;
+                }
+
+                const stats = channel.statistics || {};
+                const subscriberCount = parseInt(stats.subscriberCount, 10) || 0;
+                const viewCount = parseInt(stats.viewCount, 10) || 0;
+                const publishedAt = channel.snippet && channel.snippet.publishedAt;
+                const daysSinceCreation = publishedAt
+                    ? Math.max(1, Math.floor((Date.now() - new Date(publishedAt).getTime()) / 86400000))
+                    : 365;
+
+                // The public Data API only returns current totals, not historical
+                // snapshots, so growth is approximated as the channel's lifetime
+                // daily average projected over the last 30 days.
+                const subsPerDay = subscriberCount / daysSinceCreation;
+                const viewsPerDay = viewCount / daysSinceCreation;
+                const windowDays = 30;
+
+                const realData = {
+                    channelName: channel.snippet ? channel.snippet.title : parsed.value,
+                    startSubs: Math.max(0, Math.round(subscriberCount - subsPerDay * windowDays)),
+                    endSubs: subscriberCount,
+                    startViews: Math.max(0, Math.round(viewCount - viewsPerDay * windowDays)),
+                    endViews: viewCount,
+                    days: windowDays,
+                    timestamp: new Date().toISOString()
+                };
+
+                status.innerHTML = '<span style="color: var(--accent-green);">✅ Real channel data fetched! (growth is a lifetime-average estimate — the public API doesn\'t expose historical snapshots)</span>';
+                displayResults(realData);
+            } catch (err) {
+                loading.style.display = "none";
+                status.innerHTML = `<span style="color: var(--accent-red);">❌ ${err.message || "Something went wrong."} Please try again or use manual entry.</span>`;
+                results.style.display = "none";
+            }
+        }
+
+        function generateDemoData(channelUrl) {
+            // Extract channel name from URL for demo purposes
+            let channelName = "Your Channel";
+            if (channelUrl.includes("@")) {
+                channelName = channelUrl.split("@")[1].split("/")[0] || "Your Channel";
+            } else if (channelUrl.includes("channel/")) {
+                channelName = channelUrl.split("channel/")[1].split("/")[0] || "Your Channel";
+            }
+
+            // Generate realistic demo data
+            const baseSubs = Math.floor(Math.random() * 5000) + 1000;
+            const baseViews = Math.floor(Math.random() * 500000) + 100000;
+            const days = Math.floor(Math.random() * 60) + 30;
+            
+            const growthRate = 0.05 + Math.random() * 0.15; // 5% to 20% growth
+            
+            const startSubs = baseSubs;
+            const endSubs = Math.floor(startSubs * (1 + growthRate));
+            const startViews = baseViews;
+            const endViews = Math.floor(startViews * (1 + growthRate * 2));
+
+            return {
+                channelName: channelName,
+                startSubs: startSubs,
+                endSubs: endSubs,
+                startViews: startViews,
+                endViews: endViews,
+                days: days,
+                timestamp: new Date().toISOString()
+            };
+        }
+
+        // --- small deterministic RNG so the same channel always draws the same trend line ---
+        function hashSeed(str) {
+            let h = 0;
+            for (let i = 0; i < str.length; i++) { h = (h << 5) - h + str.charCodeAt(i); h |= 0; }
+            return Math.abs(h) || 1;
+        }
+        function seededRand(seed) {
+            let s = seed % 2147483647;
+            if (s <= 0) s += 2147483646;
+            return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+        }
+
+        // Builds a plausible day-by-day path between two known totals (real APIs
+        // only give us the two endpoints, not the days in between)
+        function buildTrend(start, end, seed, n = 20) {
+            const rand = seededRand(seed);
+            const pts = [];
+            for (let i = 0; i < n; i++) {
+                const t = i / (n - 1);
+                const eased = t * t * (3 - 2 * t); // smoothstep, so it isn't a straight ramp
+                const base = start + (end - start) * eased;
+                const noise = (rand() - 0.5) * Math.abs(end - start || start * 0.05) * 0.1;
+                pts.push(base + noise);
+            }
+            pts[0] = start;
+            pts[n - 1] = end;
+            return pts;
+        }
+
+        function smoothPath(coords) {
+            let d = `M ${coords[0][0].toFixed(1)} ${coords[0][1].toFixed(1)}`;
+            for (let i = 1; i < coords.length; i++) {
+                const [x0, y0] = coords[i - 1];
+                const [x1, y1] = coords[i];
+                d += ` Q ${x0.toFixed(1)} ${y0.toFixed(1)} ${((x0 + x1) / 2).toFixed(1)} ${((y0 + y1) / 2).toFixed(1)}`;
+            }
+            const last = coords[coords.length - 1];
+            d += ` L ${last[0].toFixed(1)} ${last[1].toFixed(1)}`;
+            return d;
+        }
+
+        function trendChartSvg(pts, color, w = 640, h = 130, pad = 6) {
+            const minV = Math.min(...pts), maxV = Math.max(...pts);
+            const range = (maxV - minV) || 1;
+            const coords = pts.map((v, i) => [
+                (i / (pts.length - 1)) * w,
+                pad + (h - pad * 2) - ((v - minV) / range) * (h - pad * 2)
+            ]);
+            const linePath = smoothPath(coords);
+            const areaPath = `${linePath} L ${w} ${h} L 0 ${h} Z`;
+            const [lastX, lastY] = coords[coords.length - 1];
+            const gradId = 'grad_' + Math.round(minV) + '_' + Math.round(maxV);
+            return `
+                <svg class="trend-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="${color}" stop-opacity="0.35"/>
+                            <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="${areaPath}" fill="url(#${gradId})" stroke="none"/>
+                    <path d="${linePath}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="${lastX}" cy="${lastY}" r="4.5" fill="${color}"/>
+                    <circle cx="${lastX}" cy="${lastY}" r="8" fill="${color}" opacity="0.25"/>
+                </svg>`;
+        }
+
+        function growthRing(pct, color) {
+            const r = 30, cx = 38, cy = 38;
+            const clamped = Math.max(0, Math.min(100, Math.abs(pct)));
+            const circumference = 2 * Math.PI * r;
+            const offset = circumference * (1 - clamped / 100);
+            return `
+                <svg class="ring-svg" width="76" height="76" viewBox="0 0 76 76">
+                    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--panel-line)" stroke-width="7"/>
+                    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="7"
+                        stroke-linecap="round" stroke-dasharray="${circumference.toFixed(1)}"
+                        stroke-dashoffset="${offset.toFixed(1)}"/>
+                </svg>`;
+        }
+
+        function displayResults(data) {
+            const results = document.getElementById("resultArea");
+
+            const subsGained = data.endSubs - data.startSubs;
+            const viewsGained = data.endViews - data.startViews;
+            const subsPerDay = subsGained / data.days;
+            const viewsPerDay = viewsGained / data.days;
+
+            const subsGrowthPct = data.startSubs > 0 ? (subsGained / data.startSubs) * 100 : 0;
+            const viewsGrowthPct = data.startViews > 0 ? (viewsGained / data.startViews) * 100 : 0;
+
+            const proj30Subs = Math.round(data.endSubs + subsPerDay * 30);
+            const proj90Subs = Math.round(data.endSubs + subsPerDay * 90);
+            const proj180Subs = Math.round(data.endSubs + subsPerDay * 180);
+            const annualSubs = Math.round(data.endSubs + subsPerDay * 365);
+
+            const subsUp = subsGained >= 0;
+            const viewsUp = viewsGained >= 0;
+            const subsColor = subsUp ? 'up' : 'down';
+            const viewsColor = viewsUp ? 'up' : 'down';
+            const subsColorVar = subsUp ? 'var(--up)' : 'var(--down)';
+            const viewsColorVar = viewsUp ? 'var(--up)' : 'var(--down)';
+
+            const seed = hashSeed(data.channelName + data.endSubs);
+            const subsTrend = buildTrend(data.startSubs, data.endSubs, seed);
+
+            results.style.display = "block";
+            results.innerHTML = `
+                <div class="dash">
+                    <div class="dash-top">
+                        <div class="dash-id">
+                            <span class="dash-name">${data.channelName}</span>
+                            <span class="dash-date">${new Date(data.timestamp).toLocaleDateString()}</span>
+                        </div>
+                        <div class="dash-badge ${subsColor}">${subsUp ? '↑' : '↓'} ${Math.abs(subsGrowthPct).toFixed(1)}% over ${data.days}d</div>
+                    </div>
+
+                    <div class="hero-row">
+                        <div class="hero-panel">
+                            <div class="hero-eyebrow">Subscribers</div>
+                            <div class="hero-number">${data.endSubs.toLocaleString()}</div>
+                            <div class="hero-delta ${subsColor}">${subsUp ? '+' : ''}${subsGained.toLocaleString()} in the last ${data.days} days</div>
+                            <div class="hero-spark">${trendChartSvg(subsTrend, subsColorVar, 300, 110)}</div>
+                        </div>
+                        <div class="secondary-stack">
+                            <div class="sec-panel">
+                                <div class="sec-label">Total views</div>
+                                <div class="sec-number views">${data.endViews.toLocaleString()}</div>
+                            </div>
+                            <div class="sec-panel">
+                                <div class="sec-label">Subs / day (avg)</div>
+                                <div class="sec-number">${subsPerDay.toFixed(1)}</div>
+                            </div>
+                            <div class="sec-panel">
+                                <div class="sec-label">Views / day (avg)</div>
+                                <div class="sec-number">${Math.round(viewsPerDay).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="trend-panel">
+                        <div class="trend-head">
+                            <span>Subscriber trend</span>
+                            <span class="trend-range">${data.days}-day window</span>
+                        </div>
+                        ${trendChartSvg(subsTrend, subsColorVar, 640, 130)}
+                    </div>
+
+                    <div class="rings-row">
+                        <div class="ring-panel">
+                            ${growthRing(subsGrowthPct, subsColorVar)}
+                            <div class="ring-text">
+                                <div class="ring-pct" style="color:${subsColorVar}">${subsUp ? '+' : ''}${subsGrowthPct.toFixed(1)}%</div>
+                                <div class="ring-label">Subscriber growth</div>
+                            </div>
+                        </div>
+                        <div class="ring-panel">
+                            ${growthRing(viewsGrowthPct, viewsColorVar)}
+                            <div class="ring-text">
+                                <div class="ring-pct" style="color:${viewsColorVar}">${viewsUp ? '+' : ''}${viewsGrowthPct.toFixed(1)}%</div>
+                                <div class="ring-label">View growth</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-panel">
+                        <div class="timeline-head">🔮 Projected subscriber trajectory</div>
+                        <div class="timeline-track">
+                            <div class="tl-point" style="left:0%">
+                                <span class="tl-dot"></span>
+                                <div class="tl-val">${data.endSubs.toLocaleString()}</div>
+                                <div class="tl-lbl">Now</div>
+                            </div>
+                            <div class="tl-point" style="left:25%">
+                                <span class="tl-dot"></span>
+                                <div class="tl-val">${proj30Subs.toLocaleString()}</div>
+                                <div class="tl-lbl">30 days</div>
+                            </div>
+                            <div class="tl-point" style="left:50%">
+                                <span class="tl-dot"></span>
+                                <div class="tl-val">${proj90Subs.toLocaleString()}</div>
+                                <div class="tl-lbl">90 days</div>
+                            </div>
+                            <div class="tl-point" style="left:75%">
+                                <span class="tl-dot"></span>
+                                <div class="tl-val">${proj180Subs.toLocaleString()}</div>
+                                <div class="tl-lbl">6 months</div>
+                            </div>
+                            <div class="tl-point" style="left:100%">
+                                <span class="tl-dot"></span>
+                                <div class="tl-val">${annualSubs.toLocaleString()}</div>
+                                <div class="tl-lbl">1 year</div>
+                            </div>
+                        </div>
+                        <p class="disclaimer" style="margin-top:36px;">
+                            ⚡ Projections extend your current growth rate in a straight line — actual results depend on content quality, algorithm changes, and audience engagement.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateManual() {
+            const startSubs = parseFloat(document.getElementById("startSubs").value) || 0;
+            const endSubs = parseFloat(document.getElementById("endSubs").value) || 0;
+            const startViews = parseFloat(document.getElementById("startViews").value) || 0;
+            const endViews = parseFloat(document.getElementById("endViews").value) || 0;
+            const days = parseFloat(document.getElementById("daysBetween").value) || 0;
+
+            const status = document.getElementById("statusMessage");
+            const results = document.getElementById("resultArea");
+
+            if (days <= 0 || (startSubs === 0 && startViews === 0)) {
+                status.innerHTML = '<span style="color: var(--accent-red);">⚠️ Please fill in your starting stats and the number of days.</span>';
+                results.style.display = "none";
+                return;
+            }
+
+            const demoData = {
+                channelName: "Manual Entry",
+                startSubs: startSubs,
+                endSubs: endSubs,
+                startViews: startViews,
+                endViews: endViews,
+                days: days,
+                timestamp: new Date().toISOString()
+            };
+
+            status.innerHTML = '<span style="color: var(--accent-green);">✅ Analysis complete!</span>';
+            displayResults(demoData);
+        }
+    </script>
+</body>
+</html>
