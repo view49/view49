@@ -307,6 +307,11 @@
             text-shadow: var(--glow-gold);
         }
 
+        .stat-value.purple {
+            color: var(--accent-purple);
+            text-shadow: 0 0 20px rgba(175, 82, 222, 0.3);
+        }
+
         .stat-growth {
             font-size: 12px;
             color: var(--text-secondary);
@@ -357,6 +362,7 @@
             display: flex;
             gap: 20px;
             margin-top: 10px;
+            flex-wrap: wrap;
         }
 
         .channel-stat {
@@ -555,6 +561,11 @@
             font-weight: 600 !important;
         }
 
+        .success-message {
+            color: var(--accent-green) !important;
+            font-weight: 600 !important;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -654,37 +665,47 @@
         }
 
         function extractChannelId(url) {
-            // Handle different YouTube URL formats
-            if (url.includes("youtube.com/c/")) {
-                // Handle /c/username URLs
-                const parts = url.split("/c/");
-                if (parts.length > 1) {
-                    const username = parts[1].split("/")[0];
-                    return username;
-                }
-            } else if (url.includes("youtube.com/@")) {
-                // Handle @username URLs
-                const parts = url.split("@");
-                if (parts.length > 1) {
-                    const username = parts[1].split("/")[0];
-                    return username;
-                }
-            } else if (url.includes("youtube.com/channel/")) {
-                // Handle /channel/UC... IDs
-                const parts = url.split("/channel/");
-                if (parts.length > 1) {
-                    const channelId = parts[1].split("/")[0];
-                    return channelId;
-                }
-            } else if (url.includes("youtube.com/user/")) {
-                // Handle /user/username URLs
-                const parts = url.split("/user/");
-                if (parts.length > 1) {
-                    const username = parts[1].split("/")[0];
-                    return username;
-                }
+            // Handle @username URLs
+            if (url.includes("youtube.com/@")) {
+                const username = url.split("youtube.com/@")[1].split("/")[0];
+                return { type: "handle", value: username };
+            }
+            // Handle /c/username URLs
+            else if (url.includes("youtube.com/c/")) {
+                const username = url.split("youtube.com/c/")[1].split("/")[0];
+                return { type: "handle", value: username };
+            }
+            // Handle /user/username URLs
+            else if (url.includes("youtube.com/user/")) {
+                const username = url.split("youtube.com/user/")[1].split("/")[0];
+                return { type: "username", value: username };
+            }
+            // Handle /channel/UC... IDs
+            else if (url.includes("youtube.com/channel/")) {
+                const channelId = url.split("youtube.com/channel/")[1].split("/")[0];
+                return { type: "id", value: channelId };
+            }
+            // Handle direct channel ID
+            else if (url.match(/^[UC]{2}[0-9A-Za-z_-]{22}$/)) {
+                return { type: "id", value: url };
             }
             return null;
+        }
+
+        async function getChannelIdFromHandle(handle) {
+            try {
+                const response = await fetch(
+                    `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q=${encodeURIComponent(handle)}&maxResults=1&key=${API_KEY}`
+                );
+                const data = await response.json();
+                if (data.items && data.items.length > 0) {
+                    return data.items[0].snippet.channelId;
+                }
+                return null;
+            } catch (error) {
+                console.error("Error getting channel ID from handle:", error);
+                return null;
+            }
         }
 
         async function fetchChannelData() {
@@ -705,90 +726,112 @@
             results.style.display = "none";
 
             try {
-                const channelIdentifier = extractChannelId(channelUrl);
-                if (!channelIdentifier) {
-                    throw new Error("Invalid YouTube channel URL");
+                const channelInfo = extractChannelId(channelUrl);
+                if (!channelInfo) {
+                    throw new Error("Invalid YouTube channel URL format");
                 }
 
-                // First, try to get channel details
+                let channelId = null;
+                
+                // If we already have a channel ID
+                if (channelInfo.type === "id") {
+                    channelId = channelInfo.value;
+                } else {
+                    // For handles and usernames, we need to search for the channel ID
+                    channelId = await getChannelIdFromHandle(channelInfo.value);
+                    if (!channelId) {
+                        throw new Error("Channel not found. Please check the URL.");
+                    }
+                }
+
+                // Get channel details using the channel ID
                 const channelResponse = await fetch(
-                    `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&forUsername=${channelIdentifier}&key=${API_KEY}`
+                    `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,contentDetails&id=${channelId}&key=${API_KEY}`
                 );
                 
-                let channelData = await channelResponse.json();
+                const channelData = await channelResponse.json();
                 
-                // If no channel found with username, try as channel ID
-                if (!channelData.items || channelData.items.length === 0) {
-                    const channelIdResponse = await fetch(
-                        `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${channelIdentifier}&key=${API_KEY}`
-                    );
-                    channelData = await channelIdResponse.json();
-                }
-
                 if (!channelData.items || channelData.items.length === 0) {
                     throw new Error("Channel not found. Please check the URL.");
                 }
 
                 const channel = channelData.items[0];
-                const channelId = channel.id;
                 const channelName = channel.snippet.title;
                 const channelThumbnail = channel.snippet.thumbnails.high.url;
                 const subscriberCount = parseInt(channel.statistics.subscriberCount);
                 const viewCount = parseInt(channel.statistics.viewCount);
                 const videoCount = parseInt(channel.statistics.videoCount);
+                const publishedAt = new Date(channel.snippet.publishedAt);
 
                 // Get uploads playlist ID
                 const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads;
                 
                 // Get recent videos to calculate growth
-                const videosResponse = await fetch(
-                    `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=50&key=${API_KEY}`
-                );
-                const videosData = await videosResponse.json();
+                let avgViewsPerDay = 0;
+                let recentVideoCount = 0;
+                let daysBetweenVideos = 30;
                 
-                // Calculate growth metrics
-                const now = new Date();
-                let oldestVideoDate = now;
-                let newestVideoDate = now;
-                let totalViewsFromVideos = 0;
-                
-                if (videosData.items && videosData.items.length > 0) {
-                    const videoIds = videosData.items.map(item => item.snippet.resourceId.videoId).join(",");
-                    
-                    const videoStatsResponse = await fetch(
-                        `https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet&id=${videoIds}&key=${API_KEY}`
+                try {
+                    const videosResponse = await fetch(
+                        `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=50&key=${API_KEY}`
                     );
-                    const videoStatsData = await videoStatsResponse.json();
+                    const videosData = await videosResponse.json();
                     
-                    videoStatsData.items.forEach(video => {
-                        const publishedAt = new Date(video.snippet.publishedAt);
-                        const views = parseInt(video.statistics.viewCount) || 0;
+                    if (videosData.items && videosData.items.length > 0) {
+                        const videoIds = videosData.items.map(item => item.snippet.resourceId.videoId).join(",");
                         
-                        totalViewsFromVideos += views;
+                        const videoStatsResponse = await fetch(
+                            `https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet&id=${videoIds}&key=${API_KEY}`
+                        );
+                        const videoStatsData = await videoStatsResponse.json();
                         
-                        if (publishedAt < oldestVideoDate) oldestVideoDate = publishedAt;
-                        if (publishedAt > newestVideoDate) newestVideoDate = publishedAt;
-                    });
+                        let oldestVideoDate = new Date();
+                        let newestVideoDate = new Date();
+                        let totalViewsFromVideos = 0;
+                        
+                        videoStatsData.items.forEach(video => {
+                            const publishedAt = new Date(video.snippet.publishedAt);
+                            const views = parseInt(video.statistics.viewCount) || 0;
+                            
+                            totalViewsFromVideos += views;
+                            recentVideoCount++;
+                            
+                            if (publishedAt < oldestVideoDate) oldestVideoDate = publishedAt;
+                            if (publishedAt > newestVideoDate) newestVideoDate = publishedAt;
+                        });
+                        
+                        daysBetweenVideos = Math.floor((newestVideoDate - oldestVideoDate) / (1000 * 60 * 60 * 24)) || 30;
+                        avgViewsPerDay = daysBetweenVideos > 0 ? Math.floor(totalViewsFromVideos / daysBetweenVideos) : 0;
+                    }
+                } catch (videoError) {
+                    console.log("Could not fetch video data, using fallback calculation");
+                    // Fallback calculation
+                    const now = new Date();
+                    daysBetweenVideos = Math.floor((now - publishedAt) / (1000 * 60 * 60 * 24)) || 1;
+                    avgViewsPerDay = daysBetweenVideos > 0 ? Math.floor(viewCount / daysBetweenVideos) : 0;
                 }
 
-                const daysBetween = Math.floor((newestVideoDate - oldestVideoDate) / (1000 * 60 * 60 * 24)) || 30;
-                const avgViewsPerDay = daysBetween > 0 ? Math.floor(totalViewsFromVideos / daysBetween) : 0;
-                const avgVideosPerDay = daysBetween > 0 ? (videoCount / ((now - new Date(channel.snippet.publishedAt)) / (1000 * 60 * 60 * 24))) : 0;
+                const now = new Date();
+                const daysActive = Math.floor((now - publishedAt) / (1000 * 60 * 60 * 24)) || 1;
+                const subsPerDay = (subscriberCount / daysActive).toFixed(1);
+                const videosPerDay = (videoCount / daysActive).toFixed(2);
 
                 // Display results
                 loading.style.display = "none";
-                status.innerHTML = '<span style="color: var(--accent-green);">✅ Channel data fetched successfully!</span>';
+                status.innerHTML = '<span class="success-message">✅ Channel data fetched successfully!</span>';
                 displayResults({
                     channelName: channelName,
                     channelThumbnail: channelThumbnail,
                     channelUrl: channelUrl,
+                    channelId: channelId,
                     subscriberCount: subscriberCount,
                     viewCount: viewCount,
                     videoCount: videoCount,
-                    publishedAt: channel.snippet.publishedAt,
+                    publishedAt: publishedAt,
                     avgViewsPerDay: avgViewsPerDay,
-                    avgVideosPerDay: avgVideosPerDay.toFixed(2),
-                    daysActive: Math.floor((now - new Date(channel.snippet.publishedAt)) / (1000 * 60 * 60 * 24))
+                    avgVideosPerDay: videosPerDay,
+                    daysActive: daysActive,
+                    recentVideoCount: recentVideoCount
                 });
 
             } catch (error) {
@@ -976,16 +1019,18 @@
                 channelName: "Manual Entry",
                 channelThumbnail: "https://via.placeholder.com/80x80?text=YT",
                 channelUrl: "#",
+                channelId: "manual",
                 subscriberCount: endSubs,
                 viewCount: endViews,
                 videoCount: 0,
                 publishedAt: new Date().toISOString(),
                 avgViewsPerDay: Math.round((endViews - startViews) / days),
                 avgVideosPerDay: "0",
-                daysActive: days
+                daysActive: days,
+                recentVideoCount: 0
             };
 
-            status.innerHTML = '<span style="color: var(--accent-green);">✅ Analysis complete!</span>';
+            status.innerHTML = '<span class="success-message">✅ Analysis complete!</span>';
             displayResults(demoData);
         }
     </script>
